@@ -8,7 +8,7 @@ var CoreParticle = require('./CoreParticle');
 var GeomUtils = require('../../geom/GeomUtils');
 
 
-
+//TODO Fix comments
 
 inherits(TracerParticle, CoreParticle);
 
@@ -71,7 +71,6 @@ TracerParticle.prototype.updateDirection = function (newDirection) {
 }
 
 /**
- *
  * @function updateJoints
  */
 TracerParticle.prototype.updateJoints = function () {
@@ -85,7 +84,6 @@ TracerParticle.prototype.updateJoints = function () {
     }
 }
 /**
- *
  * @function updateJointSize
  */
 TracerParticle.prototype.updateSize = function () {
@@ -98,7 +96,7 @@ TracerParticle.prototype.updateSize = function () {
 
 
 /**
- * @see CoreParticle.draw
+ * @see CoreParticle.update
  */
 TracerParticle.prototype.update = function (time) {
 
@@ -138,12 +136,6 @@ TracerParticle.prototype.update = function (time) {
  * @see CoreParticle.draw
  */
 TracerParticle.prototype.draw = function (context) {
-
-    context.fillStyle = "rgba(" + this.color + ", " + this.opacity + ")";
-    context.beginPath();
-
-    context.fill();
-    context.closePath();
 
     var distance, cp1, cp2;
     var followerLeftX, followerLeftY;
