@@ -153,7 +153,7 @@ FocusListener.prototype.destruct = function () {
     if(this.isDestructed) return;
     this.disable();
     this.onChangeCallback = null;
-    FocusListener.super_.call(this);
+    FocusListener.super_.destruct.call(this);
 }
 
 module.exports = FocusListener;
