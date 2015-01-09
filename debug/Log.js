@@ -12,7 +12,7 @@ Log.PRETTY_FORMATTING = true;
 Log.SENDER_PADDING = 120; // defines how much padding is given to the sender name
 
 /**
- * Light-weight (Singleton) logging class for logging message to the console.
+ * Light-weight (Singleton) logging class for logging messages and/or data to the console.
  * @private
  * @constructor
  */
