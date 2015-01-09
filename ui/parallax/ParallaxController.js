@@ -2,7 +2,7 @@
  * Created by gfokke on 24/11/14.
  */
 
-ObjectUtils = require('../../utils/ObjectUtils');
+ObjectUtils = require('../../utils/objectUtils');
 Log = require('../../debug/Log');
 
 // Just a check to make sure people do not try to instantiate the Singleton themselves.

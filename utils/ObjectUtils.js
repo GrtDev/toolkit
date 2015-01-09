@@ -7,7 +7,7 @@
 /**
  * @namespace
  */
-var ObjectUtils = {};
+var objectUtils = {};
 
 
 /**
@@ -17,7 +17,7 @@ var ObjectUtils = {};
  * @param var_args {...string}   - method names to check
  * @returns {boolean}   - returns wether the object has all the defined methods.
  */
-ObjectUtils.hasMethods = function (object, var_args) {
+objectUtils.hasMethods = function (object, var_args) {
     var i = 1, methodName;
     while ((methodName = arguments[i++])) if(typeof object[methodName] != 'function') return false;
     return true;
@@ -30,9 +30,9 @@ var classNameRegExp = new RegExp('function (.{1,})\\(');
  * @param object {object}
  * @returns {string}
  */
-ObjectUtils.getName = function (object) {
+objectUtils.getName = function (object) {
     var results = classNameRegExp.exec(object.constructor.toString());
     return (results && results.length > 1) ? results[1] : object.constructor.toString();
 }
 
-module.exports = ObjectUtils;
+module.exports = objectUtils;

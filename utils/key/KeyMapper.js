@@ -149,7 +149,7 @@ KeyMapper.prototype.destruct = function () {
     if(this.isDestructed) return;
     this.disable();
     this.clear();
-    KeyMapper.super_.destruct.call(this);
+    KeyMapper.super_.prototype.destruct.call(this);
 }
 
 module.exports = KeyMapper;

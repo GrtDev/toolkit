@@ -5,7 +5,7 @@
 
 var inherits = require('../../utils/inherits');
 var CoreParticle = require('./CoreParticle');
-var GeomUtils = require('../../geom/GeomUtils');
+var GeomUtils = require('../../geom/geomUtils');
 
 
 //TODO Fix comments
@@ -15,7 +15,7 @@ inherits(TracerParticle, CoreParticle);
 /**
  * @see CoreParticle
  * @constructor
- * @augments CoreParticle
+ * @extends CoreParticle
  */
 function TracerParticle(opt_params) {
 
@@ -64,7 +64,7 @@ function TracerParticle(opt_params) {
  */
 TracerParticle.prototype.updateDirection = function (newDirection) {
 
-    var change = GeomUtils.differenceAngle(this.direction, newDirection);
+    var change = geomUtils.differenceAngle(this.direction, newDirection);
     if (change > this.maxDirectionChange) change = this.maxDirectionChange;
     this.direction -= change;
 
@@ -100,7 +100,7 @@ TracerParticle.prototype.updateSize = function () {
  */
 TracerParticle.prototype.update = function (time) {
 
-    this.constructor.super_.prototype.update.call(this, time);
+    TracerParticle.super_.prototype.update.call(this, time);
 
     // update all the joints to keep it moving
     this.direction += this.directionChange;
@@ -109,19 +109,19 @@ TracerParticle.prototype.update = function (time) {
 
         var follower = this.joints[i]; // Joint
 
-        var distance = GeomUtils.distance(leader.x, leader.y, follower.x, follower.y);
+        var distance = geomUtils.distance(leader.x, leader.y, follower.x, follower.y);
         if (distance <= this.maxJointDistance) break; // followers will not be further either..
 
-        var angleToFollower = GeomUtils.angle(leader.x, leader.y, follower.x, follower.y);
-        var angleDifference = GeomUtils.differenceAngle(leader.direction - Math.PI, angleToFollower);
-        var newPosition = GeomUtils.polar(this.maxJointDistance, (angleToFollower + angleDifference * this.stiffness), leader.x, leader.y);
+        var angleToFollower = geomUtils.angle(leader.x, leader.y, follower.x, follower.y);
+        var angleDifference = geomUtils.differenceAngle(leader.direction - Math.PI, angleToFollower);
+        var newPosition = geomUtils.polar(this.maxJointDistance, (angleToFollower + angleDifference * this.stiffness), leader.x, leader.y);
 
         follower.x = newPosition.x;
         follower.y = newPosition.y;
 
-        var backOfLeader = GeomUtils.polar(this.maxJointDistance / 2, leader.direction - Math.PI, leader.x, leader.y);
-        var angleToBack = GeomUtils.angle(follower.x, follower.y, backOfLeader.x, backOfLeader.y);
-        angleDifference = GeomUtils.differenceAngle(follower.direction, angleToBack);
+        var backOfLeader = geomUtils.polar(this.maxJointDistance / 2, leader.direction - Math.PI, leader.x, leader.y);
+        var angleToBack = geomUtils.angle(follower.x, follower.y, backOfLeader.x, backOfLeader.y);
+        angleDifference = geomUtils.differenceAngle(follower.direction, angleToBack);
 
         follower.direction = follower.direction - angleDifference;
 
@@ -164,16 +164,16 @@ TracerParticle.prototype.draw = function (context) {
         followerLeftY = follower.y + Math.sin(follower.direction - Math.PI / 2) * follower.size / 2;
 
         // calculate the bezier control points
-        distance = GeomUtils.distance(leaderRightX, leaderRightY, followerRightX, followerRightY);
-        cp1 = GeomUtils.polar(distance / 3, leader.direction - Math.PI, leaderRightX, leaderRightY);
-        cp2 = GeomUtils.polar(distance / 3, follower.direction, followerRightX, followerRightY);
+        distance = geomUtils.distance(leaderRightX, leaderRightY, followerRightX, followerRightY);
+        cp1 = geomUtils.polar(distance / 3, leader.direction - Math.PI, leaderRightX, leaderRightY);
+        cp2 = geomUtils.polar(distance / 3, follower.direction, followerRightX, followerRightY);
         coords.push(cp1.x, cp1.y, cp2.x, cp2.y);
         coords.push(followerRightX, followerRightY);
 
         // calculate the bezier control points
-        distance = GeomUtils.distance(followerLeftX, followerLeftY, leaderLeftX, leaderLeftY);
-        cp1 = GeomUtils.polar(distance / 3, follower.direction, followerLeftX, followerLeftY);
-        cp2 = GeomUtils.polar(distance / 3, leader.direction - Math.PI, leaderLeftX, leaderLeftY);
+        distance = geomUtils.distance(followerLeftX, followerLeftY, leaderLeftX, leaderLeftY);
+        cp1 = geomUtils.polar(distance / 3, follower.direction, followerLeftX, followerLeftY);
+        cp2 = geomUtils.polar(distance / 3, leader.direction - Math.PI, leaderLeftX, leaderLeftY);
         coords.push(cp1.x, cp1.y, cp2.x, cp2.y);
         coords.push(leaderLeftX, leaderLeftY);
 

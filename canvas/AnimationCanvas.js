@@ -7,11 +7,11 @@
 require('../polyfill/requestAnimationFrame');
 
 var inherits = require('../utils/inherits');
-var CoreObject = require('../core/CoreObject')
+var CoreObject = require('../core/CoreObject');
 var AbstractAnimationLayer = require('./layer/AbstractAnimationLayer');
-var FocusListener = require('../utils/focus/FocusListener')
+var FocusListener = require('../utils/focus/FocusListener');
 
-inherits(AnimationCanvas, CoreObject)
+inherits(AnimationCanvas, CoreObject);
 
 /**
  * Creates a canvas object used for animations, works with 'AbstractAnimationLayer' to maintain layers and control the animations.
@@ -19,7 +19,7 @@ inherits(AnimationCanvas, CoreObject)
  * @param opt_id {string=} - id of the canvas HTMLElement, specify an id or it will take the first canvas element it can find.
  * @param opt_contextType {string='2d'} - type of canvas
  * @constructor
- * @augments CoreObject
+ * @extends CoreObject
  */
 function AnimationCanvas(opt_id, opt_contextType) {
     // initialize the super
@@ -42,51 +42,53 @@ function AnimationCanvas(opt_id, opt_contextType) {
 
 
     _this.pause = function () {
-        if (_isPaused) return;
-        if (_this.debug) _this.logDebug('pausing animation..');
+        if(_isPaused) return;
+        if(_this.debug) _this.logDebug('pausing animation..');
         stopAnimation();
         _isPaused = true;
     }
 
     _this.resume = function () {
-        if (!_isPaused) return;
-        if (_this.debug) _this.logDebug('resuming animation..');
+        if(!_isPaused) return;
+        if(_this.debug) _this.logDebug('resuming animation..');
         startAnimation();
         _isPaused = false;
     }
 
     function startAnimation() {
-        if (_isAnimating || (_stopOnBlur && !_focusListener.hasFocus)) return;
-        if (_this.debug) _this.logDebug('starting animation..');
+        if(_isAnimating || (_stopOnBlur && !_focusListener.hasFocus) || this.isDestructed) return;
+        if(_this.debug) _this.logDebug('starting animation..');
 
         _lastRun = Date.now();  // set initial value
-        _animationFrameRequestId = requestAnimationFrame(_this.update);
+        _animationFrameRequestId = requestAnimationFrame(update);
         _isAnimating = true;
-        if (_pausedNotification) _pausedNotification.style.display = _isAnimating ? 'none' : 'block';
+        if(_pausedNotification) _pausedNotification.style.display = _isAnimating ? 'none' : 'block';
     }
 
     function stopAnimation() {
-        if (!_isAnimating) return;
-        if (_this.debug) _this.logDebug('stopping animation..');
+        if(!_isAnimating) return;
+        if(_this.debug) _this.logDebug('stopping animation..');
 
         cancelAnimationFrame(_animationFrameRequestId);
         _isAnimating = false;
-        if (_pausedNotification) _pausedNotification.style.display = _isAnimating ? 'none' : 'block';
+        if(_pausedNotification) _pausedNotification.style.display = _isAnimating ? 'none' : 'block';
     }
 
 
     /**
      * Updates all the elements added to the canvas.
      * @function update
+     * @private
      */
-    this.update = function () {
-        if (_isAnimating) _animationFrameRequestId = requestAnimationFrame(_this.update);
+    function update() {
+        if(_this.isDestructed) return;
 
-        // clear canvas
-        if (_this.clearCanvas) _this.context.clearRect(0, 0, _this.htmlElement.width, _this.htmlElement.height);
+        if(_isAnimating) _animationFrameRequestId = requestAnimationFrame(update);
 
-        _timePassed = Date.now() - _lastRun; // in seconds
-        if (_this.updateCallback) _this.updateCallback(_timePassed); // trigger callback if set
+        if(_this.clearCanvas) _this.context.clearRect(0, 0, _this.htmlElement.width, _this.htmlElement.height); // clear canvas
+
+        _timePassed = Date.now() - _lastRun; // in milliseconds
+        if(_this.updateCallback) _this.updateCallback(_timePassed); // trigger callback if set
 
         for (var i = 0; i < _layersLength; i++) _layers[i].update(_timePassed, _this.context);
 
@@ -99,11 +101,11 @@ function AnimationCanvas(opt_id, opt_contextType) {
      * @param layer {AbstractAnimationLayer} - Element must contain an 'update; & 'draw(context)' function!
      */
     this.addAnimationLayer = function (layer) {
-        if (!(layer instanceof AbstractAnimationLayer)) {
+        if(!(layer instanceof AbstractAnimationLayer)) {
             _this.logError('Attempting to add an animation layer that does not extend the AbstractAnimationLayer class!', layer)
             return;
         }
-        if (_this.debug)_this.logDebug('Added layer to canvas: ' + layer);
+        if(_this.debug)_this.logDebug('Added layer to canvas: ' + layer);
 
         _layers.push(layer);
         _layersLength += 1;
@@ -118,15 +120,15 @@ function AnimationCanvas(opt_id, opt_contextType) {
      */
     _this.removeAnimationLayer = function (layer) {
         var index = _layers.indexOf(layer);
-        if (index < 0) {
+        if(index < 0) {
             _this.logError('Attempting to remove an animation layer that is not in the canvas.', layer);
             return null;
         }
         _layers.splice(index, 1);
         _layersLength -= 1;
 
-        if (_this.debug) _this.logDebug('Removed animation layer from canvas: ' + layer);
-        if (_layersLength <= 0) stopAnimation();
+        if(_this.debug) _this.logDebug('Removed animation layer from canvas: ' + layer);
+        if(_layersLength <= 0) stopAnimation();
     }
 
     function handleWindowFocusEvent(event) {
@@ -145,8 +147,8 @@ function AnimationCanvas(opt_id, opt_contextType) {
      * @param event
      */
     function onFocusChange(hasFocus) {
-        if (hasFocus) {
-            if (!_isAnimating && !_isPaused) startAnimation();
+        if(hasFocus) {
+            if(!_isAnimating && !_isPaused) startAnimation();
         }
         else {
             stopAnimation();
@@ -164,8 +166,9 @@ function AnimationCanvas(opt_id, opt_contextType) {
             return _pausedNotification;
         },
         set: function (value) {
+            if(_this.isDestructed) return;
             _pausedNotification = value;
-            if (_pausedNotification) _pausedNotification.style.display = _isAnimating ? 'none' : 'block';
+            if(_pausedNotification) _pausedNotification.style.display = _isAnimating ? 'none' : 'block';
         }
     });
 
@@ -182,14 +185,14 @@ function AnimationCanvas(opt_id, opt_contextType) {
             return _stopOnBlur;
         },
         set: function (value) {
-            if (_stopOnBlur === value) return;
+            if(_stopOnBlur === value || _this.isDestructed) return;
             _stopOnBlur = value;
 
-            if (_stopOnBlur && !_focusListener) {
+            if(_stopOnBlur && !_focusListener) {
                 _focusListener = new FocusListener(onFocusChange);
                 onFocusChange(_focusListener.hasFocus);
             }
-            if (_focusListener) _focusListener.enabled = _stopOnBlur;
+            if(_focusListener) _focusListener.enabled = _stopOnBlur;
         }
     });
 
@@ -210,7 +213,7 @@ function AnimationCanvas(opt_id, opt_contextType) {
      */
     Object.defineProperty(this, 'width', {
         get: function () {
-            return _this.htmlElement.width;
+            return _this.htmlElement && _this.htmlElement.width;
         }
     });
     /**
@@ -219,7 +222,7 @@ function AnimationCanvas(opt_id, opt_contextType) {
      */
     Object.defineProperty(this, 'height', {
         get: function () {
-            return _this.htmlElement.height;
+            return _this.htmlElement && _this.htmlElement.height;
         }
     });
 
@@ -236,10 +239,10 @@ function AnimationCanvas(opt_id, opt_contextType) {
  */
 AnimationCanvas.prototype.init = function (id, contextType) {
     var canvas = id ? document.getElementById(id) : document.getElementsByTagName('canvas');
-    if (canvas && canvas.length) canvas = canvas[0];
+    if(canvas && canvas.length) canvas = canvas[0];
     var context = canvas ? canvas.getContext(contextType || '2d') : null;
 
-    if (!canvas || !context) {
+    if(!canvas || !context) {
         this.logError('Failed to retrieve the canvas element...');
         return;
     }
@@ -283,6 +286,23 @@ AnimationCanvas.prototype.updateSize = function () {
     var parentSize = this.htmlElement.parentNode.getBoundingClientRect();
     this.htmlElement.width = parentSize.width;
     this.htmlElement.height = parentSize.height;
+}
+
+/**
+ * @see sector22/core/CoreObject#destruct
+ */
+AnimationCanvas.prototype.destruct = function () {
+    if(this.isDestructed) return;
+
+    window.removeEventListener('resize', this.handleWindowResizeEvent, false);
+
+    this.pause();
+    this.pausedNotification = null;
+
+    delete this.htmlElement;
+    delete this.context;
+
+    AnimationCanvas.super_.prototype.destruct();
 }
 
 

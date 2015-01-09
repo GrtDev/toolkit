@@ -4,7 +4,7 @@
  * @module sector22/utils
  */
 
-var UIUtils = {};
+var uiUtils = {};
 
 /**
  * Check if the element is within viewport.
@@ -13,11 +13,11 @@ var UIUtils = {};
  * @param   opt_complete {boolean=false}    - Check if the complete element is within the view.
  * @returns {boolean}                   - Returns whether the element is (completely) within viewport.
  */
-UIUtils.isElementInViewport = function (element, opt_complete) {
+uiUtils.isElementInViewport = function (element, opt_complete) {
 
     var rect = element.getBoundingClientRect();
 
-    return !complete ? (
+    return !opt_complete ? (
     rect.top <= window.innerHeight &&
     rect.bottom >= 0 &&
     rect.left <= window.innerWidth &&
@@ -30,4 +30,4 @@ UIUtils.isElementInViewport = function (element, opt_complete) {
     );
 }
 
-module.exports = UIUtils;
+module.exports = uiUtils;

@@ -7,7 +7,7 @@
 /**
  * @namespace
  */
-var ColorUtils = {};
+var colorUtils = {};
 
 /**
  * Calculates the rgb value between 2 colors given a percentage.
@@ -16,7 +16,7 @@ var ColorUtils = {};
  * @param percentage
  * @returns {string} - the new rgb value as string
  */
-ColorUtils.getGradientValue = function (rgb1, rgb2, percentage) {
+colorUtils.getGradientValue = function (rgb1, rgb2, percentage) {
     var rgb = rgb1.split(',');
 
     var red = parseInt(rgb[0]);
@@ -32,4 +32,4 @@ ColorUtils.getGradientValue = function (rgb1, rgb2, percentage) {
     return ((red << 0) + ',' + (green << 0) + ',' + (blue << 0));
 }
 
-module.exports = ColorUtils;
+module.exports = colorUtils;

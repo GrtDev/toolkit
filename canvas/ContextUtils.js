@@ -9,7 +9,7 @@ var Log = require('../debug/Log');
  * Collection of context helper functions to dot quick lines and shapes.
  * @namespace
  */
-var ContextUtils = {};
+var contextUtils = {};
 
 /**
  * Draws a dot using the given context
@@ -20,7 +20,7 @@ var ContextUtils = {};
  * @param opt_size {number=2}
  * @param opt_color {string=#FF0000}
  */
-ContextUtils.dot = function (context, x, y, opt_size, opt_color) {
+contextUtils.dot = function (context, x, y, opt_size, opt_color) {
 
     context.fillStyle = opt_color || '#FF0000';
     context.beginPath();
@@ -39,7 +39,7 @@ ContextUtils.dot = function (context, x, y, opt_size, opt_color) {
  * @param opt_size {number=2}
  * @param opt_color {string=#FF0000}
  */
-ContextUtils.circle = function (context, x, y, opt_size, opt_color) {
+contextUtils.circle = function (context, x, y, opt_size, opt_color) {
 
     context.strokeStyle = opt_color || '#FF0000';
     context.beginPath();
@@ -59,7 +59,7 @@ ContextUtils.circle = function (context, x, y, opt_size, opt_color) {
  *     - or -
  *     point, point2, opt_color
  */
-ContextUtils.line = function (context, var_args) {
+contextUtils.line = function (context, var_args) {
 
     if (arguments.length >= 5 && typeof arguments[1] === 'number') { // x & y values
         context.strokeStyle = arguments.length > 5 && typeof arguments[5] === 'string' ? arguments[5] : '#FF0000';
@@ -76,7 +76,7 @@ ContextUtils.line = function (context, var_args) {
         context.stroke();
         context.closePath();
     } else {
-        Log.warn('Invalid arguments on ContextUtils.line  : ' + arguments, this);
+        Log.warn('Invalid arguments on contextUtils.line  : ' + arguments, this);
     }
 
 }
@@ -91,7 +91,7 @@ ContextUtils.line = function (context, var_args) {
  * @param height
  * @param opt_color
  */
-ContextUtils.box = function (context, x, y, width, height, opt_color) {
+contextUtils.box = function (context, x, y, width, height, opt_color) {
     context.strokeStyle = opt_color || 'red';
     context.beginPath();
     context.rect(x, y, width, height);
@@ -99,4 +99,4 @@ ContextUtils.box = function (context, x, y, width, height, opt_color) {
     context.closePath();
 }
 
-module.exports = ContextUtils;
+module.exports = contextUtils;

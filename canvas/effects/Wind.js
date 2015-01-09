@@ -6,7 +6,7 @@
 var inherits = require('../../utils/inherits');
 
 var AbstractEffect = require('./AbstractEffect');
-var GeomUtils = require('../../geom/GeomUtils');
+var GeomUtils = require('../../geom/geomUtils');
 
 
 inherits(Wind, AbstractEffect);
@@ -41,15 +41,15 @@ Wind.prototype.applyEffect = function (particle, time) {
 
     if (time < 1 || !particle.wind.enabled) return;
     //console.log('this.direction: ' + (this.direction* 180/Math.PI)  + ' wind: ' + (_wind.direction * 180/Math.PI) +', dif: '+  (dif* 180/Math.PI));
-    particle.direction -= GeomUtils.differenceAngle(particle.direction, this.direction + particle.wind.directionOffset) * particle.wind.effect;
+    particle.direction -= geomUtils.differenceAngle(particle.direction, this.direction + particle.wind.directionOffset) * particle.wind.effect;
 
-    var moveTo = GeomUtils.polar(particle.speed * time, particle.direction);
-    var change = GeomUtils.polar(this.speed * time, this.direction);
+    var moveTo = geomUtils.polar(particle.speed * time, particle.direction);
+    var change = geomUtils.polar(this.speed * time, this.direction);
 
     moveTo.x += change.x;
     moveTo.y += change.y;
 
-    var speed = GeomUtils.distance(0, 0, moveTo.x, moveTo.y);
+    var speed = geomUtils.distance(0, 0, moveTo.x, moveTo.y);
 
     var newSpeed = (speed / time);
     if (newSpeed > this.speed) newSpeed = this.speed;

@@ -18,6 +18,7 @@ CoreObject.numObjects = 0;
  */
 function CoreObject() {
 
+    // @see CoreObject#isDestructed
     var _isDestructed;
 
     /**
@@ -37,8 +38,9 @@ function CoreObject() {
     /**
      * Returns whether the object has been destroyed and made available for the garbage collector.
      * @memberOf sector22/core.CoreObject
+     * @function isDestructed
      * @public
-     * @property isDestructed {boolean}
+     * @returns {boolean}
      * @readonly
      */
     Object.defineProperty(this, 'isDestructed', {
