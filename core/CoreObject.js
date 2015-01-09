@@ -4,10 +4,7 @@
  * @module sector22/core
  */
 
-var Log = require('../debug/Log');
-
-// retrieve a reference
-var log = Log.getInstance();
+var log = require('../debug/Log').getInstance();
 
 // Keeps count of the number of objects created.
 CoreObject.numObjects = 0;
@@ -51,7 +48,7 @@ function CoreObject() {
 
     /**
      * A callback for when the object has been completely destroyed and made available for the garbage collection.
-     * NOTE: Should only ever be called upon from the destruct method.
+     * NOTE: Should only ever be called upon from the destruct method in this "class"
      * @memberOf sector22/core.CoreObject
      * @private
      * @function onDestructed
@@ -67,55 +64,55 @@ function CoreObject() {
  * @memberOf sector22/core.CoreObject
  * @protected
  * @function logDebug
- * @param message {string|object} - Message or object to log.
- * @param opt_data {object=} - (optional) Object to log.
+ * @param var_args {...object} - messages and/or data to log.
  */
-CoreObject.prototype.logDebug = function (message, opt_data) {
-    log.debug(message, this, opt_data);
+CoreObject.prototype.logDebug = function (var_args) {
+    Array.prototype.unshift.call(arguments, this);
+    log.debug.apply(this, arguments);
 }
 /**
  * Function to log a info message,
  * @memberOf sector22/core.CoreObject
  * @protected
  * @function logInfo
- * @param message {string|object} - Message or object to log.
- * @param opt_data {object=} - (optional) Object to log.
+ * @param var_args {...object} - messages and/or data to log.
  */
-CoreObject.prototype.logInfo = function (message, opt_data) {
-    log.info(message, this, opt_data);
+CoreObject.prototype.logInfo = function (var_args) {
+    Array.prototype.unshift.call(arguments, this);
+    log.info.apply(this, arguments);
 }
 /**
  * Function to log a warning message,
  * @memberOf sector22/core.CoreObject
  * @protected
  * @function logWarn
- * @param message {string|object} - Message or object to log.
- * @param opt_data {object=} - (optional) Object to log.
+ * @param var_args {...object} - messages and/or data to log.
  */
-CoreObject.prototype.logWarn = function (message, opt_data) {
-    log.warn(message, this, opt_data);
+CoreObject.prototype.logWarn = function (var_args) {
+    Array.prototype.unshift.call(arguments, this);
+    log.warn.apply(this, arguments);
 }
 /**
  * Function to log a error message,
  * @memberOf sector22/core.CoreObject
  * @protected
  * @function logError
- * @param message {string|object} - Message or object to log.
- * @param opt_data {object=} - (optional) Object to log.
+ * @param var_args {...object} - messages and/or data to log.
  */
-CoreObject.prototype.logError = function (message, opt_data) {
-    log.error(message, this, opt_data);
+CoreObject.prototype.logError = function (var_args) {
+    Array.prototype.unshift.call(arguments, this);
+    log.error.apply(this, arguments);
 }
 /**
  * Function to log a fatal error message,
  * @memberOf sector22/core.CoreObject
  * @protected
  * @function logFatal
- * @param message {string|object} - Message or object to log.
- * @param opt_data {object=} - (optional) Object to log.
+ * @param var_args {...object} - messages and/or data to log.
  */
-CoreObject.prototype.logFatal = function (message, opt_data) {
-    log.fatal(message, this, opt_data);
+CoreObject.prototype.logFatal = function (var_args) {
+    Array.prototype.unshift.call(arguments, this);
+    log.fatal.apply(this, arguments);
 }
 
 /**
