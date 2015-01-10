@@ -17,7 +17,7 @@ Log.ALERT_FATALS = false;
  */
 Log.LINE_NUMBER = true;
 /**
- * Defines whether to retrieve a line number from where the log was called
+ * Defines whether to create a time stamp for each log
  * @static
  * @type {boolean}
  */
