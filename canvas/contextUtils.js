@@ -99,4 +99,5 @@ contextUtils.box = function (context, x, y, width, height, opt_color) {
     context.closePath();
 }
 
+if( typeof Object.freeze === 'function') Object.freeze(contextUtils) // lock the object to minimize accidental changes
 module.exports = contextUtils;

@@ -5,7 +5,7 @@
 
 var inherits = require('../../utils/inherits');
 var CoreParticle = require('./CoreParticle');
-var GeomUtils = require('../../geom/geomUtils');
+var geomUtils = require('../../geom/geomUtils');
 
 
 //TODO Fix comments

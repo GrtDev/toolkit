@@ -12,7 +12,7 @@ var systemUtils = {};
  * Checks the user agent and tries to figure out if the user is using a mobile browser.
  * NOTE: Mind you though that this technique is not fool proof!
  * @link http://detectmobilebrowsers.com/
- * @static
+ * @function isMobile
  * @returns {boolean}
  */
 systemUtils.isMobile = function () {
@@ -24,7 +24,7 @@ systemUtils.isMobile = function () {
  * Checks the user agent and tries to figure out if the user is using a mobile browser.
  * NOTE: Mind you though that this technique is not fool proof!
  * @link http://detectmobilebrowsers.com/
- * @static
+ * @function isTablet
  * @returns {boolean}
  */
 systemUtils.isTablet = function () {
@@ -36,7 +36,7 @@ systemUtils.isTablet = function () {
  * Attempts to figure out what browser is used via the user agent.
  * NOTE: This is not fool proof!
  * @link http://stackoverflow.com/questions/5916900/detect-version-of-browser
- * @static
+ * @function getBrowser
  * @returns {string}
  */
 systemUtils.getBrowser = function () {
@@ -66,8 +66,8 @@ systemUtils.getBrowser = function () {
  * Uses document mode to check if the browser is in fact, Internet Explorer (8 and above).
  * @memberOf module:sector22/system.systemUtils
  * @link http://stackoverflow.com/questions/7690676/javascript-the-best-way-to-detect-ie
- * @static
- * @returns {boolean}
+ * @function isIE
+ * @returns {boolean} - current browser is IE8 or above
  */
 systemUtils.isIE = function () {
     return ('documentMode' in document);
@@ -77,5 +77,5 @@ systemUtils.isIE = function () {
     //isIE11 = (document.documentMode === 11);
 }
 
-
+if( typeof Object.freeze === 'function') Object.freeze(systemUtils) // lock the object to minimize accidental changes
 module.exports = systemUtils;

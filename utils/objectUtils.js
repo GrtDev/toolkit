@@ -24,15 +24,16 @@ objectUtils.hasMethods = function (object, var_args) {
 }
 
 
-var classNameRegExp = new RegExp('function (.{1,})\\(');
+var classNameRegExp = /^function\s(\w+)\s?\((\w*|,|\s)*\)/;
 /**
  * Retrieves the 'class name' of an object
  * @param object {object}
  * @returns {string}
  */
 objectUtils.getName = function (object) {
-    var results = classNameRegExp.exec(object.constructor.toString());
+    var results = classNameRegExp.exec((typeof object === 'function') ? object.toString() : object.constructor.toString());
     return (results && results.length > 1) ? results[1] : object.constructor.toString();
 }
 
+if( typeof Object.freeze === 'function') Object.freeze(objectUtils) // lock the object to minimize accidental changes
 module.exports = objectUtils;

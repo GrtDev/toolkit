@@ -5,8 +5,10 @@
  */
 
 /**
+ * Object containing useful geometry & trigonometry functions.
+ * @module sector22/geom
  * @namespace
- * Usefull geometry & trigonometry helper functions
+ * @type {object}
  */
 var geomUtils = {};
 
@@ -24,13 +26,13 @@ var geomUtils = {};
  * @returns {x: {number}, y: {number}} - intersection point of given vectors, can be null!
  */
 var slope1, slope2, yIntercept1, yIntercept2;
-geomUtils.intersect = function (x1, y1, angle1, x2, y2, angle2) {
+geomUtils.intersect = function(x1, y1, angle1, x2, y2, angle2) {
 
     slope1 = Math.tan(angle1);
     slope2 = Math.tan(angle2);
     // if the slopes are equal, the lines are parallel so there is not intersection.
     // if the y intercepts are equal as well, the lines are identical.
-    if (slope1 === slope2) return null;
+    if(slope1 === slope2) return null;
     yIntercept1 = y1 - (slope1 * x1);
     yIntercept2 = y2 - (slope2 * x2);
 
@@ -52,7 +54,7 @@ geomUtils.intersect = function (x1, y1, angle1, x2, y2, angle2) {
  * @param y2
  * @returns {number}
  */
-geomUtils.distance = function (x, y, x2, y2) {
+geomUtils.distance = function(x, y, x2, y2) {
     return Math.sqrt((x -= x2) * x + (y -= y2) * y);
 }
 
@@ -67,7 +69,7 @@ geomUtils.distance = function (x, y, x2, y2) {
  * @param opt_offsetY {number=0}
  * @returns {x: {number}, y: {number}}
  */
-geomUtils.polar = function (distance, angle, opt_offsetX, opt_offsetY) {
+geomUtils.polar = function(distance, angle, opt_offsetX, opt_offsetY) {
     return {x: distance * Math.cos(angle) + (opt_offsetX || 0), y: distance * Math.sin(angle) + (opt_offsetY || 0)};
 }
 
@@ -81,7 +83,7 @@ geomUtils.polar = function (distance, angle, opt_offsetX, opt_offsetY) {
  * @param x2
  * @param y2
  */
-geomUtils.angle = function (x, y, x2, y2) {
+geomUtils.angle = function(x, y, x2, y2) {
     return Math.atan2(y2 - y, x2 - x);
 }
 
@@ -89,17 +91,16 @@ geomUtils.angle = function (x, y, x2, y2) {
 /**
  * Calculates the smallest different between 2 angles
  * @memberOf module:sector22/geom.geomUtils
- * @static
  * @function differenceAngle
  * @param angle1
  * @param angle2
  * @returns {number}
  * @link http://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles
  */
-geomUtils.differenceAngle = function(angle1, angle2){
+geomUtils.differenceAngle = function(angle1, angle2) {
     var threesixty = Math.PI * 2;
-    return ((((angle1  - angle2) + threesixty/2) % threesixty + threesixty) % threesixty) - threesixty/2;
+    return ((((angle1 - angle2) + threesixty / 2) % threesixty + threesixty) % threesixty) - threesixty / 2;
 }
 
-
+if( typeof Object.freeze === 'function') Object.freeze(geomUtils) // lock the object to minimize accidental changes
 module.exports = geomUtils;

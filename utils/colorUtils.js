@@ -32,4 +32,5 @@ colorUtils.getGradientValue = function (rgb1, rgb2, percentage) {
     return ((red << 0) + ',' + (green << 0) + ',' + (blue << 0));
 }
 
+if( typeof Object.freeze === 'function') Object.freeze(colorUtils) // lock the object to minimize accidental changes
 module.exports = colorUtils;
