@@ -253,7 +253,7 @@ AnimationCanvas.prototype.init = function (id, contextType) {
      */
     Object.defineProperty(this, 'htmlElement', {
         enumerable: true,
-        configurable: false,
+        configurable: true,
         writable: false,
         value: canvas
     })
@@ -263,7 +263,7 @@ AnimationCanvas.prototype.init = function (id, contextType) {
      */
     Object.defineProperty(this, 'context', {
         enumerable: true,
-        configurable: false,
+        configurable: true,
         writable: false,
         value: context
     });
