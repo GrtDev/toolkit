@@ -15,7 +15,7 @@ Log.ALERT_FATALS = false;
  * @static
  * @type {boolean}
  */
-Log.LINE_NUMBER = true;
+Log.LINE_NUMBER = false;
 /**
  * Defines whether to create a time stamp for each log
  * @static
@@ -308,13 +308,13 @@ function log(level, sender, var_args) {
             report += '000'.slice(value.length) + value;
         }
 
-        logMethod.call(this, report); // log message & sender
+        logMethod.call(console, report); // log message & sender
         if(level === LogLevel.FATAL && Log.ALERT_FATALS && message.length) alert('Fatal Error: ' + message); // throw alert if the error is fatal
 
     } else if(arguments.length > 2) {
 
         log(level, sender, ''); // log the sender
-        logMethod.apply(this, Array.prototype.slice.call(arguments, 2, arguments.length)); // log messages and/or data
+        logMethod.apply(console, Array.prototype.slice.call(arguments, 2, arguments.length)); // log messages and/or data
 
     }
 

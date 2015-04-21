@@ -35,5 +35,16 @@ objectUtils.getName = function (object) {
     return (results && results.length > 1) ? results[1] : object.constructor.toString();
 }
 
+
+/**
+ * Test if an object is empty
+ * @param object {object} object to test.
+ * @returns {boolean}
+ */
+objectUtils.isEmpty = function (object) {
+    for (var prop in object) if(object.hasOwnProperty(prop)) return false;
+    return true;
+}
+
 if( typeof Object.freeze === 'function') Object.freeze(objectUtils) // lock the object to minimize accidental changes
 module.exports = objectUtils;
