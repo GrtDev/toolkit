@@ -112,7 +112,7 @@
  * @property {number} BACK_SLASH	- Corresponding key code for this button.
  * @property {number} SINGLE_QUOTE	- Corresponding key code for this button.
  */
-var keyCode = {}
+var keyCode = {};
 
 keyCode.BACKSPACE 		= 8;
 keyCode.TAB				= 9;

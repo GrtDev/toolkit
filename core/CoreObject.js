@@ -4,7 +4,12 @@
  * @module sector22/core
  */
 
-var log = require('../debug/Log').getInstance();
+// @formatter:off
+
+var log             = require('../debug/Log').getInstance();
+var inherits        = require('../utils/inherits');
+
+//@formatter:on
 
 // Keeps count of the number of objects created.
 CoreObject.numObjects = 0;
@@ -21,11 +26,11 @@ function CoreObject() {
     /**
      * Contains a unique id of this object
      * @memberOf sector22/core.CoreObject
-     * @public
-     * @property id {string}
+     * @private
+     * @property _id {string}
      * @readonly
      */
-    Object.defineProperty(this, 'id', {
+    Object.defineProperty(this, '_id', {
         enumerable: true,
         configurable: false,
         writable: false,
@@ -41,6 +46,7 @@ function CoreObject() {
      * @readonly
      */
     Object.defineProperty(this, 'isDestructed', {
+        enumerable: true,
         get: function () {
             return _isDestructed;
         }
@@ -57,6 +63,19 @@ function CoreObject() {
         _isDestructed = true;
     }
 }
+
+/**
+ * Function to easily inherit the CoreObject class.
+ * @memberOf sector22/core.CoreObject
+ * @protected
+ * @function extend
+ * @param constructor {function} the class that should inherit the CoreObject
+ */
+CoreObject.prototype.extend = function (constructor) {
+    inherits(constructor, this);
+}
+
+CoreObject.extend = CoreObject.prototype.extend;
 
 
 /**

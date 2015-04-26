@@ -19,6 +19,8 @@ var XREQUEST_STATE_DONE                 = 4;
 
 //@formatter:on
 
+// TODO: Add cross domain config
+
 function JSONLoader() {
 
     var _this = this;
@@ -52,7 +54,7 @@ function JSONLoader() {
         if(_this.debug) _this.logDebug('Loading new JSON, url: ' + _url + ', async: ' + async + ', user: \'' + user + '\', password: \'' + password + '\'');
 
         _xRequest = new XMLHttpRequest();
-        _xRequest.overrideMimeType("application/json");
+        if(_xRequest.overrideMimeType) _xRequest.overrideMimeType("application/json"); // IE9 does not support overrideMimeType
         _xRequest.onreadystatechange = handleXRequestStateChange;
         _xRequest.open('GET', _url, async, user, password);
         _xRequest.send(null);
