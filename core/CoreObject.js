@@ -7,7 +7,7 @@
 // @formatter:off
 
 var log             = require('../debug/Log').getInstance();
-var inherits        = require('../utils/inherits');
+var inherits        = require('./utils/inherits');
 
 //@formatter:on
 
