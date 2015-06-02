@@ -6,7 +6,6 @@
 
 // @formatter:off
 
-var log                 = require('../../debug/Log').getInstance();
 var CoreObject          = require('./../CoreObject');
 
 //@formatter:on
@@ -17,6 +16,7 @@ CoreObject.extend( CoreEvent );
  * Creates a new CoreEvent
  * @param type {string}
  * @param opt_target {object=}
+ * @extends {CoreObject}
  * @constructor
  */
 function CoreEvent ( type, opt_target ) {

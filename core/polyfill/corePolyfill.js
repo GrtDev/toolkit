@@ -44,6 +44,7 @@ var corePolyfill = {}
 
 /**
  * Applies basic polyfill to add basic cross-browser functionality
+ * Aims to support IE9+
  * @function apply
  * @param opt_global {object=}
  */

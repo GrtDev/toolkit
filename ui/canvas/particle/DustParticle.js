@@ -3,7 +3,7 @@
  * @www sector22.com
  */
 
-var inherits = require('../../utils/inherits');
+var inherits = require('../../../core/utils/inherits');
 var CoreParticle = require('./CoreParticle');
 
 

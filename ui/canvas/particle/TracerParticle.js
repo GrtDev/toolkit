@@ -3,9 +3,9 @@
  * @www sector22.com
  */
 
-var inherits = require('../../utils/inherits');
 var CoreParticle = require('./CoreParticle');
-var geomUtils = require('../../geom/geomUtils');
+var inherits = require('../../../core/utils/inherits');
+var geomUtils = require('../../../utils/geom/geomUtils');
 
 
 //TODO Fix comments
