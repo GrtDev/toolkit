@@ -127,12 +127,12 @@ function CoreLoader () {
                 if( _xRequest.status === 200 ) {
 
                     var data = _this.parseData(_xRequest);
-                    result = new DataResult( data, true, 'Successfully loaded the data', _xRequest.status );
+                    result = new DataResult( data, true, 'Successfully loaded the data', _xRequest.status, _url);
 
                 } else {
 
                     _this.logWarn( 'Failed to load the file... status: ' + _xRequest.status + ' - ' + httpStatusUtils.getDescription(_xRequest.status) );
-                    result = new DataResult( null, false, 'Failed to load the data', _xRequest.status, httpStatusUtils.getDescription(_xRequest.status) );
+                    result = new DataResult( null, false, 'Failed to load the data: ' + httpStatusUtils.getDescription(_xRequest.status), _xRequest.status, _url );
 
                 }
 
@@ -240,4 +240,4 @@ CoreLoader.prototype.destruct = function () {
 
 }
 
-module.exports = JSONLoader;
+module.exports = CoreLoader;

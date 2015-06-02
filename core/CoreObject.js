@@ -73,6 +73,7 @@ function CoreObject() {
  */
 CoreObject.prototype.extend = function (constructor) {
     inherits(constructor, this);
+    constructor.extend = CoreObject.extend;
 }
 
 CoreObject.extend = CoreObject.prototype.extend;

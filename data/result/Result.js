@@ -3,23 +3,34 @@
  * @www sector22.com
  */
 
-function Result(success, message, code) {
+/**
+ * An object containing result data
+ * @param success {boolean}
+ * @param message {string}
+ * @param code {number}
+ * @param opt_url {string=}
+ * @constructor
+ */
+function Result(success, message, code, opt_url) {
 
     var _success = success;
     var _message = message;
     var _code = code;
 
     Object.defineProperty(this, 'success', {
+        enumerable: true,
         get: function () {
             return _success;
         }
     });
     Object.defineProperty(this, 'message', {
+        enumerable: true,
         get: function () {
             return _message;
         }
     });
     Object.defineProperty(this, 'code', {
+        enumerable: true,
         get: function () {
             return _code;
         }

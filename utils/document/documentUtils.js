@@ -4,33 +4,120 @@
  * @module sector22/utils
  */
 
+// @formatter:off
+
+var log                 = require('../../debug/Log' ).getInstance();
+
+// @formatter:on
+
+var debug;
+
 /**
  * @namespace
  */
-var colorUtils = {};
+var documentUtils = {};
+
+Object.defineProperty( documentUtils, 'debug', {
+    enumerable: true,
+    get: function () {
+        return debug;
+    },
+    set: function ( value ) {
+        debug = value;
+    }
+} );
 
 /**
- * Calculates the rgb value between 2 colors given a percentage.
- * @param rgb1
- * @param rgb2
- * @param percentage
- * @returns {string} - the new rgb value as string
+ * Find the index within a collection that contains the element based on HTML content
+ * @param collection {HTMLCollection | NodeList | Array}
+ * @param element {HTMLElement}
+ * @returns {number}
  */
-colorUtils.getGradientValue = function (rgb1, rgb2, percentage) {
-    var rgb = rgb1.split(',');
+documentUtils.collectionIndexOfElement = function ( collection, element ) {
 
-    var red = parseInt(rgb[0]);
-    var green = parseInt(rgb[1]);
-    var blue = parseInt(rgb[2]);
+    for ( var i = 0, leni = collection.length; i < leni; i++ ) {
 
-    rgb = rgb2.split(',');
+        var collectionElement = collection[ i ];
 
-    red += (parseInt(rgb[0]) - red) * percentage;
-    green += (parseInt(rgb[1]) - green) * percentage;
-    blue += (parseInt(rgb[2]) - blue) * percentage;
+        if( collectionElement.outerHTML === element.outerHTML ) return i;
 
-    return ((red << 0) + ',' + (green << 0) + ',' + (blue << 0));
+    }
+
+    return -1;
+
 }
 
-if( typeof Object.freeze === 'function') Object.freeze(colorUtils) // lock the object to minimize accidental changes
-module.exports = colorUtils;
+/**
+ * Updates the old head meta tags with the meta tags from the new head
+ * @param head {HTMLElement}
+ * @param newHead {HTMLElement}
+ */
+documentUtils.updateHeadMeta = function ( head, newHead ) {
+
+    if( debug ) log.debug( documentUtils.toString(), 'updateHeadMeta: ', head, newHead );
+
+    if( !head || !newHead ) return;
+
+    // convert {HTMLCollection} to {Array} so we can use splice
+    var newMeta = Array.prototype.slice.call( newHead.getElementsByTagName( 'meta' ) );
+    var currentMeta = head.getElementsByTagName( 'meta' );
+    var unusedCurrentMetaTags = [];
+    var i, leni;
+
+    for ( i = 0, leni = currentMeta.length; i < leni; i++ ) {
+
+        var currentMetaTag = currentMeta[ i ];
+        var indexCurrentTag = documentUtils.collectionIndexOfElement( newMeta, currentMetaTag );
+
+        if( indexCurrentTag >= 0 ) {
+
+            newMeta.splice( indexCurrentTag, 1 );
+
+        } else {
+
+            if( documentUtils.debug ) log.debug( documentUtils.toString(), 'removing current meta tag: ', currentMetaTag );
+            // save unused tags to reuse for new meta
+            unusedCurrentMetaTags.push( currentMetaTag );
+
+        }
+    }
+
+
+    for ( i = 0, leni = newMeta.length; i < leni; i++ ) {
+
+        var newMetaTag = newMeta[ i ];
+        var metaTag;
+
+        if( unusedCurrentMetaTags.length ) {
+
+            metaTag = unusedCurrentMetaTags.pop();
+
+        } else if( global.document ) {
+
+            metaTag = global.document.createElement( 'meta' );
+            head.appendChild( metaTag );
+
+        } else {
+
+            log.error( documentUtils.toString(), 'Failed to create a new meta tag' );
+            return;
+
+        }
+
+        metaTag.outerHTML = newMetaTag.outerHTML;
+
+    }
+
+    // remove any unused meta tag elements
+    while ( unusedCurrentMetaTags.length ) head.removeChild( unusedCurrentMetaTags.pop() );
+
+}
+
+documentUtils.toString = function () {
+
+    return 'documentUtils'
+
+}
+
+if( typeof Object.freeze === 'function' ) Object.freeze( documentUtils ) // lock the object to minimize accidental changes
+module.exports = documentUtils;

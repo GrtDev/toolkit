@@ -40,7 +40,9 @@ function consolePolyfill ( global ) {
     if( !global.console.log ) global.console.log = function () {};
 }
 
-var corePolyfill = {}
+
+var polyfillApplied;
+var polyfill = {}
 
 /**
  * Applies basic polyfill to add basic cross-browser functionality
@@ -48,10 +50,15 @@ var corePolyfill = {}
  * @function apply
  * @param opt_global {object=}
  */
-corePolyfill.apply = function ( opt_global ) {
+polyfill.apply = function ( opt_global ) {
+
+    if(polyfillApplied) return;
+    polyfillApplied = true;
+
     opt_global = opt_global || global || window;
     animationFramePolyfill( opt_global );
     consolePolyfill( opt_global );
+
 }
 
-module.exports = corePolyfill;
+module.exports = polyfill;

@@ -1,48 +1,55 @@
 /**
- * Provides requestAnimationFrame in a cross browser way.
+ * Provides HTML parsing functionality with regular DOM document parsing as fallback
  * From: http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
- * @param global {object}
+ * @see: https://developer.mozilla.org/en-US/docs/Web/API/DOMParser
+ * @see: https://gist.github.com/1129031
+ * @param DOMParser {function}
  */
-function animationFramePolyfill ( global ) {
+function domParserPolyfill ( DOMParser ) {
 
-    var lastTime = 0;
-    var vendors = [ 'webkit', 'moz' ];
-    for ( var x = 0; x < vendors.length && !global.requestAnimationFrame; ++x ) {
-        global.requestAnimationFrame = global[ vendors[ x ] + 'RequestAnimationFrame' ];
-        global.cancelAnimationFrame =
-            global[ vendors[ x ] + 'CancelAnimationFrame' ] || global[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
-    }
+    var proto = DOMParser.prototype;
+    var nativeParse = proto.parseFromString;
 
-    if( !global.requestAnimationFrame )
-        global.requestAnimationFrame = function ( callback, element ) {
-            var currTime = new Date().getTime();
-            var timeToCall = Math.max( 0, 16 - (currTime - lastTime) );
-            var id = global.setTimeout( function () {
-                    callback( currTime + timeToCall );
-                },
-                timeToCall );
-            lastTime = currTime + timeToCall;
-            return id;
-        };
+    // Firefox/Opera/IE throw errors on unsupported types
+    try {
+        // WebKit returns null on unsupported types
+        if( (new DOMParser()).parseFromString( "", "text/html" ) ) {
+            // text/html parsing is natively supported
+            return;
+        }
+    } catch ( ex ) {}
 
-    if( !global.cancelAnimationFrame ) global.cancelAnimationFrame = function ( id ) {
-        clearTimeout( id );
+    proto.parseFromString = function ( markup, type ) {
+
+        if( /^\s*text\/html\s*(?:;|$)/i.test( type ) ) {
+
+            var doc = document.implementation.createHTMLDocument( "" );
+
+            if( markup.toLowerCase().indexOf( '<!doctype' ) > -1 ) {
+
+                doc.documentElement.innerHTML = markup;
+
+            }
+            else {
+
+                doc.body.innerHTML = markup;
+
+            }
+            return doc;
+
+        } else {
+
+            return nativeParse.apply( this, arguments );
+
+        }
+
     };
 
 }
 
-/**
- * Fixes console.log functionality for <IE10
- * @param global
- */
-function consolePolyfill ( global ) {
-    if( !global.console ) global.console = {};
-    if( !global.console.log ) global.console.log = function () {};
-}
-
 
 var polyfillApplied;
-var corePolyfill = {}
+var polyfill = {}
 
 /**
  * Applies basic polyfill to add basic cross-browser functionality
@@ -50,15 +57,14 @@ var corePolyfill = {}
  * @function apply
  * @param opt_global {object=}
  */
-corePolyfill.apply = function ( opt_global ) {
+polyfill.apply = function ( opt_global ) {
 
-    if(polyfillApplied) return;
+    if( polyfillApplied ) return;
     polyfillApplied = true;
 
     opt_global = opt_global || global || window;
-    animationFramePolyfill( opt_global );
-    consolePolyfill( opt_global );
+    domParserPolyfill( opt_global.DOMParser );
 
 }
 
-module.exports = corePolyfill;
+module.exports = polyfill;

@@ -7,29 +7,22 @@
  * @see: https://github.com/mrdoob/eventdispatcher.js/
  */
 
-// @formatter:off
+var applyMixin = require( '../utils/applyMixin' );
 
-var log                 = require('../../debug/Log').getInstance();
-var CoreObject          = require('./../CoreObject');
+mixin = {};
 
-//@formatter:on
+mixin.apply = function ( constructor ) {
 
-CoreObject.extend( CoreEventDispatcher );
+    applyMixin( constructor, mixin );
 
-/**
- * Creates a new CoreEventDispatcher
- * @constructor
- * @extends {CoreObject}
- */
-function CoreEventDispatcher () {
-}
+};
 
 /**
  * Adds an event listener to this dispatcher
  * @param type {CoreEvent}
  * @param listener {function}
  */
-CoreEventDispatcher.prototype.addEventListener = function ( type, listener ) {
+mixin.addEventListener = function ( type, listener ) {
 
     if( this._listeners === undefined ) this._listeners = {};
 
@@ -55,7 +48,7 @@ CoreEventDispatcher.prototype.addEventListener = function ( type, listener ) {
  * @param listener {function}
  * @returns {boolean}
  */
-CoreEventDispatcher.prototype.hasEventListener = function ( type, listener ) {
+mixin.hasEventListener = function ( type, listener ) {
 
     if( this._listeners === undefined ) return false;
 
@@ -76,7 +69,7 @@ CoreEventDispatcher.prototype.hasEventListener = function ( type, listener ) {
  * @param type {string}
  * @param listener {function}
  */
-CoreEventDispatcher.prototype.removeEventListener = function ( type, listener ) {
+mixin.removeEventListener = function ( type, listener ) {
 
     if( this._listeners === undefined ) return;
 
@@ -101,7 +94,7 @@ CoreEventDispatcher.prototype.removeEventListener = function ( type, listener ) 
  * Dispatches an event
  * @param event {CoreEvent}
  */
-CoreEventDispatcher.prototype.dispatchEvent = function ( event ) {
+mixin.dispatchEvent = function ( event ) {
 
     if( this._listeners === undefined ) return;
 
@@ -131,4 +124,4 @@ CoreEventDispatcher.prototype.dispatchEvent = function ( event ) {
 }
 
 
-module.exports = CoreEventDispatcher
+module.exports = mixin;
