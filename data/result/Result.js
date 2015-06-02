@@ -16,6 +16,7 @@ function Result(success, message, code, opt_url) {
     var _success = success;
     var _message = message;
     var _code = code;
+    var _url = opt_url;
 
     Object.defineProperty(this, 'success', {
         enumerable: true,
@@ -35,6 +36,13 @@ function Result(success, message, code, opt_url) {
             return _code;
         }
     });
+
+     Object.defineProperty(this, 'url', {
+         enumerable: true,
+     	get: function() {
+              return _url;
+          }
+     });
 
 }
 

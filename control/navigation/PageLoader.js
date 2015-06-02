@@ -6,9 +6,11 @@
 
 //@formatter:off
 
+require('../../core/polyfill/corePolyfill');
+
 var documentUtils               = require('../../utils/document/documentUtils');
-var CoreSingleton               = require('../../core/CoreSingleton');
 var eventDispatcherMixin        = require('../../core/events/eventDispatcherMixin');
+var CoreSingleton               = require('../../core/CoreSingleton');
 var HTMLLoader                  = require('../../core/loader/HTMLLoader');
 
 //@formatter:on
@@ -39,11 +41,15 @@ function PageLoader () {
     var _isTransitioning;
     var _newPageContent;
     var _containerID;
+    var _currentContentContainer;
+    var _history;
+    var _restoringPopState;
+    var _newPageUrl;
 
 
     _this.init = function ( containerID ) {
 
-        if( !_isSupported ) return;
+        if( !_isSupported ) return _this.logWarn( 'No push state support found.. can not initialize...' );
 
         if( !containerID ) {
             _this.logError( 'Container ID can not be null or empty. PageLoader needs to know what content to grab from new pages...' );
@@ -52,11 +58,14 @@ function PageLoader () {
 
         _containerID = containerID;
         _loader = new HTMLLoader();
-        _loader.debug = _this.debug;
+        _history = global.history;
         _document = document;
         _documentHead = _document.getElementsByTagName( 'head' )[ 0 ];
-        _host = location.host;
+        _currentContentContainer = _document.getElementById( _containerID );
+        _host = global.location.host;
         _links = [];
+
+        global.addEventListener( 'popstate', handleHistoryPopState );
 
         updateLinks();
 
@@ -65,27 +74,47 @@ function PageLoader () {
 
     function updateLinks () {
 
-        var links = _document.getElementsByTagName( 'a' );
+        var i, leni;
+        var link;
 
-        for ( var i = 0, leni = links.length; i < leni; i++ ) {
-            var link = links[ i ];
+        // clean up the old links first
+        for ( i = 0, leni = _links.length; i < leni; i++ ) {
 
-            if( !link.parsed && link.host === _host ) {
+            link = _links[ i ];
+
+            if( !_document.contains( link ) ) {
+
+                link.removeEventListener( 'click', handleLinkClick );
+                _links.splice( i, 1 );
+                i--, leni--;
+
+                if( _this.debug ) _this.logDebug( 'Removed link: ' + link.href + ' (' + link.textContent + ')' );
+
+            }
+
+        }
+
+        var links = _currentContentContainer.getElementsByTagName( 'a' );
+
+        for ( i = 0, leni = links.length; i < leni; i++ ) {
+
+            link = links[ i ];
+
+            if( !link._parsed && link.host === _host ) {
 
                 link.addEventListener( 'click', handleLinkClick, true );
-                link.parsed = true;
+                link._parsed = true;
                 _links.push( link );
 
                 if( _this.debug ) _this.logDebug( 'Added link: ' + link.href + ' (' + link.textContent + ')' );
 
             }
-
-
         }
 
     }
 
     function handleLinkClick ( event ) {
+
         if( _this.debug ) _this.logDebug( 'handle link click: ', event );
 
         if( _isTransitioning ) return; // ignore link clicks during transitions
@@ -101,9 +130,31 @@ function PageLoader () {
 
         }
 
+        loadPage( link.href );
+
+    }
+
+    /**
+     * Starts loading a new page
+     * @param url {string}
+     * @param opt_isHistory {boolean=} defines whether the page to load comes from the history (back button)
+     */
+    function loadPage ( url, opt_isHistory ) {
+
         if( _loader.isLoading ) _loader.abort();
 
-        _loader.load( link.href, onPageLoadResult );
+        _restoringPopState = opt_isHistory;
+
+        _loader.load( url, onPageLoadResult );
+
+    }
+
+
+    function handleHistoryPopState ( event ) {
+
+        if( _this.debug ) _this.logDebug( 'Handle pop state', event.state );
+
+        loadPage( global.location.href, true );
 
     }
 
@@ -117,7 +168,7 @@ function PageLoader () {
 
             if( _this.debug ) _this.logDebug( 'Successfully loaded the HTML data', result.data );
 
-            _this.startPageTransition( result.data );
+            _this.startPageTransition( result.data, result.url );
 
         } else {
 
@@ -133,14 +184,22 @@ function PageLoader () {
      * @param   opt_container {HTMLElement=} a container for the new content, if none
      *          is given it will load the content into the container found with the default container id.
      */
-    _this.updatePageContents = function ( opt_container ) {
+    _this.updatePage = function ( opt_container ) {
 
         if( _this.debug ) _this.logDebug( 'updating new page content....', _newPageContent );
 
         if( !_newPageContent ) return _this.logError( 'no new page content was found?!' );
 
-        if( !opt_container ) opt_container = _document.getElementById( _containerID );
-        if( !opt_container ) return _this.logError( 'Failed to find the new container!', _document );
+        _currentContentContainer = opt_container ? opt_container : _currentContentContainer;
+        if( !_currentContentContainer ) return _this.logError( 'Failed to find the new container!', _document );
+
+
+        // If the page did not come from the history, add it to the History
+        if( !_restoringPopState ) {
+
+            _history.pushState( {}, _document.title, _newPageUrl );
+
+        }
 
 
         var head = _newPageContent.getElementsByTagName( 'head' )[ 0 ];
@@ -161,14 +220,18 @@ function PageLoader () {
 
         if( content ) {
 
-            // replace container's content 
-            opt_container.innerHTML = content.innerHTML;
+            // replace container's content
+            _currentContentContainer.innerHTML = content.innerHTML;
+            updateLinks();
 
         } else {
 
             _this.logError( 'Failed to retrieve the page content container! container id: ' + _containerID );
 
         }
+
+
+
 
     }
 
@@ -189,13 +252,22 @@ function PageLoader () {
      * Sets the new page content
      * @function _setNewPageContent
      * @private
-     * @param newPage
+     * @param newPage {HTMLDocument}
+     * @param newURL {string}
      */
-    _this._setNewPageContent = function ( newPage ) {
+    _this._setNewPageData = function ( newPage, newURL ) {
 
+        _newPageUrl = newURL;
         _newPageContent = newPage;
 
     }
+
+    Object.defineProperty( this, 'currentContentContainer', {
+        enumerable: true,
+        get: function () {
+            return _currentContentContainer;
+        }
+    } );
 
     Object.defineProperty( this, 'newPageContent', {
         enumerable: true,
@@ -223,62 +295,89 @@ function PageLoader () {
 /**
  * Starts the transitioning process
  * @param newPage {HTMLDocument}
+ * @param url {string} url of the new page
  */
-PageLoader.prototype.startPageTransition = function ( newPage ) {
+PageLoader.prototype.startPageTransition = function ( newPage, url ) {
 
     if( !newPage ) {
         this.logError( 'Attempting to start a page transition but no new page was found!' );
         return;
     }
 
-    this._setNewPageContent( newPage );
+    this._setNewPageData( newPage, url );
     this._setTransitioning( true );
 
-    this.transitionOut();
+    this.onTransitionStart();
 
 }
 
 /**
- * Override this to add a custom transition out
+ * Override this function to add a custom transition
  * @function transitionOut
  */
-PageLoader.prototype.transitionOut = function () {
+PageLoader.prototype.onTransitionStart = function () {
 
-    this.onTransitionOutComplete();
+    var _this = this;
 
-}
+    simpleFade( false, _this.currentContentContainer, function () {
 
-/**
- * Override this to add a custom functionality on transition out complete.
- * Always call this function at some point!
- * @function onTransitionOutComplete
- */
-PageLoader.prototype.onTransitionOutComplete = function () {
+        _this.updatePage();
 
-    this.updatePageContents();
-    this.transitionIn();
+        simpleFade( true, _this.currentContentContainer, _this.onTransitionComplete.bind( _this ) );
+
+    } );
 
 }
 
-/**
- * Override this to add a custom transition in
- * @function transitionIn
- */
-PageLoader.prototype.transitionIn = function () {
-
-    this.onTransitionInComplete();
-
-}
 
 /**
- * Override this to add a custom functionality on transition out complete.
- * Always call this function at some point!
- * @function onTransitionOutComplete
+ * Override this to add a custom functionality on transition complete.
+ * Note: Always call this function after you are done!
+ * @public
+ * @function onTransitionComplete
  */
-PageLoader.prototype.onTransitionInComplete = function () {
+PageLoader.prototype.onTransitionComplete = function () {
 
     this._setTransitioning( false );
 
 }
 
+
 module.exports = PageLoader;
+
+
+/**
+ * Provides a very basic fade in and out functionality
+ * @param fadeIn {boolean}
+ * @param element {HTMLElement}
+ * @param callback {function}
+ * @param opt_time {number=} in milliseconds
+ */
+function simpleFade ( fadeIn, element, callback, opt_time ) {
+
+    var opacity = element.style.opacity = fadeIn ? 0 : 1;
+    var opacityStep = (1 / (opt_time || 250));
+    var last = Date.now();
+
+    var tick = function () {
+
+        opacity += (((Date.now() - last) * opacityStep) * (fadeIn ? 1 : -1));
+
+        if( opacity < 0 || opacity > 1 ) opacity = (fadeIn ? 1 : 0);
+        element.style.opacity = opacity;
+        last = Date.now();
+
+        if( fadeIn ? (opacity < 1) : (opacity > 0) ) {
+
+            window.requestAnimationFrame( tick );
+
+        } else if( typeof callback === 'function' ) {
+
+            callback();
+
+        }
+    };
+
+    tick();
+}
+

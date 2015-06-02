@@ -133,7 +133,7 @@ function CoreLoader () {
 
                     _this.logWarn( 'Failed to load the file... status: ' + _xRequest.status + ' - ' + httpStatusUtils.getDescription(_xRequest.status) );
                     result = new DataResult( null, false, 'Failed to load the data: ' + httpStatusUtils.getDescription(_xRequest.status), _xRequest.status, _url );
-
+                    
                 }
 
                 if( _callback && typeof _callback === 'function' ) _callback( result );
