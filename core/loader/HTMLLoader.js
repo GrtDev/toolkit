@@ -25,7 +25,7 @@ function HTMLLoader() {
     var _this = this;
     var _parser = new DOMParser();
 
-    _this.setMimeType('text/html');
+    _this.setMimeType(CoreLoader.MIMETYPE_HTML);
     _this.setResponseType(CoreLoader.RESPONSE_TYPE_DOCUMENT);
 
      Object.defineProperty(this, 'parser', {

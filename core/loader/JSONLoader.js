@@ -21,7 +21,7 @@ function JSONLoader() {
 
     var _this = this;
 
-    _this.setMimeType('application/json');
+    _this.setMimeType(CoreLoader.MIMETYPE_JSON);
     _this.setResponseType(CoreLoader.RESPONSE_TYPE_JSON);
 
 }

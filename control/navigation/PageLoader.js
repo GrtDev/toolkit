@@ -41,7 +41,7 @@ function PageLoader () {
     var _isTransitioning;
     var _newPageContent;
     var _containerID;
-    var _currentContentContainer;
+    var _contentContainer;
     var _history;
     var _restoringPopState;
     var _newPageUrl;
@@ -61,7 +61,7 @@ function PageLoader () {
         _history = global.history;
         _document = document;
         _documentHead = _document.getElementsByTagName( 'head' )[ 0 ];
-        _currentContentContainer = _document.getElementById( _containerID );
+        _contentContainer = _document.getElementById( _containerID );
         _host = global.location.host;
         _links = [];
 
@@ -94,7 +94,7 @@ function PageLoader () {
 
         }
 
-        var links = _currentContentContainer.getElementsByTagName( 'a' );
+        var links = _contentContainer.getElementsByTagName( 'a' );
 
         for ( i = 0, leni = links.length; i < leni; i++ ) {
 
@@ -135,6 +135,19 @@ function PageLoader () {
     }
 
     /**
+     * Handles browser's History pop state events.
+     * @param event
+     */
+    function handleHistoryPopState ( event ) {
+
+        if( _this.debug ) _this.logDebug( 'Handle pop state', event.state );
+
+        loadPage( global.location.href, true );
+
+    }
+
+
+    /**
      * Starts loading a new page
      * @param url {string}
      * @param opt_isHistory {boolean=} defines whether the page to load comes from the history (back button)
@@ -146,15 +159,6 @@ function PageLoader () {
         _restoringPopState = opt_isHistory;
 
         _loader.load( url, onPageLoadResult );
-
-    }
-
-
-    function handleHistoryPopState ( event ) {
-
-        if( _this.debug ) _this.logDebug( 'Handle pop state', event.state );
-
-        loadPage( global.location.href, true );
 
     }
 
@@ -190,8 +194,8 @@ function PageLoader () {
 
         if( !_newPageContent ) return _this.logError( 'no new page content was found?!' );
 
-        _currentContentContainer = opt_container ? opt_container : _currentContentContainer;
-        if( !_currentContentContainer ) return _this.logError( 'Failed to find the new container!', _document );
+        _contentContainer = opt_container ? opt_container : _contentContainer;
+        if( !_contentContainer ) return _this.logError( 'Failed to find the new container!', _document );
 
 
         // If the page did not come from the history, add it to the History
@@ -221,7 +225,7 @@ function PageLoader () {
         if( content ) {
 
             // replace container's content
-            _currentContentContainer.innerHTML = content.innerHTML;
+            _contentContainer.innerHTML = content.innerHTML;
             updateLinks();
 
         } else {
@@ -262,10 +266,10 @@ function PageLoader () {
 
     }
 
-    Object.defineProperty( this, 'currentContentContainer', {
+    Object.defineProperty( this, 'contentContainer', {
         enumerable: true,
         get: function () {
-            return _currentContentContainer;
+            return _contentContainer;
         }
     } );
 
@@ -319,11 +323,11 @@ PageLoader.prototype.onTransitionStart = function () {
 
     var _this = this;
 
-    simpleFade( false, _this.currentContentContainer, function () {
+    simpleFade( false, _this.contentContainer, function () {
 
         _this.updatePage();
 
-        simpleFade( true, _this.currentContentContainer, _this.onTransitionComplete.bind( _this ) );
+        simpleFade( true, _this.contentContainer, _this.onTransitionComplete.bind( _this ) );
 
     } );
 

@@ -23,6 +23,9 @@ CoreLoader.RESPONSE_TYPE_BLOB           = 'blob';
 CoreLoader.RESPONSE_TYPE_JSON           = 'json';
 CoreLoader.RESPONSE_TYPE_ARRAY_BUFFER   = 'arraybuffer';
 
+CoreLoader.MIMETYPE_HTML                = 'text/html';
+CoreLoader.MIMETYPE_JSON                = 'application/json';
+
 //@formatter:on
 
 // TODO: Add cross domain support ( CORS )
