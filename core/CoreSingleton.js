@@ -11,10 +11,10 @@ var CoreObject                  = require('./CoreObject');
 //@formatter:on
 
 /**
- * Returns an instance of the Page Loader.
+ * Returns an instance of the Singleton
  * @static
  * @function getInstance
- * @returns {PageLoader} The page loader instance.
+ * @returns {*} The singleton instance.
  */
 CoreSingleton.getInstance = function () {
 
