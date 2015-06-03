@@ -12,6 +12,8 @@ var documentUtils               = require('../../utils/document/documentUtils');
 var eventDispatcherMixin        = require('../../core/events/eventDispatcherMixin');
 var CoreSingleton               = require('../../core/CoreSingleton');
 var HTMLLoader                  = require('../../core/loader/HTMLLoader');
+var PageLoaderEvent             = require('./PageLoaderEvent');
+var TransitionEvent             = require('../events/TransitionEvent');
 
 //@formatter:on
 
@@ -25,6 +27,11 @@ eventDispatcherMixin.apply( PageLoader );
  * @constructor
  * @singleton
  * @extends {CoreSingleton}
+ *
+ * @event TransitionEvent.START
+ * @event TransitionEvent.COMPLETE
+ * @event PageLoaderEvent.BEFORE_PAGE_UPDATE
+ * @event PageLoaderEvent.AFTER_PAGE_UPDATE
  */
 function PageLoader () {
 
@@ -45,9 +52,11 @@ function PageLoader () {
     var _history;
     var _restoringPopState;
     var _newPageUrl;
+    var _initialized;
 
 
     _this.init = function ( containerID ) {
+
 
         if( !_isSupported ) return _this.logWarn( 'No push state support found.. can not initialize...' );
 
@@ -55,6 +64,9 @@ function PageLoader () {
             _this.logError( 'Container ID can not be null or empty. PageLoader needs to know what content to grab from new pages...' );
             return;
         }
+
+        if( _initialized ) return;
+        _initialized = true;
 
         _containerID = containerID;
         _loader = new HTMLLoader();
@@ -192,13 +204,16 @@ function PageLoader () {
 
         if( _this.debug ) _this.logDebug( 'updating new page content....', _newPageContent );
 
-        if( !_newPageContent ) return _this.logError( 'no new page content was found?!' );
-
         _contentContainer = opt_container ? opt_container : _contentContainer;
+
+        if( !_initialized ) return _this.logError( 'Page Loader needs to be initialized!' );
+        if( !_newPageContent ) return _this.logError( 'No new page content was found?!' );
         if( !_contentContainer ) return _this.logError( 'Failed to find the new container!', _document );
 
+        _this.dispatchEvent(new PageLoaderEvent(PageLoaderEvent.BEFORE_PAGE_UPDATE, _newPageUrl));
 
         // If the page did not come from the history, add it to the History
+        // & update the location to the new page.
         if( !_restoringPopState ) {
 
             _history.pushState( {}, _document.title, _newPageUrl );
@@ -234,8 +249,7 @@ function PageLoader () {
 
         }
 
-
-
+        _this.dispatchEvent(new PageLoaderEvent(PageLoaderEvent.AFTER_PAGE_UPDATE, _newPageUrl));
 
     }
 
@@ -311,6 +325,8 @@ PageLoader.prototype.startPageTransition = function ( newPage, url ) {
     this._setNewPageData( newPage, url );
     this._setTransitioning( true );
 
+    this.dispatchEvent(new TransitionEvent(TransitionEvent.START));
+
     this.onTransitionStart();
 
 }
@@ -341,6 +357,8 @@ PageLoader.prototype.onTransitionStart = function () {
  * @function onTransitionComplete
  */
 PageLoader.prototype.onTransitionComplete = function () {
+
+    this.dispatchEvent(new TransitionEvent(TransitionEvent.COMPLETE));
 
     this._setTransitioning( false );
 

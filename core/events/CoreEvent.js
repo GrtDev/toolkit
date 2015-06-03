@@ -6,17 +6,24 @@
 
 // @formatter:off
 
-var CoreObject          = require('./../CoreObject');
+var inherits                    = require('../utils/inherits');
 
-//@formatter:on
 
-CoreObject.extend( CoreEvent );
+CoreEvent.CHANGE                = 'CoreEvent.CHANGE';
+CoreEvent.CANCEL                = 'CoreEvent.CANCEL';
+CoreEvent.CLEAR                 = 'CoreEvent.CLEAR';
+CoreEvent.ACTIVATE              = 'CoreEvent.ACTIVATE';
+CoreEvent.DEACTIVATE            = 'CoreEvent.DEACTIVATE';
+CoreEvent.OPEN                  = 'CoreEvent.OPEN';
+CoreEvent.CLOSE                 = 'CoreEvent.CLOSE';
+
+// @formatter:on
+
 
 /**
- * Creates a new CoreEvent
+ * Creates a new CoreEvent with some basic event types
  * @param type {string}
  * @param opt_target {object=}
- * @extends {CoreObject}
  * @constructor
  */
 function CoreEvent ( type, opt_target ) {
@@ -49,5 +56,19 @@ function CoreEvent ( type, opt_target ) {
     } );
 }
 
+/**
+ * Function to easily inherit the CoreEvent class.
+ * @memberOf sector22/core/events.CoreEvent
+ * @protected
+ * @function extend
+ * @param constructor {function} the class that should inherit the CoreEvent
+ */
+CoreEvent.prototype.extend = function ( constructor ) {
+    inherits( constructor, this );
+    constructor.extend = CoreEvent.extend;
+}
 
-module.exports = CoreEvent
+CoreEvent.extend = CoreEvent.prototype.extend;
+
+
+module.exports = CoreEvent;
