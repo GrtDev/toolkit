@@ -28,17 +28,28 @@ mixin.addEventListener = function ( type, listener ) {
 
     var listeners = this._listeners;
 
-    if( listeners[ type ] === undefined ) {
+    if( listeners[ type ] === undefined )  listeners[ type ] = [];
 
-        listeners[ type ] = [];
-
-    }
 
     if( listeners[ type ].indexOf( listener ) === -1 ) {
 
         listeners[ type ].push( listener );
 
     }
+
+}
+
+/**
+ * Adds an event listener to this dispatcher which will be
+ * automatically removed after the event is dispatched.
+ * @param type {CoreEvent}
+ * @param listener {function}
+ */
+mixin.addEventListenerOnce = function ( type, listener ) {
+
+    listener.__isOneTimeListener = true;
+
+    this.addEventListener( type, listener );
 
 }
 
@@ -101,22 +112,30 @@ mixin.dispatchEvent = function ( event ) {
     var listeners = this._listeners;
     var listenerArray = listeners[ event.type ];
 
+    if( !event.target ) event.setTarget( this );
+
     if( listenerArray !== undefined ) {
 
-        if( !event.target ) event.setTarget( this );
-
         var array = [];
+        var listener;
+        var i;
         var length = listenerArray.length;
 
-        for ( var i = 0; i < length; i++ ) {
+        for ( i = 0; i < length; i++ ) {
 
             array[ i ] = listenerArray[ i ];
 
         }
 
-        for ( var i = 0; i < length; i++ ) {
+        for ( i = 0; i < length; i++ ) {
 
-            array[ i ].call( this, event );
+            listener = array[ i ];
+            listener.call( this, event );
+
+            if( listener.__isOneTimeListener ) {
+                listener.__isOneTimeListener = null;
+                this.removeEventListener( event.type, listener );
+            }
 
         }
 
