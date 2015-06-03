@@ -19,7 +19,7 @@ mixin.apply = function ( constructor ) {
 
 /**
  * Adds an event listener to this dispatcher
- * @param type {CoreEvent}
+ * @param type {string}
  * @param listener {function}
  */
 mixin.addEventListener = function ( type, listener ) {
@@ -42,14 +42,23 @@ mixin.addEventListener = function ( type, listener ) {
 /**
  * Adds an event listener to this dispatcher which will be
  * automatically removed after the event is dispatched.
- * @param type {CoreEvent}
+ * @param type {string}
  * @param listener {function}
  */
 mixin.addEventListenerOnce = function ( type, listener ) {
 
-    listener.__isOneTimeListener = true;
+    if( this._oneTimeListeners === undefined ) this._oneTimeListeners = {};
 
-    this.addEventListener( type, listener );
+    var listeners = this._oneTimeListeners;
+
+    if( listeners[ type ] === undefined )  listeners[ type ] = [];
+
+
+    if( listeners[ type ].indexOf( listener ) === -1 ) {
+
+        listeners[ type ].push( listener );
+
+    }
 
 }
 
@@ -71,6 +80,14 @@ mixin.hasEventListener = function ( type, listener ) {
 
     }
 
+    listeners = this._oneTimeListeners;
+
+    if( listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== -1 ) {
+
+        return true;
+
+    }
+
     return false;
 
 }
@@ -82,63 +99,117 @@ mixin.hasEventListener = function ( type, listener ) {
  */
 mixin.removeEventListener = function ( type, listener ) {
 
-    if( this._listeners === undefined ) return;
+    var listeners;
+    var listenerArray;
 
-    var listeners = this._listeners;
-    var listenerArray = listeners[ type ];
+    if( this._listeners !== undefined ) {
 
-    if( listenerArray !== undefined ) {
+        listeners = this._listeners;
+        listenerArray = listeners[ type ];
 
-        var index = listenerArray.indexOf( listener );
+        if( listenerArray !== undefined ) {
 
-        if( index !== -1 ) {
+            var index = listenerArray.indexOf( listener );
 
-            listenerArray.splice( index, 1 );
+            if( index !== -1 ) {
+
+                listenerArray.splice( index, 1 );
+
+            }
 
         }
 
+    }
+
+    if( this._oneTimeListeners !== undefined ) {
+
+        listeners = this._oneTimeListeners;
+        var listenerArray = listeners[ type ];
+
+        if( listenerArray !== undefined ) {
+
+            var index = listenerArray.indexOf( listener );
+
+            if( index !== -1 ) {
+
+                listenerArray.splice( index, 1 );
+
+            }
+
+        }
     }
 
 }
 
 /**
  * Dispatches an event
- * @param event {CoreEvent}
+ * @param event {CoreEvent|object}
  */
 mixin.dispatchEvent = function ( event ) {
 
-    if( this._listeners === undefined ) return;
+    var listeners;
+    var listenerArray;
+    var array = [];
+    var listener;
+    var i;
+    var length
 
-    var listeners = this._listeners;
-    var listenerArray = listeners[ event.type ];
+    if( this._listeners !== undefined ) {
 
-    if( !event.target ) event.setTarget( this );
+        listeners = this._listeners;
+        listenerArray = listeners[ event.type ];
 
-    if( listenerArray !== undefined ) {
+        if( !event.target ) event.setTarget( this );
 
-        var array = [];
-        var listener;
-        var i;
-        var length = listenerArray.length;
+        if( listenerArray !== undefined ) {
 
-        for ( i = 0; i < length; i++ ) {
+            array = [];
+            length = listenerArray.length;
 
-            array[ i ] = listenerArray[ i ];
+            for ( i = 0; i < length; i++ ) {
 
-        }
+                array[ i ] = listenerArray[ i ];
 
-        for ( i = 0; i < length; i++ ) {
+            }
 
-            listener = array[ i ];
-            listener.call( this, event );
+            for ( i = 0; i < length; i++ ) {
 
-            if( listener.__isOneTimeListener ) {
-                listener.__isOneTimeListener = null;
-                this.removeEventListener( event.type, listener );
+                listener = array[ i ];
+                listener.call( this, event );
+
             }
 
         }
+    }
 
+
+    if( this._oneTimeListeners !== undefined ) {
+
+        listeners = this._oneTimeListeners;
+        listenerArray = listeners[ event.type ];
+
+        if( !event.target ) event.setTarget( this );
+
+        if( listenerArray !== undefined ) {
+
+            array = [];
+            length = listenerArray.length;
+
+            for ( i = 0; i < length; i++ ) {
+
+                array[ i ] = listenerArray[ i ];
+
+            }
+
+            for ( i = 0; i < length; i++ ) {
+
+                listener = array[ i ];
+                listener.call( this, event );
+                this.removeEventListener(event.type, listener);
+
+            }
+
+        }
     }
 }
 
