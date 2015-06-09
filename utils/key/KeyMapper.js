@@ -5,24 +5,23 @@
  */
 
 
-var inherits = require('../../utils/inherits');
 var CoreObject = require('../../core/CoreObject')
 
-inherits(KeyMapper, CoreObject);
+CoreObject.extend(KeyMapper);
 
 /**
  * Creates a mapper for directly coupling Keyboard events to callbacks, without having to bother about event filtering.
- * @param target {HTMLElement=window} - Defines on which object the listeners will be attached to.
+ * @param opt_target {HTMLElement=window} - Defines on which object the listeners will be attached to.
  * @constructor
- * @extends sector22/core.CoreObject
+ * @extends {CoreObject}
  */
-function KeyMapper(target) {
+function KeyMapper(opt_target) {
     var _this = this,
         _callbackCollection = {},
         _callbackCollectionLength = 0,
         _paramsCollection = {},
         _enabled,
-        _target = target || window,
+        _target = opt_target || window,
         _callbacks,
         _params,
         _i;
