@@ -5,6 +5,7 @@
 // @formatter:off
 
 var CoreEventDispatcher             = require('../../core/events/CoreEventDispatcher');
+var CoreEvent                       = require('../../core/events/CoreEvent');
 
 
 var mp4RegExp                       =   /\.mp4(\?.*)?$/
@@ -136,6 +137,7 @@ function VideoPlayer ( element ) {
         _element.style.width = _width + 'px';
         _element.style.height = _height + 'px';
 
+        _this.dispatchEvent( new CoreEvent( CoreEvent.RESIZE ) );
     }
 
 
@@ -143,10 +145,12 @@ function VideoPlayer ( element ) {
 
         if( !_element ) return;
 
-        if( _this.debug ) _this.logDebug( 'play' );
+        if( !_this.source ) {
+            if( _dataSource ) setSource( _dataSource );
+            else return _this.logWarn( 'Can not play the video because there is no source.' );
+        }
 
-        if( !_this.source && _dataSource ) setSource( _dataSource );
-        else return _this.logWarn( 'Can not play the video because there is no source.' );
+        if( _this.debug ) _this.logDebug( 'play: ' + _source );
 
         _element.play();
 
@@ -179,6 +183,20 @@ function VideoPlayer ( element ) {
 
         // empty the source attribute so it won't continue loading.
         if( opt_stopLoad ) setSource( null );
+
+    }
+
+    _this.preload = function () {
+
+        if( _source ) return _this.logWarn( 'Video already has a source so it already is preloading...' );
+
+        if( !_dataSource ) return _this.logError( 'Could not find a source' );
+
+        _element.setAttribute( 'preload', 'auto' );
+
+        setSource( _dataSource );
+
+        if(_this.debug) _this.logDebug('preloading video.. ' + _source);
 
     }
 
@@ -238,6 +256,13 @@ function VideoPlayer ( element ) {
         }
     }
 
+    Object.defineProperty( this, 'hasVideo', {
+        enumerable: true,
+        get: function () {
+            return !!_source;
+        }
+    } );
+
     Object.defineProperty( this, 'height', {
         enumerable: true,
         get: function () {
@@ -274,8 +299,6 @@ function VideoPlayer ( element ) {
     } );
 
     _this.kill = function () {
-
-        if( _this.debug ) _this.logDebug( 'kill' );
 
         if( _element ) {
 

@@ -22,31 +22,20 @@ destructibleMixin.apply = function ( constructor ) {
     // the actual function, for docs see the auto-complete filler function below
     constructor.prototype.destruct = function () {
 
-        if( constructor.prototype.isDestructed ) return;
+        if( this.__isDestructed ) return;
 
-        // Remove event listeners and stop all activities of this class.
+        // log debug message when in debug mode
+        if( this.debug && typeof this.logDebug === 'function' ) this.logDebug( '-- destruct --' );
 
-        constructor.prototype.__isDestructed = true;
+        this.__isDestructed = true;
 
     }
 
+    // the actual function, for docs see the auto-complete filler function below
     Object.defineProperty( constructor.prototype, 'isDestructed', {
         enumerable: true,
-        get: function () {
-            return constructor.prototype.__isDestructed;
-        },
-        //@private
-        set: function ( value ) {
-            console.log( arguments.callee.caller.name );
-            constructor.prototype.__isDestructed = value;
-        }
+        get: function () { return this.__isDestructed; }
     } );
-
-    //// the actual function, for docs see the auto-complete filler function below
-    //Object.defineProperty( constructor.prototype, 'isDestructed', {
-    //    enumerable: true,
-    //    get: function () { return constructor.prototype.__isDestructed; }
-    //} );
 
 }
 

@@ -16,6 +16,7 @@ CoreEvent.ACTIVATE              = 'CoreEvent.ACTIVATE';
 CoreEvent.DEACTIVATE            = 'CoreEvent.DEACTIVATE';
 CoreEvent.OPEN                  = 'CoreEvent.OPEN';
 CoreEvent.CLOSE                 = 'CoreEvent.CLOSE';
+CoreEvent.RESIZE                = 'CoreEvent.RESIZE';
 
 // @formatter:on
 

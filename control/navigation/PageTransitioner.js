@@ -240,7 +240,7 @@ function PageTransitioner () {
         }
 
         if( content ) {
-console.log(_contentContainer);
+
             // copy over the attributes
             documentUtils.copyAttributes( content, _contentContainer, true, ['id', 'style'] );
 

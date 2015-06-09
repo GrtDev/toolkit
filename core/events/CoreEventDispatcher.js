@@ -21,7 +21,7 @@ eventDispatcherMixin.apply( CoreEventDispatcher );
  * @constructor
  * @extends {CoreObject}
  */
-function CoreEventDispatcher () {console.log('CoreEventDispatcher', this);}
+function CoreEventDispatcher () {}
 
 
 module.exports = CoreEventDispatcher
