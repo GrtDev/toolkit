@@ -3,6 +3,9 @@
  * @www sector22.com
  */
 
+// TODO: Restructure and add singleton mixin
+
+
 
 /**
  * Whether to throw an alert for fatal errors

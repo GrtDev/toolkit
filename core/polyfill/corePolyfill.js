@@ -87,4 +87,5 @@ polyfill.apply = function ( opt_global ) {
 
 }
 
+if( typeof Object.freeze === 'function') Object.freeze(polyfill) // lock the object to minimize accidental changes
 module.exports = polyfill;

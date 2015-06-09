@@ -8,26 +8,25 @@
 
 var CoreEvent                           = require('../../core/events/CoreEvent');
 
-
-PageLoaderEvent.BEFORE_PAGE_UPDATE      = 'PageLoaderEvent.BEFORE_PAGE_UPDATE';
-PageLoaderEvent.AFTER_PAGE_UPDATE       = 'PageLoaderEvent.AFTER_PAGE_UPDATE';
+PageTransitionEvent.BEFORE_PAGE_UPDATE      = 'PageTransitionEvent.BEFORE_PAGE_UPDATE';
+PageTransitionEvent.AFTER_PAGE_UPDATE       = 'PageTransitionEvent.AFTER_PAGE_UPDATE';
 
 //@formatter:on
 
 
-CoreEvent.extend( PageLoaderEvent );
+CoreEvent.extend(PageTransitionEvent)
 
 /**
- * Creates a new PageLoaderEvent
+ * Creates a new PageTransitionEvent
  * @param type {string}
  * @param opt_url {string=}
  * @param opt_target {object=}
  * @extends {CoreEvent}
  * @constructor
  */
-function PageLoaderEvent ( type, opt_url, opt_target) {
+function PageTransitionEvent ( type, opt_url, opt_target) {
 
-    PageLoaderEvent.super_.call(this, type, opt_target);
+    PageTransitionEvent.super_.call(this, type, opt_target);
 
     var _url    = opt_url;
 
@@ -41,4 +40,4 @@ function PageLoaderEvent ( type, opt_url, opt_target) {
 }
 
 
-module.exports = PageLoaderEvent;
+module.exports = PageTransitionEvent;

@@ -6,22 +6,23 @@
 
 // @formatter:off
 
-var log             = require('../debug/Log').getInstance();
-var inherits        = require('./utils/inherits');
+var log                     = require('../debug/Log').getInstance();
+var inherits                = require('./utils/inherits');
+var destructibleMixin       = require('./destructibleMixin');
 
 //@formatter:on
+
+destructibleMixin.apply(CoreObject);
 
 // Keeps count of the number of objects created.
 CoreObject.numObjects = 0;
 
 /**
  * Creates a new Object with log capabilities and a destruct method.
+ * @mixes destructibleMixin
  * @constructor
  */
 function CoreObject() {
-
-    // @see CoreObject#isDestructed
-    var _isDestructed;
 
     /**
      * Contains a unique id of this object
@@ -37,31 +38,6 @@ function CoreObject() {
         value: ('core_object_' + ++CoreObject.numObjects)
     });
 
-    /**
-     * Returns whether the object has been destroyed and made available for the garbage collector.
-     * @memberOf sector22/core.CoreObject
-     * @function isDestructed
-     * @public
-     * @returns {boolean}
-     * @readonly
-     */
-    Object.defineProperty(this, 'isDestructed', {
-        enumerable: true,
-        get: function () {
-            return _isDestructed;
-        }
-    });
-
-    /**
-     * A callback for when the object has been completely destroyed and made available for the garbage collection.
-     * NOTE: Should only ever be called upon from the destruct method in this "class"
-     * @memberOf sector22/core.CoreObject
-     * @private
-     * @function onDestructed
-     */
-    this.onDestructed = function () {
-        _isDestructed = true;
-    }
 }
 
 /**
@@ -133,20 +109,6 @@ CoreObject.prototype.logError = function (var_args) {
 CoreObject.prototype.logFatal = function (var_args) {
     Array.prototype.unshift.call(arguments, this);
     log.fatal.apply(this, arguments);
-}
-
-/**
- * Destroys the object and makes it available for the garbage collector.
- * @memberOf sector22/core.CoreObject
- * @public
- * @function destruct
- */
-CoreObject.prototype.destruct = function () {
-    if (this.isDestructed) return;
-
-    // Remove event listeners and stop all activities of this class.
-
-    this.onDestructed();
 }
 
 module.exports = CoreObject

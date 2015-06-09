@@ -6,36 +6,38 @@
 
 //@formatter:off
 
-require('../../core/polyfill/corePolyfill');
+require('../../core/polyfill/corePolyfill' ).apply(global);
 
 var documentUtils               = require('../../utils/document/documentUtils');
-var eventDispatcherMixin        = require('../../core/events/eventDispatcherMixin');
-var CoreSingleton               = require('../../core/CoreSingleton');
+var singletonMixin              = require('../../core/singletonMixin');
+var CoreEventDispatcher         = require('../../core/events/CoreEventDispatcher');
 var HTMLLoader                  = require('../../core/loader/HTMLLoader');
-var PageLoaderEvent             = require('./PageLoaderEvent');
+var PageLoaderEvent             = require('./PageTransitionEvent');
 var TransitionEvent             = require('../events/TransitionEvent');
 
 //@formatter:on
 
+CoreEventDispatcher.extend( PageTransitioner );
 
-CoreSingleton.extend( PageLoader );
-
-eventDispatcherMixin.apply( PageLoader );
+singletonMixin.apply( PageTransitioner );
 
 
 /**
  * @constructor
  * @singleton
- * @extends {CoreSingleton}
+ * @mixes singletonMixin
+ * @extends {CoreEventDispatcher}
  *
  * @event TransitionEvent.START
  * @event TransitionEvent.COMPLETE
- * @event PageLoaderEvent.BEFORE_PAGE_UPDATE
- * @event PageLoaderEvent.AFTER_PAGE_UPDATE
+ * @event PageTransitionEvent.BEFORE_PAGE_UPDATE
+ * @event PageTransitionEvent.AFTER_PAGE_UPDATE
  */
-function PageLoader () {
+function PageTransitioner () {
 
-    PageLoader.super_.call( this );
+    PageTransitioner.singletonCheck( this );
+
+    PageTransitioner.super_.call( this );
 
     var _this = this;
     var _isSupported = (global.history && global.history.pushState);
@@ -61,7 +63,7 @@ function PageLoader () {
         if( !_isSupported ) return _this.logWarn( 'No push state support found.. can not initialize...' );
 
         if( !containerID ) {
-            _this.logError( 'Container ID can not be null or empty. PageLoader needs to know what content to grab from new pages...' );
+            _this.logError( 'Container ID can not be null or empty. PageTransitioner needs to know what content to grab from new pages...' );
             return;
         }
 
@@ -210,7 +212,7 @@ function PageLoader () {
         if( !_newPageContent ) return _this.logError( 'No new page content was found?!' );
         if( !_contentContainer ) return _this.logError( 'Failed to find the new container!', _document );
 
-        _this.dispatchEvent(new PageLoaderEvent(PageLoaderEvent.BEFORE_PAGE_UPDATE, _newPageUrl));
+        _this.dispatchEvent( new PageLoaderEvent( PageLoaderEvent.BEFORE_PAGE_UPDATE, _newPageUrl ) );
 
         // If the page did not come from the history, add it to the History
         // & update the location to the new page.
@@ -238,6 +240,9 @@ function PageLoader () {
         }
 
         if( content ) {
+console.log(_contentContainer);
+            // copy over the attributes
+            documentUtils.copyAttributes( content, _contentContainer, true, ['id', 'style'] );
 
             // replace container's content
             _contentContainer.innerHTML = content.innerHTML;
@@ -249,13 +254,13 @@ function PageLoader () {
 
         }
 
-        _this.dispatchEvent(new PageLoaderEvent(PageLoaderEvent.AFTER_PAGE_UPDATE, _newPageUrl));
+        _this.dispatchEvent( new PageLoaderEvent( PageLoaderEvent.AFTER_PAGE_UPDATE, _newPageUrl ) );
 
     }
 
     /**
      * Set the transitioning flag.
-     * If true, it also disables the PageLoader from reacting to any new link clicks.
+     * If true, it also disables the PageTransitioner from reacting to any new link clicks.
      * @function _setTransitioning
      * @private
      * @param value
@@ -315,7 +320,7 @@ function PageLoader () {
  * @param newPage {HTMLDocument}
  * @param url {string} url of the new page
  */
-PageLoader.prototype.startPageTransition = function ( newPage, url ) {
+PageTransitioner.prototype.startPageTransition = function ( newPage, url ) {
 
     if( !newPage ) {
         this.logError( 'Attempting to start a page transition but no new page was found!' );
@@ -325,7 +330,7 @@ PageLoader.prototype.startPageTransition = function ( newPage, url ) {
     this._setNewPageData( newPage, url );
     this._setTransitioning( true );
 
-    this.dispatchEvent(new TransitionEvent(TransitionEvent.START));
+    this.dispatchEvent( new TransitionEvent( TransitionEvent.START ) );
 
     this.onTransitionStart();
 
@@ -335,7 +340,7 @@ PageLoader.prototype.startPageTransition = function ( newPage, url ) {
  * Override this function to add a custom transition
  * @function transitionOut
  */
-PageLoader.prototype.onTransitionStart = function () {
+PageTransitioner.prototype.onTransitionStart = function () {
 
     var _this = this;
 
@@ -356,16 +361,16 @@ PageLoader.prototype.onTransitionStart = function () {
  * @public
  * @function onTransitionComplete
  */
-PageLoader.prototype.onTransitionComplete = function () {
+PageTransitioner.prototype.onTransitionComplete = function () {
 
-    this.dispatchEvent(new TransitionEvent(TransitionEvent.COMPLETE));
+    this.dispatchEvent( new TransitionEvent( TransitionEvent.COMPLETE ) );
 
     this._setTransitioning( false );
 
 }
 
 
-module.exports = PageLoader;
+module.exports = PageTransitioner;
 
 
 /**

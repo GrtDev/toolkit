@@ -113,6 +113,48 @@ documentUtils.updateHeadMeta = function ( head, newHead ) {
 
 }
 
+/**
+ * Merges attributes of given elements into the destination element.
+ * @param source {HTMLElement}
+ * @param destination {HTMLElement}
+ * @param opt_removeOld {boolean=} remove old attributes
+ * @param opt_filter {Array=} attributes not to copy over OR deleted
+ */
+documentUtils.copyAttributes = function ( source, destination, opt_removeOld, opt_filter ) {
+
+    if( opt_removeOld ) {
+
+        var attributes = destination.attributes;
+
+        for ( var i = 0, leni = attributes.length; i < leni; i++ ) {
+
+            var attribute = attributes[ i ];
+
+            if( opt_filter && opt_filter.indexOf( attribute.nodeName ) !== -1 ) continue;
+            
+            destination.removeAttribute( attribute.nodeName )
+
+            leni--; // Don't need to splice on the attributes because its a live list.
+
+        }
+    }
+
+
+    attributes = source.attributes;
+
+    for ( i = 0, leni = attributes.length; i < leni; i++ ) {
+
+        var attribute = attributes[ i ];
+
+        if( opt_filter && opt_filter.indexOf( attribute.nodeName ) !== -1 ) continue;
+
+        destination.setAttribute( attribute.nodeName, attribute.nodeValue );
+
+    }
+
+}
+
+
 documentUtils.toString = function () {
 
     return 'documentUtils'
