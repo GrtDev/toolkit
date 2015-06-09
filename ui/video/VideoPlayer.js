@@ -78,8 +78,11 @@ function VideoPlayer ( element ) {
      */
     function setSource ( source ) {
 
+        if( !source ) source = '';// convert to empty string to prevent
         _element.setAttribute( 'src', source );
         if( mp4RegExp.test( source ) ) _element.setAttribute( 'type', 'video/mp4' );
+
+        //if(!source)
 
     }
 
@@ -90,7 +93,7 @@ function VideoPlayer ( element ) {
 
         if( _this.debug ) _this.logDebug( 'play' );
 
-        if( !_this.source  && _dataSource) setSource( _dataSource );
+        if( !_this.source && _dataSource ) setSource( _dataSource );
         else return _this.logWarn( 'Can not play the video because there is no source.' );
 
         _element.play();
@@ -123,7 +126,7 @@ function VideoPlayer ( element ) {
         _element.currentTime = 0;
 
         // empty the source attribute so it won't continue loading.
-        if( opt_stopLoad ) _element.setAttribute( 'src', '' );
+        if( opt_stopLoad ) setSource( null );
 
     }
 
@@ -156,16 +159,17 @@ function VideoPlayer ( element ) {
         _source = null;
 
     }
+}
 
-    VideoPlayer.prototype.destruct = function () {
+VideoPlayer.prototype.destruct = function () {
 
-        if( this.isDestructed ) return;
+    if( this.isDestructed ) return;
 
-        this.kill();
+    this.kill();
 
-        VideoPlayer.super_.prototype.destruct.call( this );
+    VideoPlayer.super_.prototype.destruct.call( this );
 
-    }
+}
 
 
-    module.exports = VideoPlayer;
+module.exports = VideoPlayer;
