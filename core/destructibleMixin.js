@@ -19,7 +19,10 @@ destructibleMixin.apply = function ( constructor ) {
      */
     constructor.prototype.__isDestructed = false;
 
-    // the actual function, for docs see the auto-complete filler function below
+    // TODO: Make destruct inheritable
+
+
+
     constructor.prototype.destruct = function () {
 
         if( this.__isDestructed ) return;

@@ -133,16 +133,21 @@ function PageTransitioner () {
 
         if( _isTransitioning ) return; // ignore link clicks during transitions
 
-        event.preventDefault();
+
 
         var link = event.target;
 
         if( !link || !link.href ) {
 
-            _this.logError( 'Failed to retrieve the href of a link', event );
+            _this.logWarn( 'Failed to retrieve the href of a link', event );
             return;
 
         }
+
+        event.preventDefault();
+
+        if(link.href === window.location.href) return;
+
 
         loadPage( link.href );
 

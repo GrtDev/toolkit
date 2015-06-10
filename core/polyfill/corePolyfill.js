@@ -1,3 +1,8 @@
+// @formatter:off
+var log                     = require('../../debug/Log');
+var polyfillName            = 'core polyfill'
+// @formatter:on
+
 /**
  * Provides requestAnimationFrame in a cross browser way.
  * From: http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
@@ -62,9 +67,6 @@ function documentPolyfill ( global ) {
 
 }
 
-
-
-
 var polyfillApplied;
 var polyfill = {}
 
@@ -87,5 +89,5 @@ polyfill.apply = function ( opt_global ) {
 
 }
 
-if( typeof Object.freeze === 'function') Object.freeze(polyfill) // lock the object to minimize accidental changes
+if( typeof Object.freeze === 'function' ) Object.freeze( polyfill ) // lock the object to minimize accidental changes
 module.exports = polyfill;
