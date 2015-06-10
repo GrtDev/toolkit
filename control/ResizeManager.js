@@ -8,7 +8,7 @@
 
 require('../core/polyfill/corePolyfill' ).apply(global);
 
-var singletonMixin              = require('../core/singletonMixin');
+var singletonMixin              = require('../core/mixin/singletonMixin');
 var CoreObject                  = require('../core/CoreObject');
 
 //@formatter:on

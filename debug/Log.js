@@ -24,7 +24,7 @@ Log.LINE_NUMBER = false;
  * @static
  * @type {boolean}
  */
-Log.TIME_STAMP = true;
+Log.TIME_STAMP = false;
 /**
  * Sets the indentation for the sender's name, set to -1 to disable
  * @static

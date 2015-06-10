@@ -159,7 +159,7 @@ mixin.dispatchEvent = function ( event ) {
         listeners = this._listeners;
         listenerArray = listeners[ event.type ];
 
-        if( !event.target ) event.setTarget( this );
+        if( !event.target && typeof event.setTarget === 'function') event.setTarget( this );
 
         if( listenerArray !== undefined ) {
 

@@ -196,7 +196,7 @@ function VideoPlayer ( element ) {
 
         setSource( _dataSource );
 
-        if(_this.debug) _this.logDebug('preloading video.. ' + _source);
+        if( _this.debug ) _this.logDebug( 'preloading video.. ' + _source );
 
     }
 
@@ -298,7 +298,7 @@ function VideoPlayer ( element ) {
         }
     } );
 
-    _this.kill = function () {
+    _this.setDestruct( function () {
 
         if( _element ) {
 
@@ -319,17 +319,7 @@ function VideoPlayer ( element ) {
         _videoWidth = NaN;
         _videoHeight = NaN;
 
-    }
-}
-
-VideoPlayer.prototype.destruct = function () {
-
-    if( this.isDestructed ) return;
-
-    this.kill();
-
-    VideoPlayer.super_.prototype.destruct.call( this );
-
+    } );
 }
 
 

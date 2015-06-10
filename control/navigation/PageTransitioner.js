@@ -9,7 +9,7 @@
 require('../../core/polyfill/corePolyfill' ).apply(global);
 
 var documentUtils               = require('../../utils/document/documentUtils');
-var singletonMixin              = require('../../core/singletonMixin');
+var singletonMixin              = require('../../core/mixin/singletonMixin');
 var CoreEventDispatcher         = require('../../core/events/CoreEventDispatcher');
 var HTMLLoader                  = require('../../core/loader/HTMLLoader');
 var PageLoaderEvent             = require('./PageTransitionEvent');
@@ -86,6 +86,30 @@ function PageTransitioner () {
     }
 
 
+    _this.addLinks = function ( element ) {
+
+        var links = element.getElementsByTagName( 'a' );
+
+        var i, leni;
+        var link;
+
+        for ( i = 0, leni = links.length; i < leni; i++ ) {
+
+            link = links[ i ];
+
+            if( !link._parsed && link.host === _host ) {
+
+                link.addEventListener( 'click', handleLinkClick, true );
+                link._parsed = true;
+                _links.push( link );
+
+                if( _this.debug ) _this.logDebug( 'Added link: ' + link.href + ' (' + link.textContent + ')' );
+
+            }
+        }
+
+    }
+
     function updateLinks () {
 
         var i, leni;
@@ -105,34 +129,17 @@ function PageTransitioner () {
                 if( _this.debug ) _this.logDebug( 'Removed link: ' + link.href + ' (' + link.textContent + ')' );
 
             }
-
         }
 
-        var links = _contentContainer.getElementsByTagName( 'a' );
-
-        for ( i = 0, leni = links.length; i < leni; i++ ) {
-
-            link = links[ i ];
-
-            if( !link._parsed && link.host === _host ) {
-
-                link.addEventListener( 'click', handleLinkClick, true );
-                link._parsed = true;
-                _links.push( link );
-
-                if( _this.debug ) _this.logDebug( 'Added link: ' + link.href + ' (' + link.textContent + ')' );
-
-            }
-        }
-
+        _this.addLinks( _contentContainer );
     }
+
 
     function handleLinkClick ( event ) {
 
         if( _this.debug ) _this.logDebug( 'handle link click: ', event );
 
         if( _isTransitioning ) return; // ignore link clicks during transitions
-
 
 
         var link = event.target;
@@ -146,7 +153,7 @@ function PageTransitioner () {
 
         event.preventDefault();
 
-        if(link.href === window.location.href) return;
+        if( link.href === window.location.href ) return;
 
 
         loadPage( link.href );
@@ -247,7 +254,7 @@ function PageTransitioner () {
         if( content ) {
 
             // copy over the attributes
-            documentUtils.copyAttributes( content, _contentContainer, true, ['id', 'style'] );
+            documentUtils.copyAttributes( content, _contentContainer, true, [ 'id', 'style' ] );
 
             // replace container's content
             _contentContainer.innerHTML = content.innerHTML;

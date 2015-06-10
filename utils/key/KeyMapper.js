@@ -102,7 +102,11 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
 
             if(!_callbacks) return _this.logError('failed to retrieve key map callback collection');
 
-            for ( _i = 0; _i < _callbacks.length; _i++ ) _callbacks[ _i ].apply( null, _params[ _i ] );
+            //TODO: Fix length bug
+
+            for ( _i = 0; _i < _callbacks.length; _i++ ) {
+                _callbacks[ _i ].apply( null, _params[ _i ] );
+            }
         }
 
     }

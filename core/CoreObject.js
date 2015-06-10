@@ -8,11 +8,11 @@
 
 var log                     = require('../debug/Log').getInstance();
 var inherits                = require('./utils/inherits');
-var destructibleMixin       = require('./destructibleMixin');
+var destructibleMixin       = require('./mixin/destructibleMixin');
 
 //@formatter:on
 
-destructibleMixin.apply(CoreObject);
+destructibleMixin.apply( CoreObject );
 
 // Keeps count of the number of objects created.
 CoreObject.numObjects = 0;
@@ -22,7 +22,7 @@ CoreObject.numObjects = 0;
  * @mixes destructibleMixin
  * @constructor
  */
-function CoreObject() {
+function CoreObject () {
 
     /**
      * Contains a unique id of this object
@@ -31,12 +31,19 @@ function CoreObject() {
      * @property _id {string}
      * @readonly
      */
-    Object.defineProperty(this, '_id', {
+    Object.defineProperty( this, '_id', {
         enumerable: true,
         configurable: false,
         writable: false,
         value: ('core_object_' + ++CoreObject.numObjects)
-    });
+    } );
+
+
+    this.setDestruct( function () {
+
+        // Remove event listeners and references to other objects here
+
+    } )
 
 }
 
@@ -47,8 +54,8 @@ function CoreObject() {
  * @function extend
  * @param constructor {function} the class that should inherit the CoreObject
  */
-CoreObject.prototype.extend = function (constructor) {
-    inherits(constructor, this);
+CoreObject.prototype.extend = function ( constructor ) {
+    inherits( constructor, this );
     constructor.extend = CoreObject.extend;
 }
 
@@ -62,9 +69,9 @@ CoreObject.extend = CoreObject.prototype.extend;
  * @function logDebug
  * @param var_args {...object} - messages and/or data to log.
  */
-CoreObject.prototype.logDebug = function (var_args) {
-    Array.prototype.unshift.call(arguments, this);
-    log.debug.apply(this, arguments);
+CoreObject.prototype.logDebug = function ( var_args ) {
+    Array.prototype.unshift.call( arguments, this );
+    log.debug.apply( this, arguments );
 }
 /**
  * Function to log a info message,
@@ -73,9 +80,9 @@ CoreObject.prototype.logDebug = function (var_args) {
  * @function logInfo
  * @param var_args {...object} - messages and/or data to log.
  */
-CoreObject.prototype.logInfo = function (var_args) {
-    Array.prototype.unshift.call(arguments, this);
-    log.info.apply(this, arguments);
+CoreObject.prototype.logInfo = function ( var_args ) {
+    Array.prototype.unshift.call( arguments, this );
+    log.info.apply( this, arguments );
 }
 /**
  * Function to log a warning message,
@@ -84,9 +91,9 @@ CoreObject.prototype.logInfo = function (var_args) {
  * @function logWarn
  * @param var_args {...object} - messages and/or data to log.
  */
-CoreObject.prototype.logWarn = function (var_args) {
-    Array.prototype.unshift.call(arguments, this);
-    log.warn.apply(this, arguments);
+CoreObject.prototype.logWarn = function ( var_args ) {
+    Array.prototype.unshift.call( arguments, this );
+    log.warn.apply( this, arguments );
 }
 /**
  * Function to log a error message,
@@ -95,9 +102,9 @@ CoreObject.prototype.logWarn = function (var_args) {
  * @function logError
  * @param var_args {...object} - messages and/or data to log.
  */
-CoreObject.prototype.logError = function (var_args) {
-    Array.prototype.unshift.call(arguments, this);
-    log.error.apply(this, arguments);
+CoreObject.prototype.logError = function ( var_args ) {
+    Array.prototype.unshift.call( arguments, this );
+    log.error.apply( this, arguments );
 }
 /**
  * Function to log a fatal error message,
@@ -106,9 +113,9 @@ CoreObject.prototype.logError = function (var_args) {
  * @function logFatal
  * @param var_args {...object} - messages and/or data to log.
  */
-CoreObject.prototype.logFatal = function (var_args) {
-    Array.prototype.unshift.call(arguments, this);
-    log.fatal.apply(this, arguments);
+CoreObject.prototype.logFatal = function ( var_args ) {
+    Array.prototype.unshift.call( arguments, this );
+    log.fatal.apply( this, arguments );
 }
 
 module.exports = CoreObject

@@ -38,6 +38,7 @@ function CoreEvent ( type, opt_target ) {
      * @param target {object}
      */
     _this.setTarget = function ( target ) {
+
         _target = target;
 
     }
