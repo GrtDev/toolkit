@@ -11,21 +11,34 @@ var polyfillName            = 'html element shim'
 function addClassFunctions ( global ) {
 
     var proto = HTMLElement.prototype;
-    
-    
-    if( typeof proto['addClass'] !== 'undefined' || typeof proto['toggleClass'] !== 'undefined'  || typeof proto['removeClass'] !== 'undefined') {
-        return log.error(polyfillName, 'ERROR');
+
+
+    if( typeof proto[ 'addClass' ] !== 'undefined' || typeof proto[ 'toggleClass' ] !== 'undefined' || typeof proto[ 'removeClass' ] !== 'undefined' ) {
+        return log.error( polyfillName, 'ERROR' );
     }
-    
-    proto.addClass = function(name){
-        
+
+    proto.addClass = function ( name ) {
+        this.className = this.className + ' ' + name;
     }
-    proto.removeClass = function(name){
-        
+    proto.removeClass = function ( name ) {
+        this.className = this.className.replace( new RegExp( '\\b' + name + '\\b' ), '' )
     }
-    proto.toggleClass = function(name){
-        console.log('toggle: ' + this.className);
+    proto.toggleClass = function ( name ) {
+
+        console.log(this.className);
+
+        if( (new RegExp( '\\b' + name + '\\b' )).test( this.className ) ) {
+
+            this.removeClass( name );
+
+        } else {
+
+            this.addClass( name )
+
+        }
+
     }
+
 
 }
 
