@@ -22,6 +22,15 @@ eventDispatcherMixin.apply( CoreEventDispatcher, true );
  */
 function CoreEventDispatcher () {
 
+    var _this = this;
+    
+
+    this.setDestruct( function () {
+
+        _this.removeAllEventListeners();
+
+    })
+
 
 }
 
