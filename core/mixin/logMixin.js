@@ -110,11 +110,11 @@ logMixin.apply = function ( constructor, opt_unsafe ) {
     var proto = constructor.prototype;
 
     if( !opt_unsafe && (
-        typeof proto[ 'logDebug' ] !== 'undefined' ||
-        typeof proto[ 'logInfo' ] !== 'undefined' ||
-        typeof proto[ 'logWarn' ] !== 'undefined' ||
-        typeof proto[ 'logError' ] !== 'undefined' ||
-        typeof proto[ 'logFatal' ] !== 'undefined' ) ) {
+        proto[ 'logDebug' ] !== undefined ||
+        proto[ 'logInfo' ] !== undefined ||
+        proto[ 'logWarn' ] !== undefined ||
+        proto[ 'logError' ] !== undefined ||
+        proto[ 'logFatal' ] !== undefined ) ) {
 
         throw new Error( 'Failed to apply the mixin because some property name is already taken!' );
 

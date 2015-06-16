@@ -1,6 +1,8 @@
 // @formatter:off
+
 var log                     = require('../../debug/Log');
-var polyfillName            = 'html element shim'
+var shimName                = 'htmEelementShim'
+
 // @formatter:on
 
 /**
@@ -12,16 +14,20 @@ function addClassFunctions ( global ) {
 
     var proto = HTMLElement.prototype;
 
+    if( typeof proto[ 'hasClass' ] !== 'undefined' ||
+        typeof proto[ 'addClass' ] !== 'undefined' ||
+        typeof proto[ 'toggleClass' ] !== 'undefined' ||
+        typeof proto[ 'removeClass' ] !== 'undefined' ) {
 
-    if( typeof proto[ 'hasClass' ] !== 'undefined' || typeof proto[ 'addClass' ] !== 'undefined' || typeof proto[ 'toggleClass' ] !== 'undefined' || typeof proto[ 'removeClass' ] !== 'undefined' ) {
-        return log.error( polyfillName, 'Element already has this function' );
+        return log.error( shimName, 'Element already has this function' );
+
     }
 
     proto.hasClass = function ( name ) {
         return (new RegExp( '\\b' + name + '\\b' )).test( this.className )
     }
     proto.addClass = function ( name ) {
-        if(!this.hasClass(name)) this.className = this.className + ' ' + name;
+        if( !this.hasClass( name ) ) this.className = this.className + ' ' + name;
     }
     proto.removeClass = function ( name ) {
         this.className = this.className.replace( new RegExp( '\\b' + name + '\\b' ), '' )
@@ -45,8 +51,8 @@ function addClassFunctions ( global ) {
 }
 
 
-var polyfillApplied;
-var polyfill = {}
+var shimApplied;
+var htmlElementShim = {}
 
 /**
  * Applies basic polyfill to add basic cross-browser functionality
@@ -54,10 +60,10 @@ var polyfill = {}
  * @function apply
  * @param opt_global {object=}
  */
-polyfill.apply = function ( opt_global ) {
+htmlElementShim.apply = function ( opt_global ) {
 
-    if( polyfillApplied ) return;
-    polyfillApplied = true;
+    if( shimApplied ) return;
+    shimApplied = true;
 
     opt_global = opt_global || global || window;
 
@@ -65,5 +71,7 @@ polyfill.apply = function ( opt_global ) {
 
 }
 
-if( typeof Object.freeze === 'function' ) Object.freeze( polyfill ) // lock the object to minimize accidental changes
-module.exports = polyfill;
+
+if( typeof Object.freeze === 'function' ) Object.freeze( htmlElementShim ) // lock the object to minimize accidental changes
+
+module.exports = htmlElementShim;

@@ -85,9 +85,9 @@ destructibleMixin.apply = function ( constructor, opt_unsafe ) {
     var proto = constructor.prototype;
 
     if( !opt_unsafe && (
-        typeof proto[ 'destruct' ] !== 'undefined' ||
-        typeof proto[ 'isDestructed' ] !== 'undefined' ||
-        typeof proto[ 'setDestruct' ] !== 'undefined' ) ) {
+        proto[ 'destruct' ] !== undefined ||
+        proto[ 'isDestructed' ] !== undefined ||
+        proto[ 'setDestruct' ] !== undefined ) ) {
 
         throw new Error( 'Failed to apply the mixin because some property name is already taken!' );
 

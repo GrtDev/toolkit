@@ -138,6 +138,21 @@ eventDispatcherMixin.removeEventListener = function ( type, listener ) {
 
 }
 
+
+/**
+ * Removes an event listener
+ * @param type {string}
+ * @param listener {function}
+ */
+eventDispatcherMixin.removeAllEventListeners = function () {
+
+
+    this._listeners = undefined;
+    this._oneTimeListeners = undefined;
+
+}
+
+
 /**
  * Dispatches an event
  * @param event {CoreEvent|object}
@@ -156,12 +171,12 @@ eventDispatcherMixin.dispatchEvent = function ( event ) {
         listeners = this._listeners;
         listenerArray = listeners[ event.type ];
 
-        if( !event.target && typeof event.setTarget === 'function') event.setTarget( this );
+        if( !event.target && typeof event.setTarget === 'function' ) event.setTarget( this );
 
         if( listenerArray !== undefined ) {
 
             length = listenerArray.length;
-            array = new Array(length);
+            array = new Array( length );
 
             for ( i = 0; i < length; i++ ) {
 
@@ -185,12 +200,12 @@ eventDispatcherMixin.dispatchEvent = function ( event ) {
         listeners = this._oneTimeListeners;
         listenerArray = listeners[ event.type ];
 
-        if( !event.target && typeof event.setTarget === 'function') event.setTarget( this );
+        if( !event.target && typeof event.setTarget === 'function' ) event.setTarget( this );
 
         if( listenerArray !== undefined ) {
 
             length = listenerArray.length;
-            array = new Array(length);
+            array = new Array( length );
 
             for ( i = 0; i < length; i++ ) {
 
@@ -202,7 +217,7 @@ eventDispatcherMixin.dispatchEvent = function ( event ) {
 
                 listener = array[ i ];
                 listener.call( this, event );
-                this.removeEventListener(event.type, listener);
+                this.removeEventListener( event.type, listener );
 
             }
 
@@ -220,23 +235,23 @@ eventDispatcherMixin.apply = function ( constructor, opt_unsafe ) {
     var proto = constructor.prototype;
 
     if( !opt_unsafe && (
-        typeof proto[ 'addEventListener' ] !== 'undefined' ||
-        typeof proto[ 'addEventListenerOnce' ] !== 'undefined' ||
-        typeof proto[ 'hasEventListener' ] !== 'undefined' ||
-        typeof proto[ 'dispatchEvent' ] !== 'undefined' ) ) {
+        proto[ 'addEventListener' ] !== undefined ||
+        proto[ 'addEventListenerOnce' ] !== undefined ||
+        proto[ 'hasEventListener' ] !== undefined ||
+        proto[ 'dispatchEvent' ] !== undefined ) ) {
 
         throw new Error( 'Failed to apply the mixin because some property name is already taken!' );
 
     }
 
-    proto.addEventListener          = eventDispatcherMixin.addEventListener;
-    proto.addEventListenerOnce      = eventDispatcherMixin.addEventListenerOnce;
-    proto.hasEventListener          = eventDispatcherMixin.hasEventListener;
-    proto.dispatchEvent             = eventDispatcherMixin.dispatchEvent;
+    proto.addEventListener = eventDispatcherMixin.addEventListener;
+    proto.addEventListenerOnce = eventDispatcherMixin.addEventListenerOnce;
+    proto.hasEventListener = eventDispatcherMixin.hasEventListener;
+    proto.dispatchEvent = eventDispatcherMixin.dispatchEvent;
 
 };
 
 
-if( typeof Object.freeze === 'function') Object.freeze(eventDispatcherMixin) // lock the object to minimize accidental changes
+if( typeof Object.freeze === 'function' ) Object.freeze( eventDispatcherMixin ) // lock the object to minimize accidental changes
 
 module.exports = eventDispatcherMixin;

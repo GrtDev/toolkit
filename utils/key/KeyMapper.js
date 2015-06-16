@@ -42,7 +42,7 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
 
         keyCode = keyCode.toString();
 
-        if( typeof _callbackCollection[ keyCode ] === 'undefined' ) {
+        if( _callbackCollection[ keyCode ] === undefined ) {
 
             _callbackCollection[ keyCode ] = [ callback ];
             _paramsCollection[ keyCode ] = [ opt_params ];
@@ -69,7 +69,7 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
      */
     this.unmap = function ( keyCode, callback ) {
 
-        if( typeof _callbackCollection[ keyCode ] === 'undefined' )  return _this.logWarn( callback( 'Callback of this key could not be found!' ) );
+        if( _callbackCollection[ keyCode ] === undefined )  return _this.logWarn( callback( 'Callback of this key could not be found!' ) );
 
         var index = _callbackCollection[ keyCode ].indexOf( callback );
 
@@ -104,7 +104,7 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
      */
     function handleKeyDownEvent ( event ) {
 
-        if( typeof _callbackCollection[ event.keyCode ] !== 'undefined' ) {
+        if( _callbackCollection[ event.keyCode ] !== undefined ) {
 
             _callbacks = _callbackCollection[ event.keyCode.toString() ];
             _params = _paramsCollection[ event.keyCode.toString() ];
@@ -113,8 +113,8 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
             var length = _callbacks.length;
 
             // make a copy of the collection in case a callback gets removed during execution
-            var arrayCallback = new Array(length);
-            var arrayParams = new Array(length);
+            var arrayCallback = new Array( length );
+            var arrayParams = new Array( length );
 
             for ( var i = 0; i < length; i++ ) {
 
@@ -183,13 +183,13 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
 
         this.disable();
 
-         _callbackCollection = null;
-         _callbackCollectionLength = -1;
-         _paramsCollection = null;
-         _target = null;
-         _autoEnable = false;
-         _callbacks = null;
-         _params = null;
+        _callbackCollection = null;
+        _callbackCollectionLength = -1;
+        _paramsCollection = null;
+        _target = null;
+        _autoEnable = false;
+        _callbacks = null;
+        _params = null;
 
     } );
 

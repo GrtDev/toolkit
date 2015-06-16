@@ -24,6 +24,7 @@ CoreObject.numObjects = 0;
 /**
  * Creates a new Object with log capabilities and a destruct method.
  * @mixes destructibleMixin
+ * @mixes logMixin
  * @constructor
  */
 function CoreObject () {
