@@ -8,109 +8,111 @@
 
 /**
  * @namespace
- * @property {number} BACKSPACE 	- Corresponding key code for this button.
- * @property {number} TAB			- Corresponding key code for this button.
- * @property {number} ENTER			- Corresponding key code for this button.
- * @property {number} SHIFT			- Corresponding key code for this button.
- * @property {number} CTRL			- Corresponding key code for this button.
- * @property {number} ALT			- Corresponding key code for this button.
- * @property {number} CAPS_LOCK		- Corresponding key code for this button.
- * @property {number} ESCAPE		- Corresponding key code for this button.
- * @property {number} SPACE			- Corresponding key code for this button.
+ * @type {object}
+ *
+ * @property {number} BACKSPACE 	    - Corresponding key code for this button.
+ * @property {number} TAB			    - Corresponding key code for this button.
+ * @property {number} ENTER			    - Corresponding key code for this button.
+ * @property {number} SHIFT			    - Corresponding key code for this button.
+ * @property {number} CTRL			    - Corresponding key code for this button.
+ * @property {number} ALT			    - Corresponding key code for this button.
+ * @property {number} CAPS_LOCK		    - Corresponding key code for this button.
+ * @property {number} ESCAPE		    - Corresponding key code for this button.
+ * @property {number} SPACE			    - Corresponding key code for this button.
 
- * @property {number} ARROW_LEFT	- Corresponding key code for this button.
- * @property {number} ARROW_UP		- Corresponding key code for this button.
- * @property {number} ARROW_RIGHT	- Corresponding key code for this button.
- * @property {number} ARROW_DOWN	- Corresponding key code for this button.
+ * @property {number} ARROW_LEFT	    - Corresponding key code for this button.
+ * @property {number} ARROW_UP		    - Corresponding key code for this button.
+ * @property {number} ARROW_RIGHT	    - Corresponding key code for this button.
+ * @property {number} ARROW_DOWN	    - Corresponding key code for this button.
 
- * @property {number} PAUSE_BREAK	- Corresponding key code for this button.
- * @property {number} PRINT_SCREEN	- Corresponding key code for this button.
- * @property {number} INSERT		- Corresponding key code for this button.
- * @property {number} DELETE		- Corresponding key code for this button.
- * @property {number} HOME			- Corresponding key code for this button.
- * @property {number} END			- Corresponding key code for this button.
- * @property {number} PAGE_UP		- Corresponding key code for this button.
- * @property {number} PAGE_DOWN		- Corresponding key code for this button.
+ * @property {number} PAUSE_BREAK		- Corresponding key code for this button.
+ * @property {number} PRINT_SCREEN		- Corresponding key code for this button.
+ * @property {number} INSERT			- Corresponding key code for this button.
+ * @property {number} DELETE			- Corresponding key code for this button.
+ * @property {number} HOME				- Corresponding key code for this button.
+ * @property {number} END				- Corresponding key code for this button.
+ * @property {number} PAGE_UP			- Corresponding key code for this button.
+ * @property {number} PAGE_DOWN			- Corresponding key code for this button.
 
- * @property {number} NUM_0			- Corresponding key code for this button.
- * @property {number} NUM_1			- Corresponding key code for this button.
- * @property {number} NUM_2			- Corresponding key code for this button.
- * @property {number} NUM_3			- Corresponding key code for this button.
- * @property {number} NUM_4			- Corresponding key code for this button.
- * @property {number} NUM_5			- Corresponding key code for this button.
- * @property {number} NUM_6			- Corresponding key code for this button.
- * @property {number} NUM_7			- Corresponding key code for this button.
- * @property {number} NUM_8			- Corresponding key code for this button.
- * @property {number} NUM_9			- Corresponding key code for this button.
+ * @property {number} NUM_0				- Corresponding key code for this button.
+ * @property {number} NUM_1				- Corresponding key code for this button.
+ * @property {number} NUM_2				- Corresponding key code for this button.
+ * @property {number} NUM_3				- Corresponding key code for this button.
+ * @property {number} NUM_4				- Corresponding key code for this button.
+ * @property {number} NUM_5				- Corresponding key code for this button.
+ * @property {number} NUM_6				- Corresponding key code for this button.
+ * @property {number} NUM_7				- Corresponding key code for this button.
+ * @property {number} NUM_8				- Corresponding key code for this button.
+ * @property {number} NUM_9				- Corresponding key code for this button.
 
- * @property {number} A				- Corresponding key code for this button.
- * @property {number} B				- Corresponding key code for this button.
- * @property {number} C				- Corresponding key code for this button.
- * @property {number} D				- Corresponding key code for this button.
- * @property {number} E				- Corresponding key code for this button.
- * @property {number} F				- Corresponding key code for this button.
- * @property {number} G				- Corresponding key code for this button.
- * @property {number} H				- Corresponding key code for this button.
- * @property {number} I				- Corresponding key code for this button.
- * @property {number} J				- Corresponding key code for this button.
- * @property {number} K				- Corresponding key code for this button.
- * @property {number} L				- Corresponding key code for this button.
- * @property {number} M				- Corresponding key code for this button.
- * @property {number} N				- Corresponding key code for this button.
- * @property {number} O				- Corresponding key code for this button.
- * @property {number} P				- Corresponding key code for this button.
- * @property {number} Q				- Corresponding key code for this button.
- * @property {number} R				- Corresponding key code for this button.
- * @property {number} S				- Corresponding key code for this button.
- * @property {number} T				- Corresponding key code for this button.
- * @property {number} U				- Corresponding key code for this button.
- * @property {number} V				- Corresponding key code for this button.
- * @property {number} W				- Corresponding key code for this button.
- * @property {number} X				- Corresponding key code for this button.
- * @property {number} Y				- Corresponding key code for this button.
- * @property {number} Z				- Corresponding key code for this button.
+ * @property {number} A					- Corresponding key code for this button.
+ * @property {number} B					- Corresponding key code for this button.
+ * @property {number} C					- Corresponding key code for this button.
+ * @property {number} D					- Corresponding key code for this button.
+ * @property {number} E					- Corresponding key code for this button.
+ * @property {number} F					- Corresponding key code for this button.
+ * @property {number} G					- Corresponding key code for this button.
+ * @property {number} H					- Corresponding key code for this button.
+ * @property {number} I					- Corresponding key code for this button.
+ * @property {number} J					- Corresponding key code for this button.
+ * @property {number} K					- Corresponding key code for this button.
+ * @property {number} L					- Corresponding key code for this button.
+ * @property {number} M					- Corresponding key code for this button.
+ * @property {number} N					- Corresponding key code for this button.
+ * @property {number} O					- Corresponding key code for this button.
+ * @property {number} P					- Corresponding key code for this button.
+ * @property {number} Q					- Corresponding key code for this button.
+ * @property {number} R					- Corresponding key code for this button.
+ * @property {number} S					- Corresponding key code for this button.
+ * @property {number} T					- Corresponding key code for this button.
+ * @property {number} U					- Corresponding key code for this button.
+ * @property {number} V					- Corresponding key code for this button.
+ * @property {number} W					- Corresponding key code for this button.
+ * @property {number} X					- Corresponding key code for this button.
+ * @property {number} Y					- Corresponding key code for this button.
+ * @property {number} Z					- Corresponding key code for this button.
 
- * @property {number} NUMPAD_0		- Corresponding key code for this button.
- * @property {number} NUMPAD_1		- Corresponding key code for this button.
- * @property {number} NUMPAD_2		- Corresponding key code for this button.
- * @property {number} NUMPAD_3		- Corresponding key code for this button.
- * @property {number} NUMPAD_4		- Corresponding key code for this button.
- * @property {number} NUMPAD_5		- Corresponding key code for this button.
- * @property {number} NUMPAD_6		- Corresponding key code for this button.
- * @property {number} NUMPAD_7		- Corresponding key code for this button.
- * @property {number} NUMPAD_8		- Corresponding key code for this button.
- * @property {number} NUMPAD_9		- Corresponding key code for this button.
+ * @property {number} NUMPAD_0			- Corresponding key code for this button.
+ * @property {number} NUMPAD_1			- Corresponding key code for this button.
+ * @property {number} NUMPAD_2			- Corresponding key code for this button.
+ * @property {number} NUMPAD_3			- Corresponding key code for this button.
+ * @property {number} NUMPAD_4			- Corresponding key code for this button.
+ * @property {number} NUMPAD_5			- Corresponding key code for this button.
+ * @property {number} NUMPAD_6			- Corresponding key code for this button.
+ * @property {number} NUMPAD_7			- Corresponding key code for this button.
+ * @property {number} NUMPAD_8			- Corresponding key code for this button.
+ * @property {number} NUMPAD_9			- Corresponding key code for this button.
 
- * @property {number} MULTIPLY		- Corresponding key code for this button.
- * @property {number} ADD			- Corresponding key code for this button.
- * @property {number} SUBTRACT		- Corresponding key code for this button.
- * @property {number} DECIMAL_POINT	- Corresponding key code for this button.
- * @property {number} DIVIDE		- Corresponding key code for this button.
+ * @property {number} MULTIPLY			- Corresponding key code for this button.
+ * @property {number} ADD				- Corresponding key code for this button.
+ * @property {number} SUBTRACT			- Corresponding key code for this button.
+ * @property {number} DECIMAL_POINT		- Corresponding key code for this button.
+ * @property {number} DIVIDE			- Corresponding key code for this button.
 
- * @property {number} F1			- Corresponding key code for this button.
- * @property {number} F2			- Corresponding key code for this button.
- * @property {number} F3			- Corresponding key code for this button.
- * @property {number} F4			- Corresponding key code for this button.
- * @property {number} F5			- Corresponding key code for this button.
- * @property {number} F6			- Corresponding key code for this button.
- * @property {number} F7			- Corresponding key code for this button.
- * @property {number} F8			- Corresponding key code for this button.
- * @property {number} F9			- Corresponding key code for this button.
- * @property {number} F10			- Corresponding key code for this button.
- * @property {number} F11			- Corresponding key code for this button.
- * @property {number} F12			- Corresponding key code for this button.
+ * @property {number} F1				- Corresponding key code for this button.
+ * @property {number} F2				- Corresponding key code for this button.
+ * @property {number} F3				- Corresponding key code for this button.
+ * @property {number} F4				- Corresponding key code for this button.
+ * @property {number} F5				- Corresponding key code for this button.
+ * @property {number} F6				- Corresponding key code for this button.
+ * @property {number} F7				- Corresponding key code for this button.
+ * @property {number} F8				- Corresponding key code for this button.
+ * @property {number} F9				- Corresponding key code for this button.
+ * @property {number} F10				- Corresponding key code for this button.
+ * @property {number} F11				- Corresponding key code for this button.
+ * @property {number} F12				- Corresponding key code for this button.
 
- * @property {number} NUM_LOCK		- Corresponding key code for this button.
- * @property {number} SCROLL_LOCK	- Corresponding key code for this button.
- * @property {number} SEMI_COLON	- Corresponding key code for this button.
- * @property {number} COMMA			- Corresponding key code for this button.
- * @property {number} DASH			- Corresponding key code for this button.
- * @property {number} PERIOD		- Corresponding key code for this button.
- * @property {number} FORWARD_SLASH	- Corresponding key code for this button.
- * @property {number} OPEN_BRACKET	- Corresponding key code for this button.
- * @property {number} CLOSE_BRACKET	- Corresponding key code for this button.
- * @property {number} BACK_SLASH	- Corresponding key code for this button.
- * @property {number} SINGLE_QUOTE	- Corresponding key code for this button.
+ * @property {number} NUM_LOCK			- Corresponding key code for this button.
+ * @property {number} SCROLL_LOCK		- Corresponding key code for this button.
+ * @property {number} SEMI_COLON		- Corresponding key code for this button.
+ * @property {number} COMMA				- Corresponding key code for this button.
+ * @property {number} DASH				- Corresponding key code for this button.
+ * @property {number} PERIOD			- Corresponding key code for this button.
+ * @property {number} FORWARD_SLASH		- Corresponding key code for this button.
+ * @property {number} OPEN_BRACKET		- Corresponding key code for this button.
+ * @property {number} CLOSE_BRACKET		- Corresponding key code for this button.
+ * @property {number} BACK_SLASH		- Corresponding key code for this button.
+ * @property {number} SINGLE_QUOTE		- Corresponding key code for this button.
  */
 var keyCode = {};
 
@@ -218,6 +220,8 @@ keyCode.CLOSE_BRACKET	= 221;
 keyCode.BACK_SLASH		= 220;
 keyCode.SINGLE_QUOTE	= 222;
 
+
+if( typeof Object.freeze === 'function') Object.freeze(keyCode) // lock the object to minimize accidental changes
 
 module.exports = keyCode;
 

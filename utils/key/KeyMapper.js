@@ -16,6 +16,7 @@ CoreObject.extend( KeyMapper );
  * @extends {CoreObject}
  */
 function KeyMapper ( opt_target, opt_autoEnable ) {
+
     var _this = this;
     var _callbackCollection = {};
     var _callbackCollectionLength = 0;
@@ -25,7 +26,6 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
     var _autoEnable = typeof opt_autoEnable === 'undefined' || opt_autoEnable;
     var _callbacks;
     var _params;
-    var _i;
 
 
     /**
@@ -40,17 +40,22 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
 
         if( this.isDestructed ) return;
 
-        keyCode = String( keyCode );
+        keyCode = keyCode.toString();
 
-        if( !( keyCode in _callbackCollection) ) {
+        if( typeof _callbackCollection[ keyCode ] === 'undefined' ) {
+
             _callbackCollection[ keyCode ] = [ callback ];
             _paramsCollection[ keyCode ] = [ opt_params ];
             _callbackCollectionLength++;
+
         }
         else {
+
             _callbackCollection[ keyCode ].push( callback );
             _paramsCollection[ keyCode ].push( opt_params );
+
         }
+
 
         if( _autoEnable && !_enabled ) _this.enable();
     }
@@ -63,15 +68,17 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
      * @param callback - the callback to remove.
      */
     this.unmap = function ( keyCode, callback ) {
-        if( !( keyCode in _callbackCollection) ) {
-            _this.logError( callback( 'Callback of this key could not be found!' ) );
-            return;
-        }
+
+        if( typeof _callbackCollection[ keyCode ] === 'undefined' )  return _this.logWarn( callback( 'Callback of this key could not be found!' ) );
+
         var index = _callbackCollection[ keyCode ].indexOf( callback );
+
         if( index >= 0 ) {
+
             _callbackCollection[ keyCode ].splice( index, 1 );
             _paramsCollection[ keyCode ].splice( index, 1 );
             _callbackCollectionLength--;
+
         }
     }
 
@@ -81,10 +88,12 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
      * @public
      */
     this.clear = function () {
+
         _callbackCollection = {};
         _callbackCollectionLength = 0;
         _paramsCollection = {};
         _callbacks = null;
+
     }
 
     /**
@@ -95,18 +104,32 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
      */
     function handleKeyDownEvent ( event ) {
 
-        if( String( event.keyCode ) in _callbackCollection ) {
+        if( typeof _callbackCollection[ event.keyCode ] !== 'undefined' ) {
 
-            _callbacks = _callbackCollection[ String( event.keyCode ) ];
-            _params = _paramsCollection[ String( event.keyCode ) ];
+            _callbacks = _callbackCollection[ event.keyCode.toString() ];
+            _params = _paramsCollection[ event.keyCode.toString() ];
 
-            if(!_callbacks) return _this.logError('failed to retrieve key map callback collection');
+            var i;
+            var length = _callbacks.length;
 
-            //TODO: Fix length bug
+            // make a copy of the collection in case a callback gets removed during execution
+            var arrayCallback = new Array(length);
+            var arrayParams = new Array(length);
 
-            for ( _i = 0; _i < _callbacks.length; _i++ ) {
-                _callbacks[ _i ].apply( null, _params[ _i ] );
+            for ( var i = 0; i < length; i++ ) {
+
+                arrayCallback[ i ] = _callbacks[ i ];
+                arrayParams[ i ] = _params[ i ];
+
             }
+
+
+            for ( i = 0; i < length; i++ ) {
+
+                arrayCallback[ i ].apply( null, arrayParams[ i ] );
+
+            }
+
         }
 
     }
@@ -151,17 +174,26 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
         }
     } );
 
+    /**
+     * Destructs the key mapper and makes it available for the garbage collector.
+     */
+    _this.setDestruct( function () {
+
+        if( this.isDestructed ) return;
+
+        this.disable();
+
+         _callbackCollection = null;
+         _callbackCollectionLength = -1;
+         _paramsCollection = null;
+         _target = null;
+         _autoEnable = false;
+         _callbacks = null;
+         _params = null;
+
+    } );
+
 }
 
-/**
- * @memberOf sector22/utils/focus.FocusListener
- * @see module:sector22/core.CoreObject#destruct
- */
-KeyMapper.prototype.destruct = function () {
-    if( this.isDestructed ) return;
-    this.disable();
-    this.clear();
-    KeyMapper.super_.prototype.destruct.call( this );
-}
 
 module.exports = KeyMapper;

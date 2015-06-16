@@ -160,8 +160,8 @@ eventDispatcherMixin.dispatchEvent = function ( event ) {
 
         if( listenerArray !== undefined ) {
 
-            array = [];
             length = listenerArray.length;
+            array = new Array(length);
 
             for ( i = 0; i < length; i++ ) {
 
@@ -185,12 +185,12 @@ eventDispatcherMixin.dispatchEvent = function ( event ) {
         listeners = this._oneTimeListeners;
         listenerArray = listeners[ event.type ];
 
-        if( !event.target ) event.setTarget( this );
+        if( !event.target && typeof event.setTarget === 'function') event.setTarget( this );
 
         if( listenerArray !== undefined ) {
 
-            array = [];
             length = listenerArray.length;
+            array = new Array(length);
 
             for ( i = 0; i < length; i++ ) {
 
