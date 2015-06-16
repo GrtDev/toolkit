@@ -5,24 +5,21 @@
  *
  * Based on mrDoob's EventDispatcher
  * @see: https://github.com/mrdoob/eventdispatcher.js/
+ *
  */
 
-var applyMixin = require( '../utils/applyMixin' );
+/**
+ * @mixin eventDispatcherMixin
+ */
+eventDispatcherMixin = {};
 
-mixin = {};
-
-mixin.apply = function ( constructor ) {
-
-    applyMixin( constructor, mixin );
-
-};
 
 /**
  * Adds an event listener to this dispatcher
  * @param type {string}
  * @param listener {function}
  */
-mixin.addEventListener = function ( type, listener ) {
+eventDispatcherMixin.addEventListener = function ( type, listener ) {
 
     if( this._listeners === undefined ) this._listeners = {};
 
@@ -45,7 +42,7 @@ mixin.addEventListener = function ( type, listener ) {
  * @param type {string}
  * @param listener {function}
  */
-mixin.addEventListenerOnce = function ( type, listener ) {
+eventDispatcherMixin.addEventListenerOnce = function ( type, listener ) {
 
     if( this._oneTimeListeners === undefined ) this._oneTimeListeners = {};
 
@@ -68,7 +65,7 @@ mixin.addEventListenerOnce = function ( type, listener ) {
  * @param listener {function}
  * @returns {boolean}
  */
-mixin.hasEventListener = function ( type, listener ) {
+eventDispatcherMixin.hasEventListener = function ( type, listener ) {
 
     if( this._listeners === undefined ) return false;
 
@@ -97,7 +94,7 @@ mixin.hasEventListener = function ( type, listener ) {
  * @param type {string}
  * @param listener {function}
  */
-mixin.removeEventListener = function ( type, listener ) {
+eventDispatcherMixin.removeEventListener = function ( type, listener ) {
 
     var listeners;
     var listenerArray;
@@ -145,7 +142,7 @@ mixin.removeEventListener = function ( type, listener ) {
  * Dispatches an event
  * @param event {CoreEvent|object}
  */
-mixin.dispatchEvent = function ( event ) {
+eventDispatcherMixin.dispatchEvent = function ( event ) {
 
     var listeners;
     var listenerArray;
@@ -213,5 +210,33 @@ mixin.dispatchEvent = function ( event ) {
     }
 }
 
+/**
+ * Adds the mixin functionality to the constructors prototype
+ * @param constructor {function}
+ * @param opt_unsafe {boolean=false} won't double check if we are overwriting anything if true
+ */
+eventDispatcherMixin.apply = function ( constructor, opt_unsafe ) {
 
-module.exports = mixin;
+    var proto = constructor.prototype;
+
+    if( !opt_unsafe && (
+        typeof proto[ 'addEventListener' ] !== 'undefined' ||
+        typeof proto[ 'addEventListenerOnce' ] !== 'undefined' ||
+        typeof proto[ 'hasEventListener' ] !== 'undefined' ||
+        typeof proto[ 'dispatchEvent' ] !== 'undefined' ) ) {
+
+        throw new Error( 'Failed to apply the mixin because some property name is already taken!' );
+
+    }
+
+    proto.addEventListener          = eventDispatcherMixin.addEventListener;
+    proto.addEventListenerOnce      = eventDispatcherMixin.addEventListenerOnce;
+    proto.hasEventListener          = eventDispatcherMixin.hasEventListener;
+    proto.dispatchEvent             = eventDispatcherMixin.dispatchEvent;
+
+};
+
+
+if( typeof Object.freeze === 'function') Object.freeze(eventDispatcherMixin) // lock the object to minimize accidental changes
+
+module.exports = eventDispatcherMixin;

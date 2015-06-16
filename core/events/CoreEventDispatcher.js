@@ -6,22 +6,24 @@
 
 // @formatter:off
 
-var log                             = require('../../debug/Log').getInstance();
 var CoreObject                      = require('./../CoreObject');
-var eventDispatcherMixin            = require('./eventDispatcherMixin');
+var eventDispatcherMixin            = require('./../mixin/eventDispatcherMixin');
 
 //@formatter:on
 
 CoreObject.extend( CoreEventDispatcher );
 
-eventDispatcherMixin.apply( CoreEventDispatcher );
+eventDispatcherMixin.apply( CoreEventDispatcher, true );
 
 /**
  * Creates a new CoreEventDispatcher
  * @constructor
  * @extends {CoreObject}
  */
-function CoreEventDispatcher () {}
+function CoreEventDispatcher () {
+
+
+}
 
 
 module.exports = CoreEventDispatcher
