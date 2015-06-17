@@ -17,7 +17,7 @@ CoreLoader.extend(JSONLoader);
  */
 function JSONLoader() {
 
-    JSONLoader._super();
+    JSONLoader._super.call(this);
 
     var _this = this;
 

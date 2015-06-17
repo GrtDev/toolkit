@@ -1,7 +1,7 @@
 // @formatter:off
 
 var log                     = require('../../debug/Log');
-var shimName                = 'htmEelementShim'
+var shimName                = 'htmlElementShim'
 
 // @formatter:on
 
@@ -14,10 +14,10 @@ function addClassFunctions ( global ) {
 
     var proto = HTMLElement.prototype;
 
-    if( typeof proto[ 'hasClass' ] !== 'undefined' ||
-        typeof proto[ 'addClass' ] !== 'undefined' ||
-        typeof proto[ 'toggleClass' ] !== 'undefined' ||
-        typeof proto[ 'removeClass' ] !== 'undefined' ) {
+    if( proto[ 'hasClass' ] !== undefined ||
+        proto[ 'addClass' ] !== undefined ||
+        proto[ 'toggleClass' ] !== undefined ||
+        proto[ 'removeClass' ] !== undefined ) {
 
         return log.error( shimName, 'Element already has this function' );
 

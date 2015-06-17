@@ -39,8 +39,8 @@ singletonMixin.singletonCheck = function  ( singleton ) {};
 singletonMixin.apply = function ( constructor, opt_unsafe ) {
 
     if( !opt_unsafe && (
-        constructor[ 'getInstance' ] === undefined ||
-        constructor[ 'singletonCheck' ] === undefined ) ) {
+        constructor[ 'getInstance' ] !== undefined ||
+        constructor[ 'singletonCheck' ] !== undefined ) ) {
 
         throw new Error( 'Failed to apply the mixin because some property name is already taken!' );
 

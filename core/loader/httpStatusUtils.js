@@ -74,6 +74,11 @@ var httpStatusCollection = {
 
 var httpStatusUtils = {};
 
+/**
+ * Returns description of a HTTPStatus code
+ * @param number {number}
+ * @returns {string}
+ */
 httpStatusUtils.getDescription = function ( number ) {
 
     if( !number || typeof number !== 'number' ) return null;
@@ -97,4 +102,5 @@ httpStatusUtils.getDescription = function ( number ) {
 
 
 if( typeof Object.freeze === 'function' ) Object.freeze( httpStatusUtils ) // lock the object to minimize accidental changes
+
 module.exports = httpStatusUtils;
