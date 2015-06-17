@@ -39,7 +39,7 @@ destructibleMixin.destruct = function () {
  * Sets the destruct function for this class, will also automatically
  * call the super classes destruct function when called.
  * @function setDestruct
- * @public
+ * @protected
  * @param destructFunction {function}
  */
 destructibleMixin.setDestruct = function ( destructFunction ) {

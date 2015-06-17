@@ -16,6 +16,8 @@ eventDispatcherMixin = {};
 
 /**
  * Adds an event listener to this dispatcher
+ * @function
+ * @public
  * @param type {string}
  * @param listener {function}
  */
@@ -39,6 +41,8 @@ eventDispatcherMixin.addEventListener = function ( type, listener ) {
 /**
  * Adds an event listener to this dispatcher which will be
  * automatically removed after the event is dispatched.
+ * @function
+ * @public
  * @param type {string}
  * @param listener {function}
  */
@@ -61,6 +65,8 @@ eventDispatcherMixin.addEventListenerOnce = function ( type, listener ) {
 
 /**
  * Checks if this event dispatcher has this listener
+ * @function
+ * @public
  * @param type {string}
  * @param listener {function}
  * @returns {boolean}
@@ -91,6 +97,8 @@ eventDispatcherMixin.hasEventListener = function ( type, listener ) {
 
 /**
  * Removes an event listener
+ * @function
+ * @public
  * @param type {string}
  * @param listener {function}
  */
@@ -140,12 +148,11 @@ eventDispatcherMixin.removeEventListener = function ( type, listener ) {
 
 
 /**
- * Removes an event listener
- * @param type {string}
- * @param listener {function}
+ * Removes all event listeners
+ * @public
+ * @function
  */
 eventDispatcherMixin.removeAllEventListeners = function () {
-
 
     this._listeners = undefined;
     this._oneTimeListeners = undefined;
@@ -155,6 +162,7 @@ eventDispatcherMixin.removeAllEventListeners = function () {
 
 /**
  * Dispatches an event
+ * @protected
  * @param event {CoreEvent|object}
  */
 eventDispatcherMixin.dispatchEvent = function ( event ) {
@@ -238,6 +246,7 @@ eventDispatcherMixin.apply = function ( constructor, opt_unsafe ) {
         proto[ 'addEventListener' ] !== undefined ||
         proto[ 'addEventListenerOnce' ] !== undefined ||
         proto[ 'hasEventListener' ] !== undefined ||
+        proto[ 'removeAllEventListeners' ] !== undefined ||
         proto[ 'dispatchEvent' ] !== undefined ) ) {
 
         throw new Error( 'Failed to apply the mixin because some property name is already taken!' );
@@ -247,6 +256,7 @@ eventDispatcherMixin.apply = function ( constructor, opt_unsafe ) {
     proto.addEventListener = eventDispatcherMixin.addEventListener;
     proto.addEventListenerOnce = eventDispatcherMixin.addEventListenerOnce;
     proto.hasEventListener = eventDispatcherMixin.hasEventListener;
+    proto.removeAllEventListeners = eventDispatcherMixin.removeAllEventListeners;
     proto.dispatchEvent = eventDispatcherMixin.dispatchEvent;
 
 };

@@ -23,7 +23,7 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
     var _paramsCollection = {};
     var _enabled;
     var _target = opt_target || window;
-    var _autoEnable = typeof opt_autoEnable === 'undefined' || opt_autoEnable;
+    var _autoEnable = opt_autoEnable === undefined || opt_autoEnable;
     var _callbacks;
     var _params;
 
@@ -32,7 +32,7 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
      * Maps a callback to the given key code, and saves the arguments to use.
      * @memberOf sector22/utils/keys.KeyMapper
      * @public
-     * @param keyCode {number} - the key code to listen to.
+     * @param keyCode {number|string} - the key code to listen to.
      * @param callback {function} - the callback to call when the key is pressed
      * @param opt_params {array=} - optional arguments to pass onto the callback when triggered.
      */
@@ -40,7 +40,7 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
 
         if( this.isDestructed ) return;
 
-        keyCode = keyCode.toString();
+        keyCode = '' +  keyCode;
 
         if( _callbackCollection[ keyCode ] === undefined ) {
 
@@ -64,10 +64,12 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
      * Removes a mapped callback.
      * @memberOf sector22/utils/keys.KeyMapper
      * @public
-     * @param keyCode {number} - the key code the callback was mapped to.
+     * @param keyCode {number|string} - the key code the callback was mapped to.
      * @param callback - the callback to remove.
      */
     this.unmap = function ( keyCode, callback ) {
+
+        keyCode = '' + keyCode;
 
         if( _callbackCollection[ keyCode ] === undefined )  return _this.logWarn( callback( 'Callback of this key could not be found!' ) );
 
@@ -82,19 +84,6 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
         }
     }
 
-    /**
-     * Clears all callbacks and corresponding parameter info.
-     * @memberOf sector22/utils/keys.KeyMapper
-     * @public
-     */
-    this.clear = function () {
-
-        _callbackCollection = {};
-        _callbackCollectionLength = 0;
-        _paramsCollection = {};
-        _callbacks = null;
-
-    }
 
     /**
      * Handles the key down events & triggers the appropriate callbacks.
@@ -106,8 +95,8 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
 
         if( _callbackCollection[ event.keyCode ] !== undefined ) {
 
-            _callbacks = _callbackCollection[ event.keyCode.toString() ];
-            _params = _paramsCollection[ event.keyCode.toString() ];
+            _callbacks = _callbackCollection[ '' + event.keyCode];
+            _params = _paramsCollection[ '' + event.keyCode ];
 
             var i;
             var length = _callbacks.length;
@@ -134,14 +123,29 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
 
     }
 
+
     /**
-     * Starts listening for key events events.
+     * Clears all callbacks and corresponding parameter info.
+     * @memberOf sector22/utils/keys.KeyMapper
+     * @public
+     */
+    this.clear = function () {
+
+        _callbackCollection = {};
+        _callbackCollectionLength = 0;
+        _paramsCollection = {};
+        _callbacks = null;
+
+    }
+
+    /**
+     * Starts listening for key events.
      * @memberOf sector22/utils/key.KeyMapper
      * @public
      * @function enable
      */
     this.enable = function () {
-        if( _enabled || this.isDestructed ) return;
+        if( _enabled || _this.isDestructed ) return;
         _enabled = true;
 
         _target.addEventListener( 'keydown', handleKeyDownEvent, false );
@@ -154,7 +158,7 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
      * @function disable
      */
     this.disable = function () {
-        if( !_enabled || this.isDestructed ) return;
+        if( !_enabled || _this.isDestructed ) return;
         _enabled = false;
 
         _target.removeEventListener( 'keydown', handleKeyDownEvent, false );
@@ -175,13 +179,15 @@ function KeyMapper ( opt_target, opt_autoEnable ) {
     } );
 
     /**
-     * Destructs the key mapper and makes it available for the garbage collector.
+     * Sets the 'destruct' function that destructs the key mapper
+     * and makes it available for the garbage collector.
+     * @see: sector22/core/mixin/destructibleMixin
      */
     _this.setDestruct( function () {
 
-        if( this.isDestructed ) return;
+        if( _this.isDestructed ) return;
 
-        this.disable();
+        _this.disable();
 
         _callbackCollection = null;
         _callbackCollectionLength = -1;
