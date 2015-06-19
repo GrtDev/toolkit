@@ -61,7 +61,7 @@ destructibleMixin.setDestruct = function ( destructFunction ) {
 
         } else {
 
-            Object.defineProperty( _this, 'isDestroyed', {
+            Object.defineProperty( _this, 'isDestructed', {
                 enumerable: true,
                 get: function () {
                     return true;
