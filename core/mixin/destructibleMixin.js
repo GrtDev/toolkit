@@ -44,31 +44,39 @@ destructibleMixin.destruct = function () {
  */
 destructibleMixin.setDestruct = function ( destructFunction ) {
 
-    var _parentDestruct = this.destruct;
-    var _this = this;
-
     this.destruct = function () {
+        destructObject( this, this.destruct, destructFunction );
+    };
 
-        if( _this.isDestructed ) return;
+}
 
-        if( _this.debug && typeof _this.logDebug === 'function' ) _this.logDebug.call( _this, '-- destruct --' );
+/**
+ * The function that wraps the actualy destruct
+ * function and makes sure the parent is also destructed.
+ * @param object {object}
+ * @param parentDestruct {function}
+ * @param destructFunction {function}
+ */
+function destructObject ( object, parentDestruct, destructFunction ) {
 
-        destructFunction.call( _this );
+    if( object.isDestructed ) return;
 
-        if( typeof _parentDestruct === 'function' ) {
+    if( object.debug && typeof object.logDebug === 'function' ) object.logDebug.call( object, '-- destruct --' );
 
-            _parentDestruct.call( _this )
+    destructFunction.call( object );
 
-        } else {
+    if( typeof parentDestruct === 'function' ) {
 
-            Object.defineProperty( _this, 'isDestructed', {
-                enumerable: true,
-                get: function () {
-                    return true;
-                }
-            } );
+        parentDestruct.call( object )
 
-        }
+    } else {
+
+        Object.defineProperty( object, 'isDestructed', {
+            enumerable: true,
+            configurable: false,
+            writable: false,
+            value: true
+        } );
 
     }
 
@@ -93,11 +101,11 @@ destructibleMixin.apply = function ( constructor, opt_unsafe ) {
 
     }
 
-    proto.setDestruct               = destructibleMixin.setDestruct;
+    proto.setDestruct = destructibleMixin.setDestruct;
 
 };
 
 
-if( typeof Object.freeze === 'function') Object.freeze(destructibleMixin) // lock the object to minimize accidental changes
+if( typeof Object.freeze === 'function' ) Object.freeze( destructibleMixin ) // lock the object to minimize accidental changes
 
 module.exports = destructibleMixin;

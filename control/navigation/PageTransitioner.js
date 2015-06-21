@@ -13,7 +13,7 @@ var singletonMixin              = require('../../core/mixin/singletonMixin');
 var CoreEventDispatcher         = require('../../core/events/CoreEventDispatcher');
 var HTMLLoader                  = require('../../core/loader/HTMLLoader');
 var PageLoaderEvent             = require('./PageTransitionEvent');
-var TransitionEvent             = require('../events/TransitionEvent');
+var AnimationEvent              = require('../../ui/animation/AnimationEvent');
 
 //@formatter:on
 
@@ -342,7 +342,7 @@ PageTransitioner.prototype.startPageTransition = function ( newPage, url ) {
     this._setNewPageData( newPage, url );
     this._setTransitioning( true );
 
-    this.dispatchEvent( new TransitionEvent( TransitionEvent.START ) );
+    this.dispatchEvent( new AnimationEvent( AnimationEvent.START ) );
 
     this.onTransitionStart();
 
@@ -375,7 +375,7 @@ PageTransitioner.prototype.onTransitionStart = function () {
  */
 PageTransitioner.prototype.onTransitionComplete = function () {
 
-    this.dispatchEvent( new TransitionEvent( TransitionEvent.COMPLETE ) );
+    this.dispatchEvent( new AnimationEvent( AnimationEvent.COMPLETE ) );
 
     this._setTransitioning( false );
 
