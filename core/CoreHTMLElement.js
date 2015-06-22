@@ -11,7 +11,7 @@ var CoreObject              = require('./CoreObject');
 //@formatter:on
 
 
-CoreObject.extend(CoreHTMLElement);
+CoreObject.extend( CoreHTMLElement );
 
 
 /**
@@ -20,7 +20,7 @@ CoreObject.extend(CoreHTMLElement);
  * @extends CoreObject
  * @param {HTMLElement}
  */
-function CoreHTMLElement (element) {
+function CoreHTMLElement ( element ) {
 
     if( !element ) return this.logError( 'element can not be null!' );
 
@@ -40,36 +40,56 @@ function CoreHTMLElement (element) {
      * @public
      * @function
      */
-    _this.parseData = function  (  ) {
-        
-        if(_data !== undefined) return _this.logWarn('data was already parsed.');
+    _this.parseData = function () {
+
+        if( _data !== undefined ) return _this.logWarn( 'data was already parsed.' );
 
         _data = {};
-        var attributes          = _element.attributes;
-        var cameCaseRexp        = /-(\w)/g;
-        var dataRegExp          = /^data-/i;
+        var attributes = _element.attributes;
+        var cameCaseRexp = /-(\w)/g;
+        var dataRegExp = /^data-/i;
 
         for ( var i = 0, leni = attributes.length; i < leni; i++ ) {
 
             var attribute = attributes[ i ];
 
             // check if the attribute is a data value, if so save it.
-            if(dataRegExp.test(attribute.nodeName)) {
+            if( dataRegExp.test( attribute.nodeName ) ) {
 
                 var name = attribute.nodeName;
-                name = name.replace(dataRegExp, '');
-                name = name.replace(cameCaseRexp, camelCaseReplacer);
-                _data[name] = attribute.nodeValue;
+                name = name.replace( dataRegExp, '' );
+                name = name.replace( cameCaseRexp, camelCaseReplacer );
+                _data[ name ] = attribute.nodeValue;
             }
 
         }
 
         // helper function to convert dashed variable names to camelCase.
-        function camelCaseReplacer(match, p1){
+        function camelCaseReplacer ( match, p1 ) {
 
             return p1 ? p1.toUpperCase() : '';
 
         }
+
+    }
+
+    _this.removeChild = function ( element ) {
+
+        if( element instanceof CoreHTMLElement ) element = element.element;
+        _this.element.removeChild( element );
+
+    }
+
+    _this.addChild = function ( element ) {
+
+        if( element instanceof CoreHTMLElement ) element = element.element;
+        _this.element.addChild( element );
+
+    }
+
+    _this.empty = function () {
+
+        _element.innerHTML = '';
 
     }
 
@@ -83,19 +103,19 @@ function CoreHTMLElement (element) {
     }
 
 
-     Object.defineProperty(this, 'element', {
-         enumerable: true,
-     	get: function() {
-              return _element;
-          }
-     });
+    Object.defineProperty( this, 'element', {
+        enumerable: true,
+        get: function () {
+            return _element;
+        }
+    } );
 
-     Object.defineProperty(this, 'data', {
-         enumerable: true,
-     	get: function() {
-              return _data;
-          }
-     });
+    Object.defineProperty( this, 'data', {
+        enumerable: true,
+        get: function () {
+            return _data;
+        }
+    } );
 
     this.setDestruct( function () {
 
@@ -109,9 +129,8 @@ function CoreHTMLElement (element) {
 }
 
 
-
 CoreHTMLElement.prototype.hasClass = function ( name ) {
-    
+
     return (new RegExp( '\\b' + name + '\\b' )).test( this.element.className )
 
 }

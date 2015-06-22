@@ -82,6 +82,8 @@ function AbstractSlideShow ( container ) {
         _slides.push( slide );
         _slidesLength++;
 
+        _this.dispatchEvent( new CommonEvent( CommonEvent.CHANGE ) );
+
     }
 
     _this.removeSlide = function ( slide ) {
@@ -95,6 +97,9 @@ function AbstractSlideShow ( container ) {
         if( index < 0 ) return _this.logWarn( 'Failed to remove slide because it is not in the slide show.' );
 
         _slides.splice( index, 1 );
+        _slidesLength--;
+
+        _this.dispatchEvent( new CommonEvent( CommonEvent.CHANGE ) );
 
     }
 
@@ -128,7 +133,7 @@ function AbstractSlideShow ( container ) {
         _currentSlide = _slides[ _currentSlideIndex ];
 
 
-        _this.dispatchEvent( new CommonEvent( CommonEvent.CHANGE ) );
+        _this.dispatchEvent( new CommonEvent( CommonEvent.UPDATE ) );
 
 
         if( !opt_noUpdate ) _this.updateShow( opt_instant );
@@ -162,6 +167,13 @@ function AbstractSlideShow ( container ) {
         _disableOnAnimation = value;
 
     }
+
+     Object.defineProperty(this, 'container', {
+         enumerable: true,
+     	get: function() {
+              return _container;
+          }
+     });
 
     Object.defineProperty( this, 'slidesLength', {
         enumerable: true,

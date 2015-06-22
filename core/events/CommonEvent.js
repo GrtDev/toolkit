@@ -8,6 +8,7 @@
 
 var CoreEvent                       = require('./CoreEvent');
 
+CommonEvent.UPDATE                  = 'CommonEvent.UPDATE';
 CommonEvent.CHANGE                  = 'CommonEvent.CHANGE';
 CommonEvent.CANCEL                  = 'CommonEvent.CANCEL';
 CommonEvent.CLEAR                   = 'CommonEvent.CLEAR';
