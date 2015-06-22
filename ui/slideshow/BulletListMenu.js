@@ -111,7 +111,12 @@ function BulletListMenu ( element, opt_autoCreate ) {
     function handleClickEvent ( event ) {
 
         if( typeof _onBulletClick === 'function' ) {
-            var index;
+
+            var bullet = event.target;
+
+            var index = _listElements.indexOf(bullet);
+
+
 
             //TODO
 

@@ -29,6 +29,7 @@ function CoreHTMLElement ( element ) {
     var _data;
     var _width;
     var _height;
+    var _mouseChildrenClick;
 
     // retrieve dimensions
     var boundingRectangle = _element.getBoundingClientRect();
@@ -72,6 +73,46 @@ function CoreHTMLElement ( element ) {
         }
 
     }
+
+    function handleMouseEvents ( event ) {
+
+
+        switch ( event.type ) {
+            case 'click':
+
+                if( !_mouseChildrenClick && event.target !== _element )  event.stopPropagation();
+
+                break;
+            default:
+                _this.logError( 'Unhandled switch case' );
+        }
+
+
+    }
+
+    /**
+     * Defines whether children trigger mouse events
+     */
+    Object.defineProperty( this, 'mouseChildrenClick', {
+        enumerable: true,
+        get: function () {
+            return _mouseChildrenClick;
+        },
+        set: function ( value ) {
+            if( _mouseChildrenClick === value ) return;
+            _mouseChildrenClick = value;
+
+            if( _mouseChildrenClick ) {
+
+                _element.addEventListener( 'click', handleMouseEvents );
+
+            } else {
+
+                _element.removeEventListener( 'click', handleMouseEvents );
+
+            }
+        }
+    } );
 
     _this.removeChild = function ( element ) {
 
