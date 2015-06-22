@@ -6,7 +6,7 @@
 
 // @formatter:off
 
-var CoreEvent          = require('../../core/events/CoreEvent');
+var AbstractEvent          = require('../../core/events/AbstractEvent');
 
 
 AnimationEvent.START                            = 'TransitionEvent.START';
@@ -19,13 +19,13 @@ AnimationEvent.TRANSITION_OUT_COMPLETE          = 'TransitionEvent.TRANSITION_OU
 //@formatter:on
 
 
-CoreEvent.extend( AnimationEvent );
+AbstractEvent.extend( AnimationEvent );
 
 /**
  * Creates a new TransitionEvent
  * @param type {string}
  * @param opt_url {string=}
- * @extends CoreEvent
+ * @extends CommonEvent
  * @constructor
  */
 function AnimationEvent ( type, opt_target) {

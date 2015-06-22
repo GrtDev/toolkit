@@ -163,7 +163,7 @@ eventDispatcherMixin.removeAllEventListeners = function () {
 /**
  * Dispatches an event
  * @protected
- * @param event {CoreEvent|object}
+ * @param event {CommonEvent|object}
  */
 eventDispatcherMixin.dispatchEvent = function ( event ) {
 

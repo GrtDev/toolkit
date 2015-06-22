@@ -6,18 +6,18 @@
 
 // @formatter:off
 
-var CoreEvent          = require('../../core/events/CoreEvent');
+var AbstractEvent          = require('../../core/events/AbstractEvent');
 
 //@formatter:on
 
-CoreEvent.extend( StatusEvent );
+AbstractEvent.extend( StatusEvent );
 
 /**
  * Creates a new Status Event
  * @param type {string}
  * @param status {string}
  * @param opt_target {object=}
- * @extends {CoreEvent}
+ * @extends {CommonEvent}
  * @constructor
  */
 function StatusEvent ( type, status, opt_target ) {
@@ -36,4 +36,4 @@ function StatusEvent ( type, status, opt_target ) {
 }
 
 
-module.exports = CoreEvent
+module.exports = StatusEvent

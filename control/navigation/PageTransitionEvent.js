@@ -6,7 +6,7 @@
 
 // @formatter:off
 
-var CoreEvent                           = require('../../core/events/CoreEvent');
+var AbstractEvent                           = require('../../core/events/AbstractEvent');
 
 PageTransitionEvent.BEFORE_PAGE_UPDATE      = 'PageTransitionEvent.BEFORE_PAGE_UPDATE';
 PageTransitionEvent.AFTER_PAGE_UPDATE       = 'PageTransitionEvent.AFTER_PAGE_UPDATE';
@@ -14,14 +14,14 @@ PageTransitionEvent.AFTER_PAGE_UPDATE       = 'PageTransitionEvent.AFTER_PAGE_UP
 //@formatter:on
 
 
-CoreEvent.extend(PageTransitionEvent)
+AbstractEvent.extend(PageTransitionEvent)
 
 /**
  * Creates a new PageTransitionEvent
  * @param type {string}
  * @param opt_url {string=}
  * @param opt_target {object=}
- * @extends {CoreEvent}
+ * @extends {CommonEvent}
  * @constructor
  */
 function PageTransitionEvent ( type, opt_url, opt_target) {

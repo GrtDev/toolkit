@@ -5,7 +5,7 @@
 // @formatter:off
 
 var CoreEventDispatcher             = require('../../core/events/CoreEventDispatcher');
-var CoreEvent                       = require('../../core/events/CoreEvent');
+var CommonEvent                       = require('../../core/events/CommonEvent');
 
 //@formatter:on
 
@@ -131,7 +131,7 @@ function Image ( element ) {
         _element.style.width = _width + 'px';
         _element.style.height = _height + 'px';
 
-        _this.dispatchEvent( new CoreEvent( CoreEvent.RESIZE ) );
+        _this.dispatchEvent( new CommonEvent( CommonEvent.RESIZE ) );
     }
 
 

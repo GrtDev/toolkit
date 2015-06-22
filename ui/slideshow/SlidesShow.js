@@ -57,12 +57,13 @@ function SlideShow () {
      */
     _this.addBulletListMenu = function ( listElement, opt_autoCreate ) {
 
-        if(_bulletMenu) return _this.logError('bullet list menu was already added!');
+        if( _bulletMenu ) return _this.logError( 'bullet list menu was already added!' );
 
         _bulletMenu = new BulletListMenu( listElement, opt_autoCreate );
 
         _bulletMenu.setLength( _this.slidesLength );
         _bulletMenu.select( _this.currentSlideIndex );
+        _bulletMenu.onBulletClick = _this.setCurrentSlide;
 
         _this.addEventListener( CommonEvent.UPDATE, handleSlideShowEvents );
         _this.addEventListener( CommonEvent.CHANGE, handleSlideShowEvents );

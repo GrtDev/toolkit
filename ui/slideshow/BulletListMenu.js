@@ -114,11 +114,17 @@ function BulletListMenu ( element, opt_autoCreate ) {
 
             var bullet = event.target;
 
-            var index = _listElements.indexOf(bullet);
+            var index;
 
+            for ( var i = 0, leni = _listElementsLength; i < leni; i++ ) {
+                var listElement = [ i ];
 
+                if(listElement.element === bullet) {
+                    index = i;
+                    break;
+                }
 
-            //TODO
+            }
 
             _onBulletClick.call( _this, index );
         }

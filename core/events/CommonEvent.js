@@ -6,7 +6,7 @@
 
 // @formatter:off
 
-var CoreEvent                       = require('./CoreEvent');
+var AbstractEvent                       = require('./AbstractEvent');
 
 CommonEvent.UPDATE                  = 'CommonEvent.UPDATE';
 CommonEvent.CHANGE                  = 'CommonEvent.CHANGE';
@@ -20,6 +20,8 @@ CommonEvent.RESIZE                  = 'CommonEvent.RESIZE';
 
 // @formatter:on
 
+
+AbstractEvent.extend( CommonEvent );
 
 /**
  * Creates a new CommonEvent with some basic event types

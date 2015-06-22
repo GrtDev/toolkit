@@ -5,7 +5,7 @@
  */
 // @formatter:off
 
-var CoreHTMLElement             = require('../../core/CoreHTMLElement');
+var CoreHTMLElement             = require('../../../core/CoreHTMLElement');
 
 // @formatter:on
 
@@ -23,9 +23,12 @@ function AbstractSlide ( element ) {
 
     var _this = this;
 
+    // add some basic styling
+    _this.element.style.overflow = 'hidden';
+    _this.element.style.position = 'absolute';
+
     // parse data attributes by default
     _this.parseData();
-
 
     _this.setDestruct( function () {
 

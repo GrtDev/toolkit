@@ -6,18 +6,21 @@
 
 // @formatter:off
 
-var CoreObject              = require('./CoreObject');
+var CoreEventDispatcher              = require('./events/CoreEventDispatcher');
+var CommonEvent                      = require('./events/CommonEvent');
 
 //@formatter:on
 
 
-CoreObject.extend( CoreHTMLElement );
+CoreEventDispatcher.extend( CoreHTMLElement );
+
+// TODO: Find a better solution to combining HTMLElement functions and the element itself in regard to events.
 
 
 /**
  * Creates a new CoreHTMLElement with basic element manipulation & log capabilities and a destruct method.
  * @constructor
- * @extends CoreObject
+ * @extends CoreEventDispatcher
  * @param {HTMLElement}
  */
 function CoreHTMLElement ( element ) {
@@ -30,11 +33,20 @@ function CoreHTMLElement ( element ) {
     var _width;
     var _height;
     var _mouseChildrenClick;
+    var _computedStyle;
 
     // retrieve dimensions
     var boundingRectangle = _element.getBoundingClientRect();
     _width = boundingRectangle.width;
     _height = boundingRectangle.height;
+
+    _this.getStyle = function ( property ) {
+
+        if(!_computedStyle) _computedStyle = getComputedStyle( _element, null );
+
+        return _computedStyle.getPropertyValue( property );
+
+    }
 
     /**
      * Function that parses all the data attributes on the element.
@@ -141,6 +153,8 @@ function CoreHTMLElement ( element ) {
         _element.style.width = _width + 'px;';
         _element.style.height = _height + 'px;';
 
+        _this.dispatchEvent( new CommonEvent( CommonEvent.RESIZE ) );
+
     }
 
 
@@ -166,6 +180,19 @@ function CoreHTMLElement ( element ) {
         _height = NaN;
 
     } );
+
+}
+
+
+CoreHTMLElement.prototype.show = function ( opt_display ) {
+
+    this.element.style.display = opt_display || 'block';
+
+}
+
+CoreHTMLElement.prototype.hide = function () {
+
+    this.element.style.display = 'none';
 
 }
 

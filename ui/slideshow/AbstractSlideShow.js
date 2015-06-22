@@ -5,14 +5,14 @@
  */
 // @formatter:off
 
-var CoreEventDistpatcher            = require('../../core/events/CoreEventDispatcher');
+var CoreHTMLElement                  = require('../../core/CoreHTMLElement');
 var CommonEvent                     = require('../../core/events/CommonEvent');
 var AnimationEvent                  = require('../animation/AnimationEvent');
 
 // @formatter:on
 
 
-CoreEventDistpatcher.extend( AbstractSlideShow );
+CoreHTMLElement.extend( AbstractSlideShow );
 
 /**
  * @constructor
@@ -22,9 +22,9 @@ CoreEventDistpatcher.extend( AbstractSlideShow );
  * @event AnimationEvent.START
  * @event AnimationEvent.COMPLETE
  */
-function AbstractSlideShow ( container ) {
+function AbstractSlideShow ( element ) {
 
-    if( !container ) return this.logError( 'container can not be null!' );
+    AbstractSlideShow.super_.call(this, element);
 
     var _this = this;
     var _currentSlide;
@@ -33,29 +33,23 @@ function AbstractSlideShow ( container ) {
     var _previousSlideIndex;
     var _slides;
     var _slidesLength;
-    var _container;
-    var _width;
-    var _height;
     var _slideForward;
     var _enabled;
     var _isAnimating;
     var _disableOnAnimation = true;
 
-    _container = container;
-
-    // retrieve dimensions
-    var boundingRectangle = _container.getBoundingClientRect();
-    _width = boundingRectangle.width;
-    _height = boundingRectangle.height;
 
     // set initial styling
-    var style = getComputedStyle( _container, null );
-    var positionStyle = style.getPropertyValue( 'position' );
+    var positionStyle = _this.getStyle( 'position' );
 
-    if( positionStyle !== 'relative' && positionStyle !== 'absolute' ) _container.style = 'relative';
-    _container.style.overflow = 'hidden';
+    if( positionStyle !== 'relative' && positionStyle !== 'absolute' ) _this.element.style = 'relative';
+    _this.element.style.overflow = 'hidden';
+
+    _this.addEventListener(CommonEvent.RESIZE, _this.handleResizeEvent);
+
 
     _this.enable = function () {
+
         if( _enabled ) return;
         _enabled = true;
 
@@ -140,16 +134,6 @@ function AbstractSlideShow ( container ) {
 
     }
 
-    _this.setSize = function ( width, height ) {
-
-        _width = width;
-        _height = height;
-        _container.style.width = _width + 'px;';
-        _container.style.height = _height + 'px;';
-
-        _this.updateLayout();
-
-    }
 
     _this.setAnimating = function ( value ) {
 
@@ -167,13 +151,6 @@ function AbstractSlideShow ( container ) {
         _disableOnAnimation = value;
 
     }
-
-     Object.defineProperty(this, 'container', {
-         enumerable: true,
-     	get: function() {
-              return _container;
-          }
-     });
 
     Object.defineProperty( this, 'slidesLength', {
         enumerable: true,
@@ -217,20 +194,6 @@ function AbstractSlideShow ( container ) {
         }
     } );
 
-    Object.defineProperty( this, 'width', {
-        enumerable: true,
-        get: function () {
-            return _width;
-        }
-    } );
-
-    Object.defineProperty( this, 'height', {
-        enumerable: true,
-        get: function () {
-            return _height;
-        }
-    } );
-
     Object.defineProperty( this, 'enabled', {
         enumerable: true,
         get: function () {
@@ -254,14 +217,21 @@ function AbstractSlideShow ( container ) {
 
     _this.setDestruct( function () {
 
+        _this.removeEventListener(CommonEvent.RESIZE, _this.handleResizeEvent);
+
         _slides = undefined;
-        _container = undefined;
         _currentSlide = undefined;
         _currentSlideIndex = NaN;
         _previousSlide = undefined;
         _previousSlideIndex = NaN;
 
     } );
+
+}
+
+AbstractSlideShow.prototype.handleResizeEvent = function ( event ) {
+
+    this.updateLayout();
 
 }
 
