@@ -14,8 +14,6 @@ var CommonEvent                 = require('../../core/events/CommonEvent');
                                   require('../../extern/gsap/easing/EasePack');
 var TweenLite                   = require('../../extern/gsap/TweenLite');
 
-SlideShow.VERTICAL              = 'vertical';
-SlideShow.HORIZONTAL            = 'horizontal';
 
 // @formatter:on
 
@@ -26,29 +24,20 @@ AbstractSlideShow.extend( SlideShow );
  * @constructor
  * @extends AbstractSlideShow
  */
-function SlideShow () {
+function SlideShow ( element ) {
+
+    SlideShow.super_.call( this, element );
+
 
     var _this = this;
     var _eventTarget;
-    var _direction;
     var _animationTime = 1;
     var _animationEase = Power3.easeInOut;
     var _touchValue = -1;
     var _previousTouchValue = -1;
     var _bulletMenu;
+    var _touchListenersAdded;
 
-    SlideShow.super_.call( this );
-
-    _this.init = function ( opt_direction, opt_eventTarget ) {
-
-        if( opt_direction ) _direction = opt_direction || SlideShow.HORIZONTAL;
-        if( opt_eventTarget ) _eventTarget = opt_eventTarget || _this.container;
-
-        _eventTarget.addEventListener( 'touchstart', handleTouchEvents );
-        _eventTarget.addEventListener( 'touchmove', handleTouchEvents );
-        _eventTarget.addEventListener( 'touchend', handleTouchEvents );
-
-    }
 
     /**
      *
@@ -61,12 +50,23 @@ function SlideShow () {
 
         _bulletMenu = new BulletListMenu( listElement, opt_autoCreate );
 
-        _bulletMenu.setLength( _this.slidesLength );
+        _bulletMenu.setLength( _this.length );
         _bulletMenu.select( _this.currentSlideIndex );
         _bulletMenu.onBulletClick = _this.setCurrentSlide;
 
         _this.addEventListener( CommonEvent.UPDATE, handleSlideShowEvents );
         _this.addEventListener( CommonEvent.CHANGE, handleSlideShowEvents );
+
+    }
+
+    _this.addTouchEventListeners = function () {
+
+        if( _touchListenersAdded ) return;
+        _touchListenersAdded = true;
+
+        _eventTarget.addEventListener( 'touchstart', handleTouchEvents );
+        _eventTarget.addEventListener( 'touchmove', handleTouchEvents );
+        _eventTarget.addEventListener( 'touchend', handleTouchEvents );
 
     }
 
@@ -76,7 +76,7 @@ function SlideShow () {
         switch ( event.type ) {
             case CommonEvent.CHANGE:
 
-                if( _bulletMenu ) _bulletMenu.setLength( _this.slidesLength );
+                if( _bulletMenu ) _bulletMenu.setLength( _this.length );
 
                 break;
             case CommonEvent.UPDATE:
@@ -92,9 +92,9 @@ function SlideShow () {
     }
 
 
-    _this.setDirection = function () {
+    _this.setEventTarget = function ( target ) {
 
-        // TODO:
+        _eventTarget = target;
 
     }
 
@@ -110,7 +110,7 @@ function SlideShow () {
         switch ( event.type ) {
             case 'touchstart':
 
-                if( _direction === SlideShow.HORIZONTAL ) _touchValue = event.touches[ 0 ].clientX;
+                if( _this.isHorizontal ) _touchValue = event.touches[ 0 ].clientX;
                 else  _touchValue = event.touches[ 0 ].clientY;
 
 
@@ -119,7 +119,7 @@ function SlideShow () {
 
                 _previousTouchValue = _touchValue;
 
-                if( _direction === SlideShow.HORIZONTAL ) _touchValue = event.touches[ 0 ].clientX;
+                if( _this.isHorizontal ) _touchValue = event.touches[ 0 ].clientX;
                 else  _touchValue = event.touches[ 0 ].clientY;
 
                 if( _previousTouchValue >= 0 ) {
@@ -141,14 +141,6 @@ function SlideShow () {
 
     }
 
-
-    Object.defineProperty( this, 'direction', {
-        enumerable: true,
-        get: function () {
-            return _direction;
-        }
-    } );
-
     Object.defineProperty( this, 'animationTime', {
         enumerable: true,
         get: function () {
@@ -167,9 +159,9 @@ function SlideShow () {
 
         if( _eventTarget ) {
 
-            _eventTarget.addEventListener( 'touchstart', handleTouchEvents );
-            _eventTarget.addEventListener( 'touchmove', handleTouchEvents );
-            _eventTarget.addEventListener( 'touchend', handleTouchEvents );
+            _eventTarget.removeEventListener( 'touchstart', handleTouchEvents );
+            _eventTarget.removeEventListener( 'touchmove', handleTouchEvents );
+            _eventTarget.removeEventListener( 'touchend', handleTouchEvents );
             _eventTarget = undefined;
         }
 
@@ -188,38 +180,46 @@ function SlideShow () {
 
 }
 
-SlideShow.prototype.updateLayout = function () {
+SlideShow.prototype.init = function ( opt_direction, opt_eventTarget ) {
+
+    SlideShow.super_.prototype.init.call( this, opt_direction );
+
+    this.setEventTarget( opt_eventTarget || this.element );
+
+    this.addTouchEventListeners();
 
 }
 
-SlideShow.prototype.updateShow = function ( opt_instant ) {
+SlideShow.prototype.transitionSlides = function ( opt_instant ) {
 
-    this.setAnimating( true );
+    this.setTransitioning( true );
 
     var animationOut = { ease: this.animationEase };
-    var animationIn = { ease: this.animationEase, onComplete: this.setAnimating, onCompleteParams: [ false ] };
+    var animationIn = { ease: this.animationEase, onComplete: this.setTransitioning, onCompleteParams: [ false ] };
     var animationInFrom = {};
 
 
-    if( this.direction === SlideShow.HORIZONTAL ) {
+    if( this.isHorizontal ) {
 
-        animationOut.x = ( this.slideForward ? -this.previousSlide.width : 0 );
-        animationIn.x = ( this.slideForward ? 0 : -this.currentSlide.width );
+        if( this.previousSlide ) animationOut.x = ( this.slideForward ? -this.previousSlide.width : this.previousSlide.width );
+        animationIn.x = 0 ;
         animationInFrom.x = ( this.slideForward ? this.currentSlide.width : -this.currentSlide.width );
 
     }
-    else {
+    else if( this.isVertical ) {
 
-        animationOut.y = (this.slideForward ? -this.previousSlide.height : this.previousSlide.height);
-        animationIn.y = (this.slideForward ? this.currentSlide.height : -this.currentSlide.height);
+        if( this.previousSlide ) animationOut.y = (this.slideForward ? -this.previousSlide.height : this.previousSlide.height);
+        animationIn.y = 0;
         animationInFrom.y = ( this.slideForward ? this.currentSlide.height : -this.currentSlide.height );
 
     }
 
+    if( this.debug ) this.logDebug( 'updating show: \nforward: ' + this.slideForward + '\ndirection:' + this.direction + ' \nanim in: ', animationIn, '\nanim from:', animationInFrom, '\nanim out: ', animationOut );
 
-    if( this.previousSlide ) TweenLite.tween( this.previousSlide, opt_instant ? 0 : this.animationTime, animationOut );
 
-    TweenLite.fromTo( this.currentSlide, opt_instant ? 0 : this.animationTime, animationInFrom, animationIn );
+    if( this.previousSlide ) TweenLite.to( this.previousSlide.element, opt_instant ? 0 : this.animationTime, animationOut );
+
+    TweenLite.fromTo( this.currentSlide.element, opt_instant ? 0 : this.animationTime, animationInFrom, animationIn );
 
 }
 

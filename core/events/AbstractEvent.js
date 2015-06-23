@@ -17,21 +17,11 @@ var inherits                    = require('../utils/inherits');
  * @param opt_target {object=}
  * @constructor
  */
-function CoreEvent ( type, opt_target ) {
+function AbstractEvent ( type, opt_target ) {
 
-    var _this = this;
     var _type = type;
     var _target = opt_target;
 
-    /**
-     * Sets the target of the event
-     * @param target {object}
-     */
-    _this.setTarget = function ( target ) {
-
-        _target = target;
-
-    }
 
     Object.defineProperty( this, 'type', {
         enumerable: true,
@@ -40,12 +30,15 @@ function CoreEvent ( type, opt_target ) {
         }
     } );
 
-    Object.defineProperty( this, 'target', {
-        enumerable: true,
-        get: function () {
-            return _target;
-        }
-    } );
+     Object.defineProperty(this, 'target', {
+          enumerable: true,
+          get: function() {
+              return _target;
+          },
+          set: function(value) {
+              _target = value;
+          }
+     });
 }
 
 /**
@@ -55,12 +48,12 @@ function CoreEvent ( type, opt_target ) {
  * @function extend
  * @param constructor {function} the class that should inherit the CoreEvent
  */
-CoreEvent.prototype.extend = function ( constructor ) {
+AbstractEvent.prototype.extend = function ( constructor ) {
     inherits( constructor, this );
-    constructor.extend = CoreEvent.extend;
+    constructor.extend = AbstractEvent.extend;
 }
 
-CoreEvent.extend = CoreEvent.prototype.extend;
+AbstractEvent.extend = AbstractEvent.prototype.extend;
 
 
-module.exports = CoreEvent;
+module.exports = AbstractEvent;

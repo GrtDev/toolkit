@@ -45,7 +45,9 @@ destructibleMixin.destruct = function () {
 destructibleMixin.setDestruct = function ( destructFunction ) {
 
     this.destruct = function () {
+
         destructObject( this, this.destruct, destructFunction );
+
     };
 
 }
