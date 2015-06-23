@@ -17,7 +17,7 @@ var inherits                    = require('../utils/inherits');
  * @param opt_target {object=}
  * @constructor
  */
-function CoreEvent ( type, opt_target ) {
+function AbstractEvent ( type, opt_target ) {
 
     var _this = this;
     var _type = type;
@@ -55,12 +55,12 @@ function CoreEvent ( type, opt_target ) {
  * @function extend
  * @param constructor {function} the class that should inherit the CoreEvent
  */
-CoreEvent.prototype.extend = function ( constructor ) {
+AbstractEvent.prototype.extend = function ( constructor ) {
     inherits( constructor, this );
-    constructor.extend = CoreEvent.extend;
+    constructor.extend = AbstractEvent.extend;
 }
 
-CoreEvent.extend = CoreEvent.prototype.extend;
+AbstractEvent.extend = AbstractEvent.prototype.extend;
 
 
-module.exports = CoreEvent;
+module.exports = AbstractEvent;
