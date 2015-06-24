@@ -24,6 +24,9 @@ function CoreImage ( element ) {
     var _this = this;
 
 
+    _this.element.style.maxWidth = 'none';
+    _this.element.style.maxHeight = 'none';
+
     if( _this.element.complete ) {
 
         _this.setSourceDimensions(_this.element.naturalWidth, _this.element.naturalHeight);

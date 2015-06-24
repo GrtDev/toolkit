@@ -24,7 +24,6 @@ CoreEventDispatcher.extend( CoreHTMLElement );
  */
 function CoreHTMLElement ( element ) {
 
-    console.log(element);
     if( !element ) throw new Error( 'element can not be null!' );
 
     var _this = this;
@@ -33,11 +32,8 @@ function CoreHTMLElement ( element ) {
     var _width;
     var _height;
     var _computedStyle;
+    var _boundingRectangle;
 
-    // retrieve dimensions
-    var boundingRectangle = _element.getBoundingClientRect();
-    _width = boundingRectangle.width;
-    _height = boundingRectangle.height;
 
     _this.getStyle = function ( property ) {
 
@@ -100,7 +96,7 @@ function CoreHTMLElement ( element ) {
     _this.addChild = function ( element ) {
 
         if( element instanceof CoreHTMLElement ) element = element.element;
-        _this.element.addChild( element );
+        _this.element.appendChild( element );
 
     }
 
@@ -110,35 +106,42 @@ function CoreHTMLElement ( element ) {
 
     }
 
+    Object.defineProperty( this, 'height', {
+        enumerable: true,
+        get: function () {
 
+            if( _height ) return _height;
+            // retrieve dimensions
+            _boundingRectangle = _element.getBoundingClientRect();
+            return _boundingRectangle.height;
+
+        },
+        set: function ( value ) {
+
+            _height = value;
+            _element.style.height = _height + 'px';
+
+        }
+    } );
 
     Object.defineProperty( this, 'width', {
         enumerable: true,
         get: function () {
-            return _width;
+
+            if( _width ) return _width;
+            // retrieve dimensions
+            _boundingRectangle = _element.getBoundingClientRect();
+            return _boundingRectangle.width;
+
         },
         set: function ( value ) {
 
-            if(_width === value) return;
             _width = value;
             _element.style.width = _width + 'px';
 
         }
     } );
 
-    Object.defineProperty( this, 'height', {
-        enumerable: true,
-        get: function () {
-            return _height;
-        },
-        set: function ( value ) {
-
-            if(_height === value) return;
-            _height = value;
-            _element.style.height = _height + 'px';
-
-        }
-    } );
 
     Object.defineProperty( this, 'data', {
         enumerable: true,
@@ -168,7 +171,7 @@ function CoreHTMLElement ( element ) {
 
 CoreHTMLElement.prototype.setSize = function ( width, height ) {
 
-    this.width = width;
+    this.width =  width;
     this.height = height;
 
 }

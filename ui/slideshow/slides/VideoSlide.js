@@ -66,7 +66,7 @@ function VideoSlide ( element, opt_debug ) {
         if( _isMobile || _isTablet ) return;
 
         _videoPlayer.play();
-        _posterImage.hide();
+        //_posterImage.hide();
 
     }
 
@@ -142,8 +142,8 @@ VideoSlide.prototype.setSize = function ( width, height ) {
 
     VideoSlide.super_.prototype.setSize.call(this, width, height);
 
-    if( this.videoPlayer ) this.videoPlayer.fillSize( this.width, this.height, true );
-    if( this.posterImage ) this.posterImage.fillSize( this.width, this.height, true );
+    if( this.videoPlayer ) this.videoPlayer.fillSize( width, height, true );
+    if( this.posterImage ) this.posterImage.fillSize( width, height, true );
 
     this.updateLayout();
 

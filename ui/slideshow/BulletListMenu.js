@@ -19,7 +19,7 @@ CoreHTMLElement.extend( BulletListMenu );
  * @param element {HTMLElement}
  * @param opt_autoCreate {boolean}
  */
-function BulletListMenu ( element, opt_autoCreate ) {
+function BulletListMenu ( element ) {
 
     BulletListMenu.super_.call( this, element );
 
@@ -30,35 +30,28 @@ function BulletListMenu ( element, opt_autoCreate ) {
     var _autoCreate;
     var _selectedBulletIndex;
     var _previousBulletIndex;
-    var _onBulletClick;
-    var _listening;
+    var _onBulletIndexClick;
 
-
-    _autoCreate = (opt_autoCreate === undefined) ? true : opt_autoCreate;
     _listElements = [];
     _listElementsLength = 0;
 
-    if( _autoCreate ) {
 
-        _listElement = _this.element.getElementsByTagName( 'li' )[ 0 ];
-        _this.empty();
+    var bulletItems = _this.element.getElementsByTagName( 'li' );
+    _listElement = bulletItems[ 0 ].cloneNode( true );
 
-    } else {
+    for ( var i = 0, leni = bulletItems.length; i < leni; i++ ) {
 
-        var bulletItems = _this.element.getElementsByTagName( 'li' );
+        _listElements.push( new CoreHTMLElement( bulletItems[ i ] ) );
+        _listElementsLength++;
 
-        for ( var i = 0, leni = bulletItems.length; i < leni; i++ ) {
-
-            _listElements.push( new CoreHTMLElement( bulletItems[ i ] ) );
-            _listElementsLength++;
-
-        }
     }
 
 
     _this.select = function ( index ) {
 
-        if( _selectedBulletIndex === index ) return;
+        if( _this.debug ) _this.logDebug( 'select: ' + index );
+
+        if( index < 0 || index >= _listElementsLength || _selectedBulletIndex === index ) return;
 
         _previousBulletIndex = _selectedBulletIndex;
         _selectedBulletIndex = index;
@@ -67,7 +60,9 @@ function BulletListMenu ( element, opt_autoCreate ) {
 
     }
 
-    _this.setLength = function ( length ) {
+    function updateBulletsLength ( length ) {
+
+        if( _this.debug ) _this.logDebug( 'set length: ' + length );
 
         if( _listElementsLength === length ) return;
 
@@ -99,34 +94,45 @@ function BulletListMenu ( element, opt_autoCreate ) {
 
     function update () {
 
-        var bullet = _listElements[ _this.currentSlideIndex ];
+        if( _this.debug ) _this.logDebug( 'update', _listElements );
+
+        var bullet = _listElements[ _selectedBulletIndex ];
         bullet.addClass( 'selected' );
 
-        bullet = _listElements[ _this.previousSlideIndex ];
-        bullet.removeClass( 'selected' );
+        if( _previousBulletIndex >= 0 ) {
+
+            bullet = _listElements[ _previousBulletIndex ];
+            bullet.removeClass( 'selected' );
+
+        }
 
     }
 
 
     function handleClickEvent ( event ) {
 
-        if( typeof _onBulletClick === 'function' ) {
+        if( _this.debug ) _this.logDebug( 'handle click: ', event );
+
+        if( typeof _onBulletIndexClick === 'function' ) {
 
             var bullet = event.target;
+            var listElement;
+            var index = -1;
 
-            var index;
+            for ( var i = 0; i < _listElementsLength; i++ ) {
 
-            for ( var i = 0, leni = _listElementsLength; i < leni; i++ ) {
-                var listElement = [ i ];
+                listElement = _listElements[ i ];
 
-                if(listElement.element === bullet) {
+                if( listElement.element === bullet ) {
                     index = i;
                     break;
                 }
 
             }
 
-            _onBulletClick.call( _this, index );
+            if( index < 0 ) return _this.logError( 'Failed to retrieve bullet index' );
+
+            _onBulletIndexClick.call( _this, index );
         }
 
     }
@@ -135,31 +141,34 @@ function BulletListMenu ( element, opt_autoCreate ) {
         enumerable: true,
         get: function () {
             return _listElementsLength;
+        },
+        set: function ( value ) {
+            updateBulletsLength( value );
         }
     } );
 
-    Object.defineProperty( this, 'onBulletClick', {
+    Object.defineProperty( this, 'onBulletIndexClick', {
         enumerable: true,
         get: function () {
-            return _onBulletClick;
+            return _onBulletIndexClick;
         },
         /**
          * @param value {function}
          */
         set: function ( value ) {
 
-            if( value === _onBulletClick ) return;
+            if( value === _onBulletIndexClick ) return;
 
-            _onBulletClick = value;
+            _onBulletIndexClick = value;
 
-            if( !_onBulletClick ) {
+            if( !_onBulletIndexClick ) {
 
-                _this.element.addEventListener( 'click', handleClickEvent );
+                _this.element.removeEventListener( 'click', handleClickEvent );
 
             }
             else {
 
-                _this.element.removeEventListener( 'click', handleClickEvent );
+                _this.element.addEventListener( 'click', handleClickEvent );
 
             }
         }

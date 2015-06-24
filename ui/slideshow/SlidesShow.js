@@ -28,13 +28,15 @@ function SlideShow ( element ) {
 
     SlideShow.super_.call( this, element );
 
+    // how many pixels you need to drag to trigger a previous / next call.
+    var TOUCH_THRESHOLD = 30;
 
     var _this = this;
     var _eventTarget;
     var _animationTime = 1;
     var _animationEase = Power3.easeInOut;
-    var _touchValue = -1;
-    var _previousTouchValue = -1;
+    var _touchStartValue = -1;
+    var _currentTouchValue = -1;
     var _bulletMenu;
     var _touchListenersAdded;
 
@@ -50,12 +52,17 @@ function SlideShow ( element ) {
 
         _bulletMenu = new BulletListMenu( listElement, opt_autoCreate );
 
-        _bulletMenu.setLength( _this.length );
+        if( opt_autoCreate ) {
+
+            _bulletMenu.length = _this.length;
+            _this.addEventListener( CommonEvent.CHANGE, handleSlideShowEvents );
+
+        }
+
         _bulletMenu.select( _this.currentSlideIndex );
-        _bulletMenu.onBulletClick = _this.setCurrentSlide;
+        _bulletMenu.onBulletIndexClick = _this.setCurrentSlide;
 
         _this.addEventListener( CommonEvent.UPDATE, handleSlideShowEvents );
-        _this.addEventListener( CommonEvent.CHANGE, handleSlideShowEvents );
 
     }
 
@@ -76,7 +83,7 @@ function SlideShow ( element ) {
         switch ( event.type ) {
             case CommonEvent.CHANGE:
 
-                if( _bulletMenu ) _bulletMenu.setLength( _this.length );
+                if( _bulletMenu ) _bulletMenu.length = _this.length;
 
                 break;
             case CommonEvent.UPDATE:
@@ -110,29 +117,35 @@ function SlideShow ( element ) {
         switch ( event.type ) {
             case 'touchstart':
 
-                if( _this.isHorizontal ) _touchValue = event.touches[ 0 ].clientX;
-                else  _touchValue = event.touches[ 0 ].clientY;
+                if( _this.isHorizontal ) _touchStartValue = event.touches[ 0 ].clientX;
+                else  _touchStartValue = event.touches[ 0 ].clientY;
 
 
                 break;
             case 'touchmove':
 
-                _previousTouchValue = _touchValue;
+                if( _this.isHorizontal ) _currentTouchValue = event.touches[ 0 ].clientX;
+                else  _currentTouchValue = event.touches[ 0 ].clientY;
 
-                if( _this.isHorizontal ) _touchValue = event.touches[ 0 ].clientX;
-                else  _touchValue = event.touches[ 0 ].clientY;
+                if( (_currentTouchValue - _touchStartValue) > TOUCH_THRESHOLD ) {
 
-                if( _previousTouchValue >= 0 ) {
-
-                    if( _touchValue > _previousTouchValue ) _this.previous();
-                    else _this.next();
+                    _this.previous();
+                    _touchStartValue = _currentTouchValue;
 
                 }
+                else if( (_currentTouchValue - _touchStartValue) < -TOUCH_THRESHOLD ) {
+
+                    _this.next();
+                    _touchStartValue = _currentTouchValue;
+
+                }
+
 
                 break;
             case 'touchend':
 
-                _previousTouchValue = -1;
+                _currentTouchValue = -1;
+                _touchStartValue = -1;
 
                 break;
             default:
@@ -173,8 +186,8 @@ function SlideShow ( element ) {
 
         _animationEase = undefined;
         _animationTime = NaN;
-        _touchValue = NaN;
-        _previousTouchValue = NaN;
+        _touchStartValue = NaN;
+        _currentTouchValue = NaN;
 
     } );
 
@@ -202,7 +215,7 @@ SlideShow.prototype.transitionSlides = function ( opt_instant ) {
     if( this.isHorizontal ) {
 
         if( this.previousSlide ) animationOut.x = ( this.slideForward ? -this.previousSlide.width : this.previousSlide.width );
-        animationIn.x = 0 ;
+        animationIn.x = 0;
         animationInFrom.x = ( this.slideForward ? this.currentSlide.width : -this.currentSlide.width );
 
     }
@@ -214,7 +227,7 @@ SlideShow.prototype.transitionSlides = function ( opt_instant ) {
 
     }
 
-    if( this.debug ) this.logDebug( 'updating show: \nforward: ' + this.slideForward + '\ndirection:' + this.direction + ' \nanim in: ', animationIn, '\nanim from:', animationInFrom, '\nanim out: ', animationOut );
+    if( this.debug ) this.logDebug( 'updating show: \ninstant: ' + opt_instant + '\nforward: ' + this.slideForward + '\ndirection:' + this.direction + ' \nanim in: ', animationIn, '\nanim in from:', animationInFrom, '\nanim out: ', animationOut );
 
 
     if( this.previousSlide ) TweenLite.to( this.previousSlide.element, opt_instant ? 0 : this.animationTime, animationOut );

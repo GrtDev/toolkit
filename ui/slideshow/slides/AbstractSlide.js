@@ -39,5 +39,4 @@ function AbstractSlide ( element ) {
 }
 
 
-
 module.exports = AbstractSlide;

@@ -8,6 +8,7 @@
 var CoreHTMLElement                         = require('../../core/CoreHTMLElement');
 var CommonEvent                             = require('../../core/events/CommonEvent');
 var AnimationEvent                          = require('../animation/AnimationEvent');
+var ResizeManager                           = require('../../control/ResizeManager' );
 
 
 AbstractSlideShow.DIRECTION_VERTICAL        = 'vertical';
@@ -40,10 +41,17 @@ function AbstractSlideShow ( element ) {
     var _slideForward;
     var _enabled;
     var _isTransitioning;
-    var _disableOnAnimation = true;
+    var _disableDuringTransition = true;
     var _fullSizeSlides = true;
     var _autoHide = true;
     var _direction;
+    var _autoResize;
+    var _resizeManager;
+
+    // set initial styling
+    var positionStyle = this.getStyle( 'position' );
+    if( positionStyle !== 'relative' && positionStyle !== 'absolute' ) this.element.style = 'relative';
+    this.element.style.overflow = 'hidden';
 
 
     _this.enable = function () {
@@ -87,7 +95,7 @@ function AbstractSlideShow ( element ) {
 
         }
 
-        if(_autoHide) slide.hide();
+        if( _autoHide ) slide.hide();
 
         _slides.push( slide );
         _slidesLength++;
@@ -116,11 +124,11 @@ function AbstractSlideShow ( element ) {
 
     _this.setCurrentSlide = function ( slideIndex, opt_instant, opt_noUpdate ) {
 
-        if( !_enabled || _this.isDestructed || (_disableOnAnimation && _isTransitioning) ) return;
+        if( !_enabled || _this.isDestructed || (_disableDuringTransition && _isTransitioning) ) return;
 
         if( slideIndex < 0 || slideIndex >= _slidesLength || slideIndex === _currentSlideIndex ) return;
 
-        if( _this.debug ) _this.logDebug( 'setting new current slide: ' + slideIndex );
+        if( _this.debug ) _this.logDebug( 'setting new current slide: ' + slideIndex + ', current: ' + _currentSlideIndex + ', prev: ' + _previousSlideIndex );
 
         _previousSlideIndex = _currentSlideIndex;
         _previousSlide = _currentSlide;
@@ -128,9 +136,9 @@ function AbstractSlideShow ( element ) {
         _currentSlideIndex = slideIndex;
         _currentSlide = _slides[ _currentSlideIndex ];
 
-        if(_autoHide) _currentSlide.show();
+        if( _autoHide ) _currentSlide.show();
 
-        _slideForward = (!this.previousSlideIndex || this.previousSlideIndex <= this.currentSlideIndex);
+        _slideForward = (!_previousSlideIndex || _previousSlideIndex <= _currentSlideIndex);
 
         _this.dispatchEvent( new CommonEvent( CommonEvent.UPDATE ) );
 
@@ -152,7 +160,7 @@ function AbstractSlideShow ( element ) {
 
     _this.setDisableOnAnimation = function ( value ) {
 
-        _disableOnAnimation = value;
+        _disableDuringTransition = value;
 
     }
 
@@ -171,6 +179,37 @@ function AbstractSlideShow ( element ) {
         }
 
     }
+
+    function handleWindowResize () {
+
+        _this.updateLayout();
+
+    }
+
+    Object.defineProperty( this, 'autoResize', {
+        enumerable: true,
+        get: function () {
+
+            return _autoResize;
+
+        },
+        set: function ( value ) {
+
+            if( value === _autoResize ) return;
+            _autoResize = value;
+
+            if( _autoResize ) {
+
+                if( !_resizeManager ) _resizeManager = ResizeManager.getInstance();
+                _resizeManager.addCallback( handleWindowResize );
+
+            } else {
+
+                _resizeManager.removeCallback( handleWindowResize );
+            }
+
+        }
+    } );
 
     Object.defineProperty( this, 'isVertical', {
         enumerable: true,
@@ -261,10 +300,10 @@ function AbstractSlideShow ( element ) {
         }
     } );
 
-    Object.defineProperty( this, 'disableOnAnimation', {
+    Object.defineProperty( this, 'disableDuringTransition', {
         enumerable: true,
         get: function () {
-            return _disableOnAnimation;
+            return _disableDuringTransition;
         }
     } );
 
@@ -277,6 +316,13 @@ function AbstractSlideShow ( element ) {
     } );
 
     _this.setDestruct( function () {
+
+        if( _resizeManager ) {
+
+            _resizeManager.removeCallback( handleWindowResize );
+            _resizeManager = undefined;
+
+        }
 
         _slides = undefined;
         _currentSlide = undefined;
@@ -296,13 +342,12 @@ AbstractSlideShow.prototype.init = function ( opt_direction ) {
 
     this.enable();
 
-    // set initial styling
-    var positionStyle = this.getStyle( 'position' );
-
-    if( positionStyle !== 'relative' && positionStyle !== 'absolute' ) this.element.style = 'relative';
-    this.element.style.overflow = 'hidden';
-
     if( this.length ) this.setCurrentSlide( 0, true );
+
+    this.autoResize = true;
+
+    this.updateLayout();
+
 
 }
 
@@ -323,9 +368,24 @@ AbstractSlideShow.prototype.next = function () {
 
 AbstractSlideShow.prototype.setSize = function ( width, height ) {
 
+    if( this.debug ) this.logDebug( 'update slide show size: ' + width + ', ' + height );
+
     AbstractSlideShow.super_.prototype.setSize.call( this, width, height );
 
+    this.updateLayout();
+
+
+}
+
+AbstractSlideShow.prototype.updateLayout = function () {
+
+
     if( this.fullSizeSlides ) {
+
+        var width = this.width;
+        var height = this.height;
+
+        if( this.debug ) this.logDebug( 'update layout ' + width + ', ' + height );
 
         for ( var i = 0, leni = this.length; i < leni; i++ ) {
 
@@ -340,7 +400,7 @@ AbstractSlideShow.prototype.setSize = function ( width, height ) {
 
 AbstractSlideShow.prototype.transitionSlides = function ( opt_instant ) {
 
-    this.logError('abstract function, should be overridden!');
+    this.logError( 'abstract function, should be overridden!' );
 
 }
 
