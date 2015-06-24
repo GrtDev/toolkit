@@ -170,7 +170,7 @@ function NotificationCenter () {
 
         if(_this.debug) _this.logDebug('notify: ', notification);
 
-        var listenerArray;
+        var observerArray;
         var array = [];
         var listener;
         var i;
@@ -178,16 +178,16 @@ function NotificationCenter () {
 
         if( _observers !== undefined ) {
 
-            listenerArray = _observers[ notification.type ];
+            observerArray = _observers[ notification.type ];
 
-            if( listenerArray !== undefined ) {
+            if( observerArray !== undefined ) {
 
-                length = listenerArray.length;
+                length = observerArray.length;
                 array = new Array( length );
 
                 for ( i = 0; i < length; i++ ) {
 
-                    array[ i ] = listenerArray[ i ];
+                    array[ i ] = observerArray[ i ];
 
                 }
 
@@ -204,16 +204,16 @@ function NotificationCenter () {
 
         if( _oneTimeObservers !== undefined ) {
 
-            listenerArray = _oneTimeObservers[ notification.type ];
+            observerArray = _oneTimeObservers[ notification.type ];
 
-            if( listenerArray !== undefined ) {
+            if( observerArray !== undefined ) {
 
-                length = listenerArray.length;
+                length = observerArray.length;
                 array = new Array( length );
 
                 for ( i = 0; i < length; i++ ) {
 
-                    array[ i ] = listenerArray[ i ];
+                    array[ i ] = observerArray[ i ];
 
                 }
 
