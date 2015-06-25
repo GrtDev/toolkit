@@ -88,6 +88,14 @@ systemUtils.isTouchDevice = function () {
     || window[ 'onmsgesturechange' ] !== undefined ); // works on ie10
 }
 
+/**
+ * @see: http://stackoverflow.com/a/16459606/3404223
+ * @returns {boolean}
+ */
+systemUtils.isWebkit = function () {
+    return ('WebkitAppearance' in document.documentElement.style);
+}
+
 
 if( typeof Object.freeze === 'function' ) Object.freeze( systemUtils ) // lock the object to minimize accidental changes
 

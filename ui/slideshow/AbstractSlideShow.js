@@ -15,7 +15,9 @@ AbstractSlideShow.DIRECTION_VERTICAL        = 'vertical';
 AbstractSlideShow.DIRECTION_HORIZONTAL      = 'horizontal';
 AbstractSlideShow.DIRECTION_NONE            = 'none';
 
+
 // @formatter:on
+
 
 CoreHTMLElement.extend( AbstractSlideShow );
 
@@ -51,7 +53,10 @@ function AbstractSlideShow ( element ) {
     // set initial styling
     var positionStyle = this.getStyle( 'position' );
     if( positionStyle !== 'relative' && positionStyle !== 'absolute' ) this.element.style = 'relative';
-    this.element.style.overflow = 'hidden';
+    _this.element.style.overflow = 'hidden';
+
+    /* this fixes the overflow:hidden and position absolute bug in Chrome/Opera */
+    _this.element.style.webkitMaskImage = 'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC)';
 
 
     _this.enable = function () {
@@ -79,8 +84,9 @@ function AbstractSlideShow ( element ) {
             var slideElement = slideElements[ i ];
             _this.addSlide( new constructor( slideElement ) );
 
-
         }
+
+        if( leni <= 0 ) _this.logWarn( 'Failed to find any slides.. selector: ' + selector );
 
     }
 
@@ -166,6 +172,8 @@ function AbstractSlideShow ( element ) {
 
     _this.setDirection = function ( value ) {
 
+        if( _direction === value ) return;
+
         switch ( value ) {
             case AbstractSlideShow.DIRECTION_HORIZONTAL:
             case AbstractSlideShow.DIRECTION_VERTICAL:
@@ -177,6 +185,8 @@ function AbstractSlideShow ( element ) {
             default:
                 _this.logError( 'Unknown direction' );
         }
+
+        _this.updateLayout();
 
     }
 

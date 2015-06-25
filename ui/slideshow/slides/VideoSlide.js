@@ -150,37 +150,4 @@ VideoSlide.prototype.setSize = function ( width, height ) {
 }
 
 
-
-AbstractSlide.prototype.prepare = function () {
-
-    this.video.preload();
-
-    VideoSlide.super_.prototype.prepare.call(this);
-
-}
-
-AbstractSlide.prototype.activate = function () {
-
-    this.video.play();
-
-    VideoSlide.super_.prototype.activate.call(this);
-
-}
-
-AbstractSlide.prototype.unprepare = function () {
-
-    this.video.pause();
-
-    VideoSlide.super_.prototype.unprepare.call(this);
-
-}
-
-AbstractSlide.prototype.deactivate = function () {
-
-    this.video.stop();
-
-    VideoSlide.super_.prototype.deactivate.call(this);
-
-}
-
 module.exports = VideoSlide;

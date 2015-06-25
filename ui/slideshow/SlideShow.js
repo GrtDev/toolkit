@@ -206,6 +206,23 @@ SlideShow.prototype.init = function ( opt_direction, opt_eventTarget ) {
 
 }
 
+SlideShow.prototype.updateLayout = function () {
+
+    SlideShow.super_.prototype.updateLayout.call( this );
+
+    if( this.previousSlide ) TweenLite.killTweensOf( this.previousSlide );
+
+    if( this.currentSlide ) {
+
+        TweenLite.killTweensOf( this.currentSlide );
+        TweenLite.to( this.currentSlide.element, 0, { y: 0, x: 0 } );
+
+    }
+
+    this.setTransitioning( false );
+
+}
+
 SlideShow.prototype.transitionSlides = function ( opt_instant ) {
 
     this.setTransitioning( true );
@@ -220,6 +237,7 @@ SlideShow.prototype.transitionSlides = function ( opt_instant ) {
         if( this.previousSlide ) animationOut.x = ( this.slideForward ? -this.previousSlide.width : this.previousSlide.width );
         animationIn.x = 0;
         animationInFrom.x = ( this.slideForward ? this.currentSlide.width : -this.currentSlide.width );
+        animationInFrom.y = 0;
 
     }
     else if( this.isVertical ) {
@@ -227,6 +245,7 @@ SlideShow.prototype.transitionSlides = function ( opt_instant ) {
         if( this.previousSlide ) animationOut.y = (this.slideForward ? -this.previousSlide.height : this.previousSlide.height);
         animationIn.y = 0;
         animationInFrom.y = ( this.slideForward ? this.currentSlide.height : -this.currentSlide.height );
+        animationInFrom.x = 0;
 
     }
 

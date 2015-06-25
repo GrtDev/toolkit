@@ -24,7 +24,10 @@ CoreEventDispatcher.extend( CoreHTMLElement );
  */
 function CoreHTMLElement ( element ) {
 
-    if( !element ) throw new Error( 'element can not be null!' );
+    if( !element ) {
+        console.log( this );
+        throw new Error( 'element can not be null!' );
+    }
 
     var _this = this;
     var _element = element;
@@ -32,7 +35,6 @@ function CoreHTMLElement ( element ) {
     var _width;
     var _height;
     var _computedStyle;
-    var _boundingRectangle;
 
 
     _this.getStyle = function ( property ) {
@@ -109,6 +111,12 @@ function CoreHTMLElement ( element ) {
     _this.find = function ( query ) {
 
         return _element.querySelector( query );
+
+    }
+
+    _this.findAll = function ( query ) {
+
+        return _element.querySelectorAll( query );
 
     }
 
