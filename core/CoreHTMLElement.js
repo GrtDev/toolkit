@@ -106,14 +106,18 @@ function CoreHTMLElement ( element ) {
 
     }
 
+    _this.find = function ( query ) {
+
+        return _element.querySelector( query );
+
+    }
+
     Object.defineProperty( this, 'height', {
         enumerable: true,
         get: function () {
 
-            if( _height ) return _height;
-            // retrieve dimensions
-            _boundingRectangle = _element.getBoundingClientRect();
-            return _boundingRectangle.height;
+            if( _height >= 0 ) return _height;
+            return _element.offsetHeight;
 
         },
         set: function ( value ) {
@@ -128,10 +132,8 @@ function CoreHTMLElement ( element ) {
         enumerable: true,
         get: function () {
 
-            if( _width ) return _width;
-            // retrieve dimensions
-            _boundingRectangle = _element.getBoundingClientRect();
-            return _boundingRectangle.width;
+            if( _width >= 0 ) return _width;
+            return _element.offsetWidth;
 
         },
         set: function ( value ) {
@@ -171,7 +173,7 @@ function CoreHTMLElement ( element ) {
 
 CoreHTMLElement.prototype.setSize = function ( width, height ) {
 
-    this.width =  width;
+    this.width = width;
     this.height = height;
 
 }

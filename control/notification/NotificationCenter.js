@@ -20,8 +20,8 @@ singletonMixin.apply( NotificationCenter );
  * Singleton for conveying global notifications
  * @constructor
  * @singleton
- * @mixes singletonMixin
  * @extends {CoreObject}
+ * @mixes singletonMixin
  */
 function NotificationCenter () {
 

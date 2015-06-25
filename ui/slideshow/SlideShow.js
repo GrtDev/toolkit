@@ -127,14 +127,17 @@ function SlideShow ( element ) {
                 if( _this.isHorizontal ) _currentTouchValue = event.touches[ 0 ].clientX;
                 else  _currentTouchValue = event.touches[ 0 ].clientY;
 
+
                 if( (_currentTouchValue - _touchStartValue) > TOUCH_THRESHOLD ) {
 
+                    event.preventDefault();
                     _this.previous();
                     _touchStartValue = _currentTouchValue;
 
                 }
                 else if( (_currentTouchValue - _touchStartValue) < -TOUCH_THRESHOLD ) {
 
+                    event.preventDefault();
                     _this.next();
                     _touchStartValue = _currentTouchValue;
 
