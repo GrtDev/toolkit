@@ -25,7 +25,6 @@ CoreEventDispatcher.extend( CoreHTMLElement );
 function CoreHTMLElement ( element ) {
 
     if( !element ) {
-        console.log( this );
         throw new Error( 'element can not be null!' );
     }
 
