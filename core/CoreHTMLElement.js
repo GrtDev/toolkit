@@ -7,7 +7,6 @@
 // @formatter:off
 
 var CoreEventDispatcher              = require('./events/CoreEventDispatcher');
-var CommonEvent                      = require('./events/CommonEvent');
 
 //@formatter:on
 
@@ -25,24 +24,22 @@ CoreEventDispatcher.extend( CoreHTMLElement );
  */
 function CoreHTMLElement ( element ) {
 
-    if( !element ) return this.logError( 'element can not be null!' );
+    if( !element ) {
+        console.log( this );
+        throw new Error( 'element can not be null!' );
+    }
 
     var _this = this;
     var _element = element;
     var _data;
     var _width;
     var _height;
-    var _mouseChildrenClick;
     var _computedStyle;
 
-    // retrieve dimensions
-    var boundingRectangle = _element.getBoundingClientRect();
-    _width = boundingRectangle.width;
-    _height = boundingRectangle.height;
 
     _this.getStyle = function ( property ) {
 
-        if(!_computedStyle) _computedStyle = getComputedStyle( _element, null );
+        if( !_computedStyle ) _computedStyle = getComputedStyle( _element, null );
 
         return _computedStyle.getPropertyValue( property );
 
@@ -56,6 +53,8 @@ function CoreHTMLElement ( element ) {
     _this.parseData = function () {
 
         if( _data !== undefined ) return _this.logWarn( 'data was already parsed.' );
+
+        if( _this.debug ) _this.logDebug( 'parsing data attributes..' );
 
         _data = {};
         var attributes = _element.attributes;
@@ -77,6 +76,8 @@ function CoreHTMLElement ( element ) {
 
         }
 
+        if( _this.debug ) _this.logDebug( 'parsed data:', _this.data );
+
         // helper function to convert dashed variable names to camelCase.
         function camelCaseReplacer ( match, p1 ) {
 
@@ -86,45 +87,6 @@ function CoreHTMLElement ( element ) {
 
     }
 
-    function handleMouseEvents ( event ) {
-
-
-        switch ( event.type ) {
-            case 'click':
-
-                if( !_mouseChildrenClick && event.target !== _element )  event.stopPropagation();
-
-                break;
-            default:
-                _this.logError( 'Unhandled switch case' );
-        }
-
-
-    }
-
-    /**
-     * Defines whether children trigger mouse events
-     */
-    Object.defineProperty( this, 'mouseChildrenClick', {
-        enumerable: true,
-        get: function () {
-            return _mouseChildrenClick;
-        },
-        set: function ( value ) {
-            if( _mouseChildrenClick === value ) return;
-            _mouseChildrenClick = value;
-
-            if( _mouseChildrenClick ) {
-
-                _element.addEventListener( 'click', handleMouseEvents );
-
-            } else {
-
-                _element.removeEventListener( 'click', handleMouseEvents );
-
-            }
-        }
-    } );
 
     _this.removeChild = function ( element ) {
 
@@ -136,7 +98,7 @@ function CoreHTMLElement ( element ) {
     _this.addChild = function ( element ) {
 
         if( element instanceof CoreHTMLElement ) element = element.element;
-        _this.element.addChild( element );
+        _this.element.appendChild( element );
 
     }
 
@@ -146,29 +108,63 @@ function CoreHTMLElement ( element ) {
 
     }
 
-    _this.setSize = function ( width, height ) {
+    _this.find = function ( query ) {
 
-        _width = width;
-        _height = height;
-        _element.style.width = _width + 'px;';
-        _element.style.height = _height + 'px;';
-
-        _this.dispatchEvent( new CommonEvent( CommonEvent.RESIZE ) );
+        return _element.querySelector( query );
 
     }
+
+    _this.findAll = function ( query ) {
+
+        return _element.querySelectorAll( query );
+
+    }
+
+    Object.defineProperty( this, 'height', {
+        enumerable: true,
+        get: function () {
+
+            if( _height >= 0 ) return _height;
+            return _element.offsetHeight;
+
+        },
+        set: function ( value ) {
+
+            _height = value;
+            _element.style.height = _height + 'px';
+
+        }
+    } );
+
+    Object.defineProperty( this, 'width', {
+        enumerable: true,
+        get: function () {
+
+            if( _width >= 0 ) return _width;
+            return _element.offsetWidth;
+
+        },
+        set: function ( value ) {
+
+            _width = value;
+            _element.style.width = _width + 'px';
+
+        }
+    } );
+
+
+    Object.defineProperty( this, 'data', {
+        enumerable: true,
+        get: function () {
+            return _data;
+        }
+    } );
 
 
     Object.defineProperty( this, 'element', {
         enumerable: true,
         get: function () {
             return _element;
-        }
-    } );
-
-    Object.defineProperty( this, 'data', {
-        enumerable: true,
-        get: function () {
-            return _data;
         }
     } );
 
@@ -180,6 +176,13 @@ function CoreHTMLElement ( element ) {
         _height = NaN;
 
     } );
+
+}
+
+CoreHTMLElement.prototype.setSize = function ( width, height ) {
+
+    this.width = width;
+    this.height = height;
 
 }
 

@@ -73,21 +73,29 @@ eventDispatcherMixin.addEventListenerOnce = function ( type, listener ) {
  */
 eventDispatcherMixin.hasEventListener = function ( type, listener ) {
 
-    if( this._listeners === undefined ) return false;
+    var listeners;
 
-    var listeners = this._listeners;
+    if( this._listeners !== undefined ) {
 
-    if( listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== -1 ) {
+        listeners = this._listeners;
 
-        return true;
+        if( listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== -1 ) {
+
+            return true;
+
+        }
 
     }
 
-    listeners = this._oneTimeListeners;
+    if( this._oneTimeListeners !== undefined ) {
 
-    if( listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== -1 ) {
+        listeners = this._oneTimeListeners;
 
-        return true;
+        if( listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== -1 ) {
+
+            return true;
+
+        }
 
     }
 
@@ -116,11 +124,7 @@ eventDispatcherMixin.removeEventListener = function ( type, listener ) {
 
             var index = listenerArray.indexOf( listener );
 
-            if( index !== -1 ) {
-
-                listenerArray.splice( index, 1 );
-
-            }
+            if( index !== -1 ) listenerArray.splice( index, 1 );
 
         }
 
@@ -129,17 +133,13 @@ eventDispatcherMixin.removeEventListener = function ( type, listener ) {
     if( this._oneTimeListeners !== undefined ) {
 
         listeners = this._oneTimeListeners;
-        var listenerArray = listeners[ type ];
+        listenerArray = listeners[ type ];
 
         if( listenerArray !== undefined ) {
 
             var index = listenerArray.indexOf( listener );
 
-            if( index !== -1 ) {
-
-                listenerArray.splice( index, 1 );
-
-            }
+            if( index !== -1 ) listenerArray.splice( index, 1 );
 
         }
     }
@@ -179,7 +179,7 @@ eventDispatcherMixin.dispatchEvent = function ( event ) {
         listeners = this._listeners;
         listenerArray = listeners[ event.type ];
 
-        if( !event.target && typeof event.setTarget === 'function' ) event.setTarget( this );
+        if( event.target === undefined ) event.target = this;
 
         if( listenerArray !== undefined ) {
 
@@ -208,7 +208,7 @@ eventDispatcherMixin.dispatchEvent = function ( event ) {
         listeners = this._oneTimeListeners;
         listenerArray = listeners[ event.type ];
 
-        if( !event.target && typeof event.setTarget === 'function' ) event.setTarget( this );
+        if( event.target === undefined ) event.target = this;
 
         if( listenerArray !== undefined ) {
 

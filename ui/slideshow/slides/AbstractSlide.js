@@ -32,9 +32,11 @@ function AbstractSlide ( element ) {
 
     _this.setDestruct( function () {
 
+        _this = undefined;
 
     } );
 
 }
+
 
 module.exports = AbstractSlide;

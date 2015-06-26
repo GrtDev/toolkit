@@ -19,19 +19,9 @@ var inherits                    = require('../utils/inherits');
  */
 function AbstractEvent ( type, opt_target ) {
 
-    var _this = this;
     var _type = type;
     var _target = opt_target;
 
-    /**
-     * Sets the target of the event
-     * @param target {object}
-     */
-    _this.setTarget = function ( target ) {
-
-        _target = target;
-
-    }
 
     Object.defineProperty( this, 'type', {
         enumerable: true,
@@ -40,12 +30,15 @@ function AbstractEvent ( type, opt_target ) {
         }
     } );
 
-    Object.defineProperty( this, 'target', {
-        enumerable: true,
-        get: function () {
-            return _target;
-        }
-    } );
+     Object.defineProperty(this, 'target', {
+          enumerable: true,
+          get: function() {
+              return _target;
+          },
+          set: function(value) {
+              _target = value;
+          }
+     });
 }
 
 /**

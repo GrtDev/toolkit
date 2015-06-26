@@ -30,7 +30,7 @@ Log.TIME_STAMP = false;
  * @static
  * @type {number}
  */
-Log.SENDER_PADDING = 120;
+Log.SENDER_PADDING = 60;
 
 
 // Defining properties one by one because otherwise PHPStorm can't find the right documentation. :(

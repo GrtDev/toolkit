@@ -1,9 +1,9 @@
 // @formatter:off
 
 var AbstractSlide               = require('./AbstractSlide');
-var CommonEvent                 = require('../../../core/events/CommonEvent');
-var VideoPlayer                 = require('../../video/VideoPlayer');
-var Image                       = require('../../image/Image');
+var MediaEvent                  = require('../../../core/media/MediaEvent');
+var VideoPlayer                 = require('../../../core/media/CoreVideo');
+var Image                       = require('../../../core/media/CoreImage');
 var systemUtils                 = require('../../../core/utils/systemUtils');
 
 
@@ -41,17 +41,15 @@ function VideoSlide ( element, opt_debug ) {
 
 
     _posterImage = new Image( _this.element.querySelector( 'img' ) );
-    _posterImage.element.style.postition = 'absolute';
+    _posterImage.element.style.position = 'absolute';
 
-    _videoPlayer.addEventListener( CommonEvent.RESIZE, handleVideoEvents );
-
-    _this.addEventListener( CommonEvent.RESIZE, _this.handleResizeEvent );
+    _videoPlayer.addEventListener( MediaEvent.DIMENSIONS_SET, handleVideoEvents );
 
 
     function handleVideoEvents ( event ) {
 
         switch ( event.type ) {
-            case CommonEvent.RESIZE:
+            case MediaEvent.DIMENSIONS_SET:
 
                 _this.updateLayout();
 
@@ -63,14 +61,12 @@ function VideoSlide ( element, opt_debug ) {
     }
 
 
-
-
     _this.play = function () {
 
         if( _isMobile || _isTablet ) return;
 
         _videoPlayer.play();
-        _posterImage.hide();
+        //_posterImage.hide();
 
     }
 
@@ -95,18 +91,18 @@ function VideoSlide ( element, opt_debug ) {
         }
     } );
 
-     Object.defineProperty(this, 'posterImage', {
-         enumerable: true,
-     	get: function() {
-              return _posterImage;
-          }
-     });
+    Object.defineProperty( this, 'posterImage', {
+        enumerable: true,
+        get: function () {
+            return _posterImage;
+        }
+    } );
 
     _this.setDestruct( function () {
 
         if( _videoPlayer ) {
 
-            _videoPlayer.removeEventListener( CommonEvent.RESIZE, handleVideoEvents );
+            _videoPlayer.removeEventListener( MediaEvent.DIMENSIONS_SET, handleVideoEvents );
             _videoPlayer.destruct();
             _videoPlayer = null;
 
@@ -117,8 +113,6 @@ function VideoSlide ( element, opt_debug ) {
             _posterImage = null;
         }
 
-        _this.removeEventListener( CommonEvent.RESIZE, _this.handleResizeEvent );
-
         _this = undefined;
 
     } );
@@ -126,6 +120,8 @@ function VideoSlide ( element, opt_debug ) {
 }
 
 VideoSlide.prototype.updateLayout = function () {
+
+    if( this.debug ) this.logDebug( 'updateLayout' );
 
     if( this.posterImage ) {
 
@@ -139,16 +135,17 @@ VideoSlide.prototype.updateLayout = function () {
         this.videoPlayer.element.style.left = -((this.videoPlayer.width - this.width) / 2) + 'px';
     }
 
+    if( this.debug ) this.logDebug( 'update layout: ' + this.width + ', ' + this.height + ' - video pos: ' + this.videoPlayer.element.style.top + ', ' + this.videoPlayer.element.style.left );
 }
 
-VideoSlide.prototype.handleResizeEvent = function ( event ) {
+VideoSlide.prototype.setSize = function ( width, height ) {
 
-    if( this.videoPlayer ) this.videoPlayer.fillSize( this.width, this.height );
-    if( this.posterImage ) this.posterImage.fillSize( this.width, this.height );
+    VideoSlide.super_.prototype.setSize.call(this, width, height);
+
+    if( this.videoPlayer ) this.videoPlayer.fillSize( width, height, true );
+    if( this.posterImage ) this.posterImage.fillSize( width, height, true );
 
     this.updateLayout();
-
-    if( this.debug ) this.logDebug( 'update size: ' + this.width + ', ' + this.height + ' - video pos: ' + this.videoPlayer.element.style.top + ', ' + this.videoPlayer.element.style.left );
 
 }
 

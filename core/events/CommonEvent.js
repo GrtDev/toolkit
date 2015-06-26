@@ -31,7 +31,7 @@ AbstractEvent.extend( CommonEvent );
  */
 function CommonEvent ( type, opt_target ) {
 
-    CommonEvent.super_.call( this );
+    CommonEvent.super_.call( this, type, opt_target );
 
 }
 
