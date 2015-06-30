@@ -29,23 +29,12 @@ function LanguageManager () {
     var _this = this;
     var _currentLanguage;
     var _languages = {};
-    var _initialized;
+    var _languageLength = 0;
 
-    _this.init = function ( languageID ) {
-
-        if( _initialized ) return _this.logWarn( 'Manager has al ready been initialized!' );
-        if( !languageID || !languageID.length ) return _this.logError( 'languageID can not be null or empty! languageID: ' + languageID );
-
-        _initialized = true;
-
-        _this.addLanguage( languageID );
-        _this.setLanguage( languageID );
-
-    }
 
     _this.parseTextData = function ( textData, opt_groupID ) {
 
-        if( !_initialized ) return _this.logError( 'The language manager has not been initialized yet... initialize the language manager first!' );
+        if( !_currentLanguage ) return _this.logError( 'parse text data: add a language first!' );
 
         for ( var textID in textData ) {
 
@@ -55,11 +44,14 @@ function LanguageManager () {
         }
     }
 
-    _this.addLanguage = function ( languageID ) {
+    _this.addLanguage = function ( languageID, opt_autoSet ) {
 
-        if( typeof _languages[ languageID ] !== 'undefined' ) return _this.logError( 'Attempting to add a language that has al ready been added!' );
+        if( _languages[ languageID ] !== undefined ) return _this.logError( 'Attempting to add a language that has al ready been added!' );
 
         _languages[ languageID ] = { id: languageID, texts: {}, groups: {} };
+        _languageLength++;
+
+        if( opt_autoSet === undefined || opt_autoSet ) _this.setLanguage( languageID );
 
     }
 
@@ -74,7 +66,7 @@ function LanguageManager () {
 
     _this.addGroup = function ( groupID ) {
 
-        if( !_initialized ) return _this.logError( 'The language manager has not been initialized yet... initialize the language manager first!' );
+        if( !_currentLanguage ) return _this.logError( 'add group: add a language first!' );
         if( !groupID ) return _this.logError( 'group id can not be null!' );
 
         groupID = groupID.toLowerCase();
@@ -87,7 +79,7 @@ function LanguageManager () {
 
     _this.addText = function ( id, text, opt_groupID ) {
 
-        if( !_initialized ) return _this.logError( 'The language manager has not been initialized yet... initialize the language manager first!' );
+        if( !_currentLanguage ) return _this.logError( 'add text: add a language first!' );
         if( !id || !text || !id.length ) return _this.logError( 'id not be null or empty!, text can not be null! id: \'' + id + '\', text: \'' + text + '\'' );
 
         var textGroup = _currentLanguage.texts;
@@ -108,7 +100,7 @@ function LanguageManager () {
 
     _this.getText = function ( id, opt_groupID ) {
 
-        if( !_initialized ) return _this.logError( 'The language manager has not been initialized yet... initialize the language manager first!' );
+        if( !_currentLanguage ) return _this.logWarn( 'get text: no language has been set yet' );
         if( !id ) return _this.logError( 'id can not be null!' );
 
         id = id.toLowerCase();
