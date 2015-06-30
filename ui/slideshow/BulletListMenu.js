@@ -37,7 +37,7 @@ function BulletListMenu ( element ) {
 
 
     var bulletItems = _this.element.getElementsByTagName( 'li' );
-    _listElement = bulletItems[ 0 ].cloneNode( true );
+    if(bulletItems.length) _listElement = bulletItems[ 0 ].cloneNode( true );
 
     for ( var i = 0, leni = bulletItems.length; i < leni; i++ ) {
 
