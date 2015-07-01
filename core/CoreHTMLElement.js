@@ -121,7 +121,16 @@ function CoreHTMLElement ( element ) {
 
     _this.append = function ( html ) {
 
-        _element.insertAdjacentHTML('beforeend', html.toString());
+        if( typeof html === 'string' ) {
+
+            _element.insertAdjacentHTML( 'beforeend', html );
+
+        } else {
+
+            _element.appendChild( html );
+
+        }
+
 
     }
 
