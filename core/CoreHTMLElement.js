@@ -119,6 +119,12 @@ function CoreHTMLElement ( element ) {
 
     }
 
+    _this.append = function ( html ) {
+
+        _element.insertAdjacentHTML('beforeend', html.toString());
+
+    }
+
     Object.defineProperty( this, 'height', {
         enumerable: true,
         get: function () {
