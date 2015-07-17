@@ -53,7 +53,7 @@ function CoreLoader () {
      * Start loading new content
      * @param url {string}
      * @param callback {function} Should accept a DataResult
-     * @param opt_options {object}
+     * @param opt_options {=object}
      */
     _this.load = function ( url, callback, opt_options ) {
 

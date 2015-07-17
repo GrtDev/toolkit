@@ -183,6 +183,13 @@ function CoreHTMLElement ( element ) {
         }
     } );
 
+     Object.defineProperty(this, 'tagName', {
+         enumerable: true,
+     	get: function() {
+              return _element.tagName;
+          }
+     });
+
     this.setDestruct( function () {
 
         _element = undefined;
