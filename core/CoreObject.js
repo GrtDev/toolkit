@@ -43,7 +43,6 @@ function CoreObject () {
         value: ('core_object_' + ++CoreObject.numObjects)
     } );
 
-
     this.setDestruct( function () {
 
         // Remove event listeners and references to other objects here
@@ -67,7 +66,6 @@ CoreObject.prototype.extend = function ( constructor ) {
 }
 
 CoreObject.extend = CoreObject.prototype.extend;
-
 
 
 module.exports = CoreObject

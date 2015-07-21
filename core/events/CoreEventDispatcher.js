@@ -22,6 +22,8 @@ eventDispatcherMixin.apply( CoreEventDispatcher, true );
  */
 function CoreEventDispatcher () {
 
+    CoreEventDispatcher.super_.call( this );
+
     var _this = this;
 
 
@@ -29,7 +31,7 @@ function CoreEventDispatcher () {
 
         _this.removeAllEventListeners();
 
-    })
+    } )
 
 
 }

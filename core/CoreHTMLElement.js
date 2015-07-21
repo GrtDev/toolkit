@@ -190,7 +190,7 @@ function CoreHTMLElement ( element ) {
         }
     } );
 
-    this.setDestruct( function () {
+    _this.setDestruct( function () {
 
         _element = undefined;
         _data = undefined;
@@ -236,7 +236,7 @@ CoreHTMLElement.prototype.addClass = function ( name ) {
 
 CoreHTMLElement.prototype.removeClass = function ( name ) {
 
-    this.element.className = this.element.className.replace( new RegExp( '\\b' + name + '\\b' ), '' );
+    this.element.className = this.element.className.replace( new RegExp( '\\b\\s?' + name + '\\b' ), '' );
 
 }
 
