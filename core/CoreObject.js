@@ -51,6 +51,12 @@ function CoreObject () {
 
 }
 
+CoreObject.prototype.test = function ( ) {
+
+    console.log('Running bamboo test');
+
+}
+
 /**
  * Function to easily inherit the CoreObject class.
  * @memberOf sector22/core.CoreObject
