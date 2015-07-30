@@ -24,10 +24,9 @@ CoreEventDispatcher.extend( CoreHTMLElement );
  */
 function CoreHTMLElement ( element ) {
 
-    if( !element ) {
-        console.log( this );
-        throw new Error( 'element can not be null!' );
-    }
+    CoreHTMLElement.super_.call( this );
+
+    if( !element ) return this.logError( 'element can not be null!' );
 
     var _this = this;
     var _element = element;
