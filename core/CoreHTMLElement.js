@@ -25,7 +25,7 @@ CoreEventDispatcher.extend( CoreHTMLElement );
 function CoreHTMLElement ( element ) {
 
     if( !element ) {
-        console.log(this);
+        console.log( this );
         throw new Error( 'element can not be null!' );
     }
 
@@ -35,11 +35,12 @@ function CoreHTMLElement ( element ) {
     var _width;
     var _height;
     var _computedStyle;
+    var _originalDisplay;
 
 
-    _this.getStyle = function ( property ) {
+    _this.getStyle = function ( property, opt_clearCache ) {
 
-        if( !_computedStyle ) _computedStyle = getComputedStyle( _element, null );
+        if( !_computedStyle || opt_clearCache ) _computedStyle = getComputedStyle( _element, null );
 
         return _computedStyle.getPropertyValue( property );
 
@@ -122,9 +123,14 @@ function CoreHTMLElement ( element ) {
 
     _this.append = function ( html ) {
 
+
         if( typeof html === 'string' ) {
 
             _element.insertAdjacentHTML( 'beforeend', html );
+
+        } else if( html instanceof CoreHTMLElement ) {
+
+            _this.append( html.element );
 
         } else {
 
@@ -132,6 +138,22 @@ function CoreHTMLElement ( element ) {
 
         }
 
+
+    }
+
+    _this.show = function () {
+
+        this.element.style.display = _originalDisplay || 'block';
+
+    }
+
+    _this.hide = function () {
+
+        if( !_originalDisplay ) {
+            _originalDisplay = _this.getStyle( 'display' );
+            if( _originalDisplay === 'none' ) _originalDisplay = 'block';
+        }
+        this.element.style.display = 'none';
 
     }
 
@@ -183,12 +205,12 @@ function CoreHTMLElement ( element ) {
         }
     } );
 
-     Object.defineProperty(this, 'tagName', {
-         enumerable: true,
-     	get: function() {
-              return _element.tagName;
-          }
-     });
+    Object.defineProperty( this, 'tagName', {
+        enumerable: true,
+        get: function () {
+            return _element.tagName;
+        }
+    } );
 
     this.setDestruct( function () {
 
@@ -205,19 +227,6 @@ CoreHTMLElement.prototype.setSize = function ( width, height ) {
 
     this.width = width;
     this.height = height;
-
-}
-
-
-CoreHTMLElement.prototype.show = function ( opt_display ) {
-
-    this.element.style.display = opt_display || 'block';
-
-}
-
-CoreHTMLElement.prototype.hide = function () {
-
-    this.element.style.display = 'none';
 
 }
 

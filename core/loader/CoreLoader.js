@@ -7,7 +7,7 @@
 
 var CoreObject                          = require('../CoreObject');
 var DataResult                          = require('../../data/result/DataResult');
-var httpStatusUtils                     = require('./httpStatusUtils');
+var httpStatusUtils                     = require('../utils/httpStatusUtils');
 
 
 var XREQUEST_STATE_UNSENT               = 0;
