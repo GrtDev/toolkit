@@ -22,7 +22,11 @@ eventDispatcherMixin.apply( CoreEventDispatcher, true );
  */
 function CoreEventDispatcher () {
 
+<<<<<<< HEAD
+    CoreEventDispatcher.super_.call( this );
+=======
     CoreEventDispatcher.super_.call(this);
+>>>>>>> 40639d10950ccca0ce702ec1bacf08403363ef37
 
     var _this = this;
 

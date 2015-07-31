@@ -195,7 +195,7 @@ eventDispatcherMixin.dispatchEvent = function ( event ) {
             for ( i = 0; i < length; i++ ) {
 
                 listener = array[ i ];
-                listener.call( this, event );
+                listener.call( undefined, event );
 
             }
 
@@ -224,7 +224,7 @@ eventDispatcherMixin.dispatchEvent = function ( event ) {
             for ( i = 0; i < length; i++ ) {
 
                 listener = array[ i ];
-                listener.call( this, event );
+                listener.call( undefined, event );
                 this.removeEventListener( event.type, listener );
 
             }

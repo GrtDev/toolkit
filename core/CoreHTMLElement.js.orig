@@ -212,6 +212,9 @@ function CoreHTMLElement ( element ) {
         }
     } );
 
+<<<<<<< HEAD
+    _this.setDestruct( function () {
+=======
     Object.defineProperty( this, 'tagName', {
         enumerable: true,
         get: function () {
@@ -219,7 +222,8 @@ function CoreHTMLElement ( element ) {
         }
     } );
 
-    _this.setDestruct( function () {
+    this.setDestruct( function () {
+>>>>>>> 40639d10950ccca0ce702ec1bacf08403363ef37
 
         _element = undefined;
         _data = undefined;
