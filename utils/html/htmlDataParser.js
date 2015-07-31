@@ -8,9 +8,11 @@ var tagNameRegExp       = /^([\w\d]*)/i;
 
 // @formatter:on
 
+//TODO: Add ID parsing!
+
 /**
  * @name: htmlDataParser
- * A simple parses for generating HTML strings. Parses HTML Data object and returns HTML string.
+ * A simple parser for generating HTML strings. Parses HTML Data objects and returns a HTML string.
  *
  * HTML Data object are objects that contain data about HTML markup and look like this:
  *  {
@@ -21,7 +23,7 @@ var tagNameRegExp       = /^([\w\d]*)/i;
  *
  *  tag {string}                        HTMLZen based string, first part identifies a tag name and can be
  *                                      appended with multiple class names and an ID tag. Defaults to 'div'.
- *                                      e.g.: 'div#some-id.some-class'
+ *                                      e.g.: 'div#some-id.some-class' @see: TODO
  *  attr {object}                       Object containing attributes to be added to the element.
  *                                      Automatically converts camelCase properties to hyphenated equivalents.
  *                                      e.g.: { href: 'http://google.com', target: '_blank' }
