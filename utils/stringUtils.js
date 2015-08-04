@@ -7,7 +7,7 @@
 
 var cameCaseRexp                = /[^\w]+(\w)/g;
 var hypenateRegExp              = /([A-Z]+)|(?:[^\w]+)(\w)/g;
-var basicKeyboardRegexp         = /^[\w\s\d§±`~!@#$%^&*()\-=+{}\[\];'\\:"|,./<>?]*$/g
+var nonBasicCharactersRegexp         = /[^\w\s\d§±`~!@#$%^&*()\-=+{}\[\];'\\:"|,./<>?]/g
 
 var accented = {
     A: /[\u0041\u24B6\uFF21\u00C0\u00C1\u00C2\u1EA6\u1EA4\u1EAA\u1EA8\u00C3\u0100\u0102\u1EB0\u1EAE\u1EB4\u1EB2\u0226\u01E0\u00C4\u01DE\u1EA2\u00C5\u01FA\u01CD\u0200\u0202\u1EA0\u1EAC\u1EB6\u1E00\u0104\u023A\u2C6F]/g,
@@ -108,7 +108,7 @@ var stringUtils = {};
 
 stringUtils.camelCase = function camelCase ( string ) {
 
-    if( !string || !string.length ) return '';
+    if( !string ) return '';
     string = string.replace( cameCaseRexp, camelCaseReplacer );
     string = string.charAt( 0 ).toLowerCase() + string.slice( 1 ); // force lower case on first letter
     return string;
@@ -117,7 +117,7 @@ stringUtils.camelCase = function camelCase ( string ) {
 
 stringUtils.hyphenate = function hyphenate ( string ) {
 
-    if( !string || !string.length ) return '';
+    if( !string ) return '';
     string = string.replace( hypenateRegExp, hyphenateReplacer );
     string = string.replace( /^-/, '' ); // make sure we didn't place a hyphen as the first character
     return string;
@@ -132,10 +132,10 @@ stringUtils.hyphenate = function hyphenate ( string ) {
  */
 stringUtils.normalize = function normalize ( string ) {
 
-    if( !string || !string.length ) return '';
+    if( !string ) return '';
 
     // perform a quick test to see if the string actually contains any unusual characters
-    if( basicKeyboardRegexp.test( string ) ) return string;
+    if( !nonBasicCharactersRegexp.test( string ) ) return string;
 
     for ( var char in accented ) string = string.replace( accented[ char ], char );
 
