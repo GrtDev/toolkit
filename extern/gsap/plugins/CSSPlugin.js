@@ -1,3 +1,17 @@
+// @formatter:off
+
+// Custom edit to ensure this version of GS is contained into its own global scope.
+
+var toolkit = require('../../../core/toolkit');
+
+var originalGreenSockGlobals = window.GreenSockGlobals;
+var originalGreenSockQueue   = window._gsQueue;
+var originalGreenSockDefine  = window._gsDefine;
+
+var localGSAP = window.GreenSockGlobals = toolkit.getGlobal('gsap', {});
+
+// @formatter:on
+
 /*!
  * VERSION: 1.17.0
  * DATE: 2015-05-27
@@ -2596,3 +2610,13 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 		module.exports = getGlobal();
 	}
 }("CSSPlugin"));
+
+
+// @formatter:off
+
+// Reset GSAP global variable to the original values
+window.GreenSockGlobals = originalGreenSockGlobals;
+window._gsQueue         = originalGreenSockQueue;
+window._gsDefine        = originalGreenSockDefine;
+
+module.export           = localGSAP;
