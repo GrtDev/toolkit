@@ -1,8 +1,3 @@
-// @formatter:off
-var log                     = require('../../debug/Log');
-var polyfillName            = 'core polyfill'
-// @formatter:on
-
 /**
  * Provides requestAnimationFrame in a cross browser way.
  * From: http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
@@ -66,6 +61,8 @@ function documentPolyfill ( global ) {
     global.document.contains = global.document.contains ? global.document.contains : global.document.body.contains;
 
 }
+
+
 
 var polyfillApplied;
 var polyfill = {}

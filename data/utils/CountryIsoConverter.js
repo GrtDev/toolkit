@@ -301,7 +301,11 @@ function CountryIsoConverter() {
         var currentType = getIsoType(iso);
         if(!currentType) return null;
 
-        for (i = 0; i < isoCodesLength; i++) if(isoCodes[i][currentType] === iso) return isoCodes[i][type];
+        for (i = 0; i < isoCodesLength; i++){
+
+            if(isoCodes[i][currentType] === iso) return isoCodes[i][type];
+
+        }
 
         return null;
     }

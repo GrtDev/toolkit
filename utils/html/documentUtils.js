@@ -6,7 +6,7 @@
 
 // @formatter:off
 
-var log                 = require('../../debug/Log' ).getInstance();
+var log                 = require('.././Log' ).getInstance();
 
 // @formatter:on
 

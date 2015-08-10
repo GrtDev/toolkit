@@ -2,7 +2,7 @@
  * @author Geert Fokke [geert@sector22.com]
  * @www sector22.com
  */
-var log = require( '../debug/Log' ).getInstance();
+var log = require( 'debug/Log' ).getInstance();
 
 /**
  * Core object containing global scope object and info about this framework.
@@ -12,23 +12,23 @@ var toolkit = {};
 var toolkitGlobals = {};
 
 
-toolkit.defineGlobal = function ( name, value ) {
+toolkit.defineNamespace = function ( name, value ) {
 
-    if( toolkit.hasGlobal( name ) ) return log.error( 'toolkit', 'global object with the name \'' + name + '\' already exists!' );
+    if( toolkit.hasNamespace( name ) ) return log.error( 'toolkit', 'namespace \'' + name + '\' already exists!' );
 
     toolkitGlobals[ name ] = value;
 
 }
 
-toolkit.getGlobal = function ( name, opt_defaultValue ) {
+toolkit.getNamespace = function ( name, opt_defaultValue ) {
 
-    if( opt_defaultValue !== undefined && !toolkit.hasGlobal( name ) ) toolkitGlobals[ name ] = opt_defaultValue;
+    if( opt_defaultValue !== undefined && !toolkit.hasNamespace( name ) ) toolkitGlobals[ name ] = opt_defaultValue;
 
     return toolkitGlobals[ name ];
 
 }
 
-toolkit.hasGlobal = function ( name ) {
+toolkit.hasNamespace = function ( name ) {
 
     return toolkitGlobals[ name ] !== undefined;
     

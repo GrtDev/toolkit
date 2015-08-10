@@ -4,12 +4,12 @@
  */
 // @formatter:off
 
-var CoreHTMLElement                     = require('../CoreHTMLElement');
-var MediaEvent                          = require('./MediaEvent');
+var CoreElement                         = require('CoreElement');
+var MediaEvent                          = require('./../../common/events/MediaEvent');
 
 //@formatter:on
 
-CoreHTMLElement.extend( AbstractMediaElement );
+CoreElement.extend( AbstractMedia );
 
 
 /**
@@ -18,9 +18,9 @@ CoreHTMLElement.extend( AbstractMediaElement );
  * @extends {CoreHTMLElement}
  * @constructor
  */
-function AbstractMediaElement ( element ) {
+function AbstractMedia ( element ) {
 
-    AbstractMediaElement.super_.call( this, element );
+    AbstractMedia.super_.call( this, element );
 
     var _this = this;
     var _aspectRatio;
@@ -30,10 +30,9 @@ function AbstractMediaElement ( element ) {
     var _fillHeight;
     var _sourceWidth;
     var _sourceHeight;
-    var _source
+    var _source = _this.element.getAttribute( 'src' );
 
-
-    _source = _this.element.getAttribute( 'src' );
+    _this.parseData();
 
 
     _this.setSourceDimensions = function ( width, height ) {
@@ -112,6 +111,13 @@ function AbstractMediaElement ( element ) {
           }
      });
 
+     Object.defineProperty(this, 'hasSource', {
+         enumerable: true,
+     	get: function() {
+              return _source !== undefined;
+          }
+     });
+
     _this.setDestruct( function () {
 
         _aspectRatio = NaN;
@@ -126,4 +132,16 @@ function AbstractMediaElement ( element ) {
 }
 
 
-module.exports = AbstractMediaElement;
+AbstractMedia.prototype.preload = function () {
+
+    if( this.source ) return this.logWarn( 'Source is already set, so it already is (pre)loading...' );
+
+    if( !this.data || !this.data.src ) return this.logWarn( 'Could not find a source' );
+
+    this.source  = this.data.src;
+
+    if( this.debug ) this.logDebug( 'preloading... ' + this.source );
+
+}
+
+module.exports = AbstractMedia;

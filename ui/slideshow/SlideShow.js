@@ -7,8 +7,8 @@
 
 var AbstractSlideShow           = require('./AbstractSlideShow');
 var BulletListMenu              = require('./BulletListMenu');
-var CoreHTMLElement             = require('../../core/CoreHTMLElement');
-var CommonEvent                 = require('../../core/events/CommonEvent');
+var CoreHTMLElement             = require('../../core/html/CoreElement');
+var CommonEvent                 = require('../../common/events/CommonEvent');
 
                                   require('../../extern/gsap/plugins/CSSPlugin');
                                   require('../../extern/gsap/easing/EasePack');

@@ -5,7 +5,7 @@
  */
 // @formatter:off
 
-var CoreHTMLElement             = require('../../core/CoreHTMLElement');
+var CoreHTMLElement             = require('../../core/html/CoreElement');
 var SearchEvent                 = require('./SearchEvent');
 
 // @formatter:on

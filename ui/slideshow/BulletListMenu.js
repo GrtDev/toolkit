@@ -5,8 +5,8 @@
  */
 // @formatter:off
 
-var CommonEvent                 = require('../../core/events/CommonEvent');
-var CoreHTMLElement             = require('../../core/CoreHTMLElement');
+var CommonEvent                 = require('../../common/events/CommonEvent');
+var CoreHTMLElement             = require('../../core/html/CoreElement');
 
 // @formatter:on
 

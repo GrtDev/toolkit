@@ -3,7 +3,7 @@
  */
 
 ObjectUtils = require('../../utils/objectUtils');
-Log = require('../../debug/Log');
+Log = require('.././Log');
 
 // Just a check to make sure people do not try to instantiate the Singleton themselves.
 var key = "_private_constructor_"

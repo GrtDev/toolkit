@@ -4,12 +4,12 @@
  */
 // @formatter:off
 
-var AbstractMediaElement                = require('./AbstractMediaElement');
-var CommonEvent                         = require('../events/CommonEvent');
+var AbstractMedia                       = require('./AbstractMedia');
+var CommonEvent                         = require('../../common/events/CommonEvent');
 
 //@formatter:on
 
-AbstractMediaElement.extend( CoreImage );
+AbstractMedia.extend( CoreImage );
 
 
 /**

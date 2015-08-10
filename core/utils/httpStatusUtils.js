@@ -1,5 +1,3 @@
-var log = require( '../../debug/Log' );
-
 /**
  * httpStatusCollection
  * @see: http://www.iana.org/assignments/http-status-codes/http-status-codes.xml
@@ -83,20 +81,9 @@ httpStatusUtils.getDescription = function ( number ) {
 
     if( !number || typeof number !== 'number' ) return null;
 
-    if( number < 100 || number >= 600 ) {
-        log.getInstance().warn( 'httpStatusUtils', 'Invalid HTTP Status number: ' + number );
-        return null;
-    }
+    if( number < 100 || number >= 600 )  return null;
 
-    if( httpStatusCollection[ number ] ) {
-
-        return httpStatusCollection[ number ];
-
-    } else {
-
-        return 'Unassigned';
-
-    }
+    return httpStatusCollection[ number ] || 'Unassigned';
 
 }
 

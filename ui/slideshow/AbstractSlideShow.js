@@ -5,8 +5,8 @@
  */
 // @formatter:off
 
-var CoreHTMLElement                         = require('../../core/CoreHTMLElement');
-var CommonEvent                             = require('../../core/events/CommonEvent');
+var CoreHTMLElement                         = require('../../core/html/CoreElement');
+var CommonEvent                             = require('../../common/events/CommonEvent');
 var AnimationEvent                          = require('../animation/AnimationEvent');
 var ResizeManager                           = require('../../control/ResizeManager' );
 

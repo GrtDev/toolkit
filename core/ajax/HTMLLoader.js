@@ -4,7 +4,7 @@
  */
 //@formatter:off
 
-require('../../polyfill/domParser').apply();
+require('../polyfill/domParser').apply();
 
 var CoreLoader              = require('./CoreLoader');
 

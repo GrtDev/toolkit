@@ -4,16 +4,16 @@
  */
 // @formatter:off
 
-var AbstractMediaElement                = require('./AbstractMediaElement');
-var CommonEvent                         = require('../events/CommonEvent');
-var MediaEvent                          = require('./MediaEvent');
+var AbstractMedia                       = require('./AbstractMedia');
+var CommonEvent                         = require('../../common/events/CommonEvent');
+var MediaEvent                          = require('./../../common/events/MediaEvent');
 
 
-var mp4RegExp                       =   /\.mp4(\?.*)?$/
+var mp4RegExp                           =   /\.mp4(\?.*)?$/
 
 //@formatter:on
 
-AbstractMediaElement.extend( CoreVideo );
+AbstractMedia.extend( CoreVideo );
 
 
 /**
@@ -27,7 +27,6 @@ function CoreVideo ( element ) {
 
     var _this = this;
 
-    _this.parseData();
 
     _this.element.addEventListener( 'error', handleVideoErrorEvent );
     _this.element.addEventListener( 'loadedmetadata', handleVideoEvents );
@@ -92,19 +91,6 @@ function CoreVideo ( element ) {
 
     }
 
-    _this.preload = function (opt_mode) {
-
-        if( _this.source ) return _this.logWarn( 'Video already has a source so it already is preloading...' );
-
-        if( !_this.data || !_this.data.src ) return _this.logError( 'Could not find a source' );
-
-        _this.element.setAttribute( 'preload', opt_mode || 'auto' );
-
-        _this.source  = _this.data.src;
-
-        if( _this.debug ) _this.logDebug( 'preloading video.. ' + _this.source );
-
-    }
 
     function handleVideoEvents ( event ) {
 
@@ -134,7 +120,7 @@ function CoreVideo ( element ) {
 
         switch ( event.target.error.code ) {
 
-            case event.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+            case event.target.error[ 'MEDIA_ERR_SRC_NOT_SUPPORTED' ]:
 
                 // only do a warning log since we don't really count this as an error.
                 if( !_this.source ) return _this.logWarn( 'Video does not have a source.' );
@@ -142,17 +128,17 @@ function CoreVideo ( element ) {
                 _this.logError( 'Media Source is not supported! source: ', _this.source );
 
                 break;
-            case event.target.error.MEDIA_ERR_DECODE:
+            case event.target.error[ 'MEDIA_ERR_DECODE' ]:
 
                 _this.logError( 'The video playback was aborted due to a corruption problem or because the video used features your browser did not support. source: ', _this.source );
 
                 break;
-            case event.target.error.MEDIA_ERR_NETWORK:
+            case event.target.error[ 'MEDIA_ERR_NETWORK' ]:
 
                 _this.logError( 'A network error caused the video download to fail part-way.' );
 
                 break;
-            case event.target.error.MEDIA_ERR_ABORTED:
+            case event.target.error[ 'MEDIA_ERR_ABORTED' ]:
 
                 _this.logError( 'Video playback was aborted!' );
 
@@ -167,7 +153,7 @@ function CoreVideo ( element ) {
     Object.defineProperty( this, 'hasVideo', {
         enumerable: true,
         get: function () {
-            return !!_this.source;
+            return _this.hasSource;
         }
     } );
 
@@ -186,6 +172,22 @@ function CoreVideo ( element ) {
         }
 
     } );
+}
+
+/**
+ * starts preloading the video
+ * preload modes:
+ *      none:       hints that either the author thinks that the user won't need to consult that video or that the server wants to minimize its traffic; in others terms this hint indicates that the video should not be cached.
+ *      metadata:   hints that though the author thinks that the user won't need to consult that video, fetching the metadata (e.g. length) is reasonable.
+ *      auto:       hints that the user needs have priority; in others terms this hint indicated that, if needed, the whole video could be downloaded, even if the user is not expected to use it.
+ * @param opt_mode {string} defaults to 'auto'
+ */
+CoreVideo.prototype.preload = function ( opt_mode ) {
+
+    this.element.setAttribute( 'preload', opt_mode || 'auto' );
+
+    CoreVideo.super_.prototype.preload.call( this );
+
 }
 
 

@@ -8,7 +8,7 @@ var originalGreenSockGlobals = window.GreenSockGlobals;
 var originalGreenSockQueue   = window._gsQueue;
 var originalGreenSockDefine  = window._gsDefine;
 
-var localGSAP = window.GreenSockGlobals = toolkit.getGlobal('gsap', {});
+var localGSAP = window.GreenSockGlobals = toolkit.getNamespace('gsap', {});
 
 // @formatter:on
 
