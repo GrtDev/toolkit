@@ -6,7 +6,6 @@
 
 // @formatter:off
 
-var log                     = require('debug/Log').getInstance();
 var inherits                = require('./utils/inherits');
 var destructibleMixin       = require('./mixin/destructibleMixin');
 var logMixin                = require('./mixin/logMixin');

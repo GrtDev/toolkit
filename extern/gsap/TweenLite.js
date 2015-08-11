@@ -3,12 +3,7 @@
 // Custom edit to ensure this version of GS is contained into its own global scope.
 
 var toolkit = require('../../core/toolkit');
-
-var originalGreenSockGlobals = window.GreenSockGlobals;
-var originalGreenSockQueue   = window._gsQueue;
-var originalGreenSockDefine  = window._gsDefine;
-
-var localGSAP = window.GreenSockGlobals = toolkit.getNamespace('gsap', {});
+var toolkitGSAP = toolkit.getNamespace('gsap', {});
 
 // @formatter:on
 
@@ -27,7 +22,10 @@ var localGSAP = window.GreenSockGlobals = toolkit.getNamespace('gsap', {});
 (function ( window, moduleName ) {
 
     "use strict";
-    var _globals = window.GreenSockGlobals = window.GreenSockGlobals || window;
+    //var _globals = window.GreenSockGlobals = window.GreenSockGlobals || window;
+    var _globals = toolkitGSAP; // force toolkit GSAP namespace
+
+
     if( _globals.TweenLite ) {
         return; //in case the core set of classes is already loaded, don't instantiate twice.
     }
@@ -133,7 +131,8 @@ var localGSAP = window.GreenSockGlobals = toolkit.getNamespace('gsap', {});
         },
 
     //used to create Definition instances (which basically registers a class that has dependencies).
-        _gsDefine = window._gsDefine = function ( ns, dependencies, func, global ) {
+    //    _gsDefine = window._gsDefine = function ( ns, dependencies, func, global ) {
+        _gsDefine = toolkitGSAP._gsDefine = function ( ns, dependencies, func, global ) {
             return new Definition( ns, dependencies, func, global );
         },
 
@@ -1890,7 +1889,8 @@ var localGSAP = window.GreenSockGlobals = toolkit.getNamespace('gsap', {});
 
 
     //now run through all the dependencies discovered and if any are missing, log that to the console as a warning. This is why it's best to have TweenLite load last - it can check all the dependencies for you.
-    a = window._gsQueue;
+    //a = window._gsQueue;
+    a = toolkitGSAP._gsQueue;
     if( a ) {
         for ( i = 0; i < a.length; i++ ) {
             a[ i ]();
@@ -1909,9 +1909,4 @@ var localGSAP = window.GreenSockGlobals = toolkit.getNamespace('gsap', {});
 
 // @formatter:off
 
-// Reset GSAP global variable to the original values
-window.GreenSockGlobals = originalGreenSockGlobals;
-window._gsQueue         = originalGreenSockQueue;
-window._gsDefine        = originalGreenSockDefine;
-
-module.export           = localGSAP["TweenLite"];
+module.exports           = toolkitGSAP["TweenLite"];

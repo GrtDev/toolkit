@@ -4,7 +4,7 @@
  */
 // @formatter:off
 
-var CoreElement                         = require('CoreElement');
+var CoreElement                         = require('./CoreElement');
 var MediaEvent                          = require('./../../common/events/MediaEvent');
 
 //@formatter:on
@@ -15,7 +15,7 @@ CoreElement.extend( AbstractMedia );
 /**
  * A slide for the homepage video slider
  * @param element {HTMLElement}
- * @extends {CoreHTMLElement}
+ * @extends {CoreElement}
  * @constructor
  */
 function AbstractMedia ( element ) {

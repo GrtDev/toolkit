@@ -5,7 +5,7 @@
  */
 
 
-var log                     = require('./Log').getInstance();
+var log                     = require('../debug/Log').getInstance();
 
 /**
  * @mixin logMixin

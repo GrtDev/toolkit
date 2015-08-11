@@ -27,7 +27,6 @@ function CoreVideo ( element ) {
 
     var _this = this;
 
-
     _this.element.addEventListener( 'error', handleVideoErrorEvent );
     _this.element.addEventListener( 'loadedmetadata', handleVideoEvents );
 
@@ -48,49 +47,6 @@ function CoreVideo ( element ) {
 
 
     }
-
-
-    _this.play = function () {
-
-        if( !_this.source ) {
-            if( _this.data && _this.data.src ) _this.source = _this.data.src;
-            else return _this.logWarn( 'Can not play the video because there is no source.' );
-        }
-
-        if( _this.debug ) _this.logDebug( 'play: ' + _this.source );
-
-        _this.element.play();
-
-    }
-
-
-    _this.pause = function () {
-
-        if( _this.debug ) _this.logDebug( 'pause' );
-
-        _this.element.pause();
-
-    }
-
-    /**
-     * Stops the video and optionally stops the loading of the video
-     * @param opt_stopLoad {boolean=}
-     */
-    _this.stop = function ( opt_stopLoad ) {
-
-        if( !_this.element ) return;
-
-        if( _this.debug ) _this.logDebug( 'stop' );
-
-
-        _this.pause();
-        _this.element.currentTime = 0;
-
-        // empty the source attribute so it won't continue loading.
-        if( opt_stopLoad ) _this.source = null;
-
-    }
-
 
     function handleVideoEvents ( event ) {
 
@@ -150,14 +106,6 @@ function CoreVideo ( element ) {
         }
     }
 
-    Object.defineProperty( this, 'hasVideo', {
-        enumerable: true,
-        get: function () {
-            return _this.hasSource;
-        }
-    } );
-
-
     _this.setDestruct( function () {
 
         _this.removeEventListener( MediaEvent.SOURCE_CHANGE, handleSourceChange );
@@ -174,13 +122,61 @@ function CoreVideo ( element ) {
     } );
 }
 
+Object.defineProperty( CoreVideo.prototype, 'hasVideo', {
+    enumerable: true,
+    get: function () {
+        return this.hasSource;
+    }
+} );
+
+CoreVideo.prototype.play = function () {
+
+    if( !this.source ) {
+        if( this.data && this.data.src ) this.source = this.data.src;
+        else return this.logWarn( 'Can not play the video because there is no source.' );
+    }
+
+    if( this.debug ) this.logDebug( 'play: ' + this.source );
+
+    this.element.play();
+
+}
+
+
+CoreVideo.prototype.pause = function () {
+
+    if( this.debug ) this.logDebug( 'pause' );
+
+    this.element.pause();
+
+}
+
+/**
+ * Stops the video and optionally stops the loading of the video
+ * @param opt_stopLoad {boolean=}
+ */
+CoreVideo.prototype.stop = function ( opt_stopLoad ) {
+
+    if( !this.element ) return;
+
+    if( this.debug ) this.logDebug( 'stop' );
+
+
+    this.pause();
+    this.element.currentTime = 0;
+
+    // empty the source attribute so it won't continue loading.
+    if( opt_stopLoad ) this.source = null;
+
+}
+
 /**
  * starts preloading the video
  * preload modes:
  *      none:       hints that either the author thinks that the user won't need to consult that video or that the server wants to minimize its traffic; in others terms this hint indicates that the video should not be cached.
  *      metadata:   hints that though the author thinks that the user won't need to consult that video, fetching the metadata (e.g. length) is reasonable.
  *      auto:       hints that the user needs have priority; in others terms this hint indicated that, if needed, the whole video could be downloaded, even if the user is not expected to use it.
- * @param opt_mode {string} defaults to 'auto'
+ * @param opt_mode {string=} defaults to 'auto'
  */
 CoreVideo.prototype.preload = function ( opt_mode ) {
 

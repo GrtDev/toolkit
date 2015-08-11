@@ -5,16 +5,16 @@
  */
 // @formatter:off
 
-var CoreHTMLElement             = require('../../../core/html/CoreElement');
+var CoreElement             = require('../../../core/html/CoreElement');
 
 // @formatter:on
 
-CoreHTMLElement.extend( AbstractSlide );
+CoreElement.extend( AbstractSlide );
 
 
 /**
  * @constructor
- * @extends CoreHTMLElement
+ * @extends CoreElement
  * @param element {HTMLElement}
  */
 function AbstractSlide ( element ) {
@@ -35,6 +35,24 @@ function AbstractSlide ( element ) {
         _this = undefined;
 
     } );
+
+}
+
+AbstractSlide.prototype.activate = function () {
+
+    if(this.debug) this.logDebug('activate');
+
+}
+
+AbstractSlide.prototype.deactivate = function () {
+
+    if(this.debug) this.logDebug('deactivate');
+
+}
+
+AbstractSlide.prototype.prepare = function () {
+
+    if(this.debug) this.logDebug('prepare');
 
 }
 

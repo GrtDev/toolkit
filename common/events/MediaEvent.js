@@ -6,7 +6,7 @@
 
 // @formatter:off
 
-var AbstractEvent                           = require('AbstractEvent');
+var AbstractEvent                           = require('./../../core/events/AbstractEvent');
 
 MediaEvent.SOURCE_CHANGE                    = 'CommonEvent.SOURCE_CHANGE';
 MediaEvent.DIMENSIONS_SET                   = 'CommonEvent.DIMENSIONS_SET';

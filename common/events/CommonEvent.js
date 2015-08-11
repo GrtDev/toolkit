@@ -6,7 +6,7 @@
 
 // @formatter:off
 
-var AbstractEvent                       = require('./../../core/events/AbstractEvent');
+var AbstractEvent                   = require('./../../core/events/AbstractEvent');
 
 CommonEvent.UPDATE                  = 'CommonEvent.UPDATE';
 CommonEvent.CHANGE                  = 'CommonEvent.CHANGE';

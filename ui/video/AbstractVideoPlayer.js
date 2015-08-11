@@ -8,16 +8,17 @@ var CoreImage                   = require('../../core/html/CoreImage');
 //@formatter:on
 
 
-CoreElement.extend( VideoPlayer );
+CoreElement.extend( AbstractVideoPlayer );
 
 /**
  * A slide for the homepage video slider
  * @param element {HTMLElement}
  * @constructor
+ * @extends CoreElement
  */
-function VideoPlayer ( element, opt_debug ) {
+function AbstractVideoPlayer ( element, opt_debug ) {
 
-    VideoPlayer.super_.call( this, element );
+    AbstractVideoPlayer.super_.call( this, element );
 
     var _this = this;
     var _video;
@@ -49,25 +50,6 @@ function VideoPlayer ( element, opt_debug ) {
             default:
                 _this.logError( 'Unhandled video event: ' + event.type, event );
         }
-
-    }
-
-
-    _this.play = function () {
-
-        _video.play();
-
-    }
-
-    _this.pause = function () {
-
-        _video.pause();
-
-    }
-
-    _this.preload = function () {
-
-        _video.preload();
 
     }
 
@@ -106,30 +88,50 @@ function VideoPlayer ( element, opt_debug ) {
 
 }
 
-VideoPlayer.prototype.updateLayout = function () {
+AbstractVideoPlayer.prototype.play = function () {
 
-    if( this.debug ) this.logDebug( 'updateLayout' );
+    this.video.play();
+
+}
+
+AbstractVideoPlayer.prototype.pause = function () {
+
+    this.video.pause();
+
+}
+
+AbstractVideoPlayer.prototype.preload = function ( opt_mode ) {
+
+    this.video.preload( opt_mode );
+
+}
+
+AbstractVideoPlayer.prototype.updateLayout = function () {
 
     if( this.poster ) {
 
-        this.poster.element.style.top = -((this.poster.height - this.height) / 2) + 'px';
-        this.poster.element.style.left = -((this.poster.width - this.width) / 2) + 'px';
+        this.poster.position(
+            -((this.poster.width - this.width) / 2),
+            -((this.poster.height - this.height) / 2)
+        );
 
     }
 
     if( this.video ) {
 
-        this.video.element.style.top = -((this.video.height - this.height) / 2) + 'px';
-        this.video.element.style.left = -((this.video.width - this.width) / 2) + 'px';
+        this.video.position(
+            -((this.video.width - this.width) / 2),
+            -((this.video.height - this.height) / 2)
+        );
 
     }
 
-    if( this.debug ) this.logDebug( 'update layout: ' + this.width + ', ' + this.height + ' - video pos: ' + this.video.element.style.top + ', ' + this.video.element.style.left );
+    if( this.debug ) this.logDebug( 'updated layout: ' + this.width + ', ' + this.height + ' - video pos: ' + this.video.x + ', ' + this.video.y );
 }
 
-VideoPlayer.prototype.setSize = function ( width, height ) {
+AbstractVideoPlayer.prototype.setSize = function ( width, height ) {
 
-    VideoPlayer.super_.prototype.setSize.call( this, width, height );
+    AbstractVideoPlayer.super_.prototype.setSize.call( this, width, height );
 
     if( this.video ) this.video.fillSize( width, height, true );
     if( this.poster ) this.poster.fillSize( width, height, true );
@@ -139,4 +141,4 @@ VideoPlayer.prototype.setSize = function ( width, height ) {
 }
 
 
-module.exports = VideoPlayer;
+module.exports = AbstractVideoPlayer;

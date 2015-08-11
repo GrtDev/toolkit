@@ -3,12 +3,7 @@
 // Custom edit to ensure this version of GS is contained into its own global scope.
 
 var toolkit = require('../../../core/toolkit');
-
-var originalGreenSockGlobals = window.GreenSockGlobals;
-var originalGreenSockQueue   = window._gsQueue;
-var originalGreenSockDefine  = window._gsDefine;
-
-var localGSAP = window.GreenSockGlobals = toolkit.getNamespace('gsap', {});
+var toolkitGSAP = toolkit.getNamespace('gsap', {});
 
 // @formatter:on
 
@@ -23,7 +18,9 @@ var localGSAP = window.GreenSockGlobals = toolkit.getNamespace('gsap', {});
  * 
  * @author: Jack Doyle, jack@greensock.com
  */
-var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(global) !== "undefined") ? global : this || window; //helps ensure compatibility with AMD/RequireJS and CommonJS/Node
+// var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(global) !== "undefined") ? global : this || window; //helps ensure compatibility with AMD/RequireJS and CommonJS/Node
+var _gsScope = toolkitGSAP; // force the use of the toolkit GSAP namespace
+
 (_gsScope._gsQueue || (_gsScope._gsQueue = [])).push( function() {
 
 	"use strict";
@@ -2614,9 +2611,4 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 
 // @formatter:off
 
-// Reset GSAP global variable to the original values
-window.GreenSockGlobals = originalGreenSockGlobals;
-window._gsQueue         = originalGreenSockQueue;
-window._gsDefine        = originalGreenSockDefine;
-
-module.export           = localGSAP;
+module.exports           = toolkitGSAP;

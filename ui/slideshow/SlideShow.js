@@ -6,70 +6,56 @@
 // @formatter:off
 
 var AbstractSlideShow           = require('./AbstractSlideShow');
-var BulletListMenu              = require('./BulletListMenu');
-var CoreHTMLElement             = require('../../core/html/CoreElement');
+var SlideControls               = require('./SlideControls');
 var CommonEvent                 = require('../../common/events/CommonEvent');
 
-                                  require('../../extern/gsap/plugins/CSSPlugin');
-                                  require('../../extern/gsap/easing/EasePack');
 var TweenLite                   = require('../../extern/gsap/TweenLite');
-
-
-// @formatter:on
+var eases                       = require('../../extern/gsap/easing/EasePack');
 
 AbstractSlideShow.extend( SlideShow );
 
+// @formatter:on
 
 /**
  * @constructor
  * @extends AbstractSlideShow
+ * @param element {HTMLElement|string} element or selector query
  */
-function SlideShow ( element ) {
+function SlideShow ( element, opt_slideConstructor, opt_autoInit ) {
 
-    SlideShow.super_.call( this, element );
+    this.debug = true;
+
+    SlideShow.super_.call( this, element, opt_slideConstructor, opt_autoInit );
+
 
     // how many pixels you need to drag to trigger a previous / next call.
     var TOUCH_THRESHOLD = 30;
 
     var _this = this;
-    var _eventTarget;
+    var _eventTarget = this;
     var _animationTime = 1;
-    var _animationEase = Power3.easeInOut;
+    var _animationEase = eases.Power3.easeInOut;
     var _touchStartValue = -1;
     var _currentTouchValue = -1;
-    var _bulletMenu;
-    var _touchListenersAdded;
+    var _listenersAdded;
+    var _controls = new SlideControls( _this );
 
 
-    /**
-     *
-     * @param listElement {HTMLElement}
-     * @param opt_autoCreate {boolean=true}
-     */
-    _this.addBulletListMenu = function ( listElement, opt_autoCreate ) {
+    _this.setEventTarget = function ( target ) {
 
-        if( _bulletMenu ) return _this.logError( 'bullet list menu was already added!' );
+        if( _eventTarget === target ) return;
 
-        _bulletMenu = new BulletListMenu( listElement, opt_autoCreate );
-
-        if( opt_autoCreate ) {
-
-            _bulletMenu.length = _this.length;
-            _this.addEventListener( CommonEvent.CHANGE, handleSlideShowEvents );
-
-        }
-
-        _bulletMenu.select( _this.currentSlideIndex );
-        _bulletMenu.onBulletIndexClick = _this.setCurrentSlide;
-
-        _this.addEventListener( CommonEvent.UPDATE, handleSlideShowEvents );
+        removeTouchListeners();
+        _eventTarget = target;
+        addTouchListeners();
 
     }
 
-    _this.addTouchEventListeners = function () {
 
-        if( _touchListenersAdded ) return;
-        _touchListenersAdded = true;
+    function addTouchListeners () {
+
+        if( _listenersAdded ) return;
+        _listenersAdded = true;
 
         _eventTarget.addEventListener( 'touchstart', handleTouchEvents );
         _eventTarget.addEventListener( 'touchmove', handleTouchEvents );
@@ -77,33 +63,17 @@ function SlideShow ( element ) {
 
     }
 
+    function removeTouchListeners () {
 
-    function handleSlideShowEvents ( event ) {
+        if( !_listenersAdded ) return;
+        _listenersAdded = false;
 
-        switch ( event.type ) {
-            case CommonEvent.CHANGE:
-
-                if( _bulletMenu ) _bulletMenu.length = _this.length;
-
-                break;
-            case CommonEvent.UPDATE:
-
-                if( _bulletMenu ) _bulletMenu.select( _this.currentSlideIndex );
-
-                break;
-            default:
-                _this.logError( 'Unhandled slide show event' );
-        }
-
+        _eventTarget.removeEventListener( 'touchstart', handleTouchEvents );
+        _eventTarget.removeEventListener( 'touchmove', handleTouchEvents );
+        _eventTarget.removeEventListener( 'touchend', handleTouchEvents );
 
     }
 
-
-    _this.setEventTarget = function ( target ) {
-
-        _eventTarget = target;
-
-    }
 
     /**
      *
@@ -181,9 +151,6 @@ function SlideShow ( element ) {
             _eventTarget = undefined;
         }
 
-        _this.removeEventListener( CommonEvent.UPDATE, handleSlideShowEvents );
-        _this.removeEventListener( CommonEvent.CHANGE, handleSlideShowEvents );
-
         if( _this.currentSlide ) TweenLite.killTweensOf( _this.currentSlide );
         if( _this.previousSlide ) TweenLite.killTweensOf( _this.previousSlide );
 
@@ -193,16 +160,6 @@ function SlideShow ( element ) {
         _currentTouchValue = NaN;
 
     } );
-
-}
-
-SlideShow.prototype.init = function ( opt_direction, opt_eventTarget ) {
-
-    SlideShow.super_.prototype.init.call( this, opt_direction );
-
-    this.setEventTarget( opt_eventTarget || this.element );
-
-    this.addTouchEventListeners();
 
 }
 
@@ -231,7 +188,6 @@ SlideShow.prototype.transitionSlides = function ( opt_instant ) {
     var animationIn = { ease: this.animationEase, onComplete: this.setTransitioning, onCompleteParams: [ false ] };
     var animationInFrom = {};
 
-
     if( this.isHorizontal ) {
 
         if( this.previousSlide ) animationOut.x = ( this.slideForward ? -this.previousSlide.width : this.previousSlide.width );
@@ -252,9 +208,9 @@ SlideShow.prototype.transitionSlides = function ( opt_instant ) {
     if( this.debug ) this.logDebug( 'updating show: \ninstant: ' + opt_instant + '\nforward: ' + this.slideForward + '\ndirection:' + this.direction + ' \nanim in: ', animationIn, '\nanim in from:', animationInFrom, '\nanim out: ', animationOut );
 
 
-    if( this.previousSlide ) TweenLite.to( this.previousSlide.element, opt_instant ? 0 : this.animationTime, animationOut );
+    if( this.previousSlide ) TweenLite.to( this.previousSlide, opt_instant ? 0 : this.animationTime, animationOut );
 
-    TweenLite.fromTo( this.currentSlide.element, opt_instant ? 0 : this.animationTime, animationInFrom, animationIn );
+    TweenLite.fromTo( this.currentSlide, opt_instant ? 0 : this.animationTime, animationInFrom, animationIn );
 
 }
 

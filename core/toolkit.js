@@ -2,35 +2,35 @@
  * @author Geert Fokke [geert@sector22.com]
  * @www sector22.com
  */
-var log = require( 'debug/Log' ).getInstance();
+var log = require( './debug/Log' ).getInstance();
 
 /**
  * Core object containing global scope object and info about this framework.
  * @namespace
  */
 var toolkit = {};
-var toolkitGlobals = {};
+var namespaces = {};
 
 
 toolkit.defineNamespace = function ( name, value ) {
 
     if( toolkit.hasNamespace( name ) ) return log.error( 'toolkit', 'namespace \'' + name + '\' already exists!' );
 
-    toolkitGlobals[ name ] = value;
+    namespaces[ name ] = value;
 
 }
 
 toolkit.getNamespace = function ( name, opt_defaultValue ) {
 
-    if( opt_defaultValue !== undefined && !toolkit.hasNamespace( name ) ) toolkitGlobals[ name ] = opt_defaultValue;
+    if( opt_defaultValue !== undefined && !toolkit.hasNamespace( name ) ) namespaces[ name ] = opt_defaultValue;
 
-    return toolkitGlobals[ name ];
+    return namespaces[ name ];
 
 }
 
 toolkit.hasNamespace = function ( name ) {
 
-    return toolkitGlobals[ name ] !== undefined;
+    return namespaces[ name ] !== undefined;
     
 }
 

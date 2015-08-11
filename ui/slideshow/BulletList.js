@@ -6,11 +6,11 @@
 // @formatter:off
 
 var CommonEvent                 = require('../../common/events/CommonEvent');
-var CoreHTMLElement             = require('../../core/html/CoreElement');
+var CoreElement                 = require('../../core/html/CoreElement');
 
 // @formatter:on
 
-CoreHTMLElement.extend( BulletListMenu );
+CoreElement.extend( BulletListMenu );
 
 
 /**
@@ -41,7 +41,7 @@ function BulletListMenu ( element ) {
 
     for ( var i = 0, leni = bulletItems.length; i < leni; i++ ) {
 
-        _listElements.push( new CoreHTMLElement( bulletItems[ i ] ) );
+        _listElements.push( new CoreElement( bulletItems[ i ] ) );
         _listElementsLength++;
 
     }
@@ -81,7 +81,7 @@ function BulletListMenu ( element ) {
 
             while ( _listElements.length < length ) {
 
-                var bullet = new CoreHTMLElement( _listElement.cloneNode( true ) );
+                var bullet = new CoreElement( _listElement.cloneNode( true ) );
                 _this.addChild( bullet );
                 _listElements.push( bullet );
                 _listElementsLength++;

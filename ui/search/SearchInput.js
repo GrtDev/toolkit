@@ -10,7 +10,7 @@ var SearchEvent                 = require('./SearchEvent');
 
 // @formatter:on
 
-CoreHTMLElement.extend( SearchInput );
+CoreElement.extend( SearchInput );
 
 
 var SEARCH_INPUT_CLASS = 'js-search-input';

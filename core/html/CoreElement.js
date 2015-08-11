@@ -11,7 +11,7 @@ var CoreEventDispatcher              = require('./../events/CoreEventDispatcher'
 //@formatter:on
 
 
-CoreEventDispatcher.extend( CoreHTMLElement );
+CoreEventDispatcher.extend( CoreElement );
 
 
 /**
@@ -20,9 +20,9 @@ CoreEventDispatcher.extend( CoreHTMLElement );
  * @extends CoreEventDispatcher
  * @param {HTMLElement}
  */
-function CoreHTMLElement ( element ) {
+function CoreElement ( element ) {
 
-    CoreHTMLElement.super_.call( this );
+    CoreElement.super_.call( this );
 
     if( typeof element === 'string' ) element = document.querySelector( element );
 
@@ -118,7 +118,7 @@ function CoreHTMLElement ( element ) {
 
         if( _animationId ) window.cancelAnimationFrame( _animationId );
 
-        _animationStep = (1 / (opt_milliseconds || 250));
+        _animationStep = (1 / (opt_milliseconds || 450));
         _animationNow = _animationLast = Date.now();
 
         _this.opacity = 0;
@@ -150,7 +150,7 @@ function CoreHTMLElement ( element ) {
 
         if( _animationId ) window.cancelAnimationFrame( _animationId );
 
-        _animationStep = (1 / (opt_milliseconds || 250));
+        _animationStep = (1 / (opt_milliseconds || 450));
         _animationNow = _animationLast = Date.now();
 
         _this.opacity = 1;
@@ -271,7 +271,7 @@ function CoreHTMLElement ( element ) {
 }
 
 
-Object.defineProperty( CoreHTMLElement.prototype, 'idName', {
+Object.defineProperty( CoreElement.prototype, 'idName', {
     enumerable: true,
     get: function () {
         if( !this.element ) return undefined;
@@ -279,7 +279,7 @@ Object.defineProperty( CoreHTMLElement.prototype, 'idName', {
     }
 } );
 
-Object.defineProperty( CoreHTMLElement.prototype, 'x', {
+Object.defineProperty( CoreElement.prototype, 'x', {
     enumerable: true,
     get: function () {
         return this.matrix.tx;
@@ -290,7 +290,7 @@ Object.defineProperty( CoreHTMLElement.prototype, 'x', {
     }
 } );
 
-Object.defineProperty( CoreHTMLElement.prototype, 'y', {
+Object.defineProperty( CoreElement.prototype, 'y', {
     enumerable: true,
     get: function () {
         return this.matrix.ty;
@@ -301,7 +301,7 @@ Object.defineProperty( CoreHTMLElement.prototype, 'y', {
     }
 } );
 
-Object.defineProperty( CoreHTMLElement.prototype, 'scaleX', {
+Object.defineProperty( CoreElement.prototype, 'scaleX', {
     enumerable: true,
     get: function () {
         return this.matrix.a;
@@ -312,7 +312,7 @@ Object.defineProperty( CoreHTMLElement.prototype, 'scaleX', {
     }
 } );
 
-Object.defineProperty( CoreHTMLElement.prototype, 'scaleY', {
+Object.defineProperty( CoreElement.prototype, 'scaleY', {
     enumerable: true,
     get: function () {
         return this.matrix.d;
@@ -323,7 +323,15 @@ Object.defineProperty( CoreHTMLElement.prototype, 'scaleY', {
     }
 } );
 
-CoreHTMLElement.prototype.resetMatrix = function () {
+CoreElement.prototype.position = function ( x, y ) {
+
+    this.matrix.tx = x;
+    this.matrix.ty = y;
+    this.applyMatrix();
+
+}
+
+CoreElement.prototype.resetMatrix = function () {
 
     this.matrix.a = this.matrix.d = 1;
     this.matrix.b = this.matrix.c = this.matrix.tx = this.matrix.ty = 0;
@@ -336,7 +344,7 @@ CoreHTMLElement.prototype.resetMatrix = function () {
 
 }
 
-CoreHTMLElement.prototype.applyMatrix = function () {
+CoreElement.prototype.applyMatrix = function () {
 
     this.element.style.transform =
         this.element.style.OTransform =
@@ -346,7 +354,7 @@ CoreHTMLElement.prototype.applyMatrix = function () {
 
 }
 
-CoreHTMLElement.prototype.setSize = function ( width, height ) {
+CoreElement.prototype.setSize = function ( width, height ) {
 
     this.width = width;
     this.height = height;
@@ -354,71 +362,71 @@ CoreHTMLElement.prototype.setSize = function ( width, height ) {
 }
 
 
-CoreHTMLElement.prototype.hasClass = function ( name ) {
+CoreElement.prototype.hasClass = function ( name ) {
 
     return (new RegExp( '\\b' + name + '\\b' )).test( this.element.className )
 
 }
 
-CoreHTMLElement.prototype.addClass = function ( name ) {
+CoreElement.prototype.addClass = function ( name ) {
 
     if( !this.hasClass( name ) ) this.element.className = this.element.className + ' ' + name;
 
 }
 
-CoreHTMLElement.prototype.removeClass = function ( name ) {
+CoreElement.prototype.removeClass = function ( name ) {
 
     this.element.className = this.element.className.replace( new RegExp( '\\b\\s?' + name + '\\b' ), '' );
 
 }
 
-CoreHTMLElement.prototype.toggleClass = function ( name ) {
+CoreElement.prototype.toggleClass = function ( name ) {
 
     if( this.hasClass( name ) ) this.removeClass( name );
     else this.addClass( name );
 
 }
 
-CoreHTMLElement.prototype.removeChild = function ( element ) {
+CoreElement.prototype.removeChild = function ( element ) {
 
-    if( element instanceof CoreHTMLElement ) element = element.element;
+    if( element instanceof CoreElement ) element = element.element;
     this.element.removeChild( element );
 
 }
 
-CoreHTMLElement.prototype.addChild = function ( element ) {
+CoreElement.prototype.addChild = function ( element ) {
 
-    if( element instanceof CoreHTMLElement ) element = element.element;
+    if( element instanceof CoreElement ) element = element.element;
     this.element.appendChild( element );
 
 }
 
-CoreHTMLElement.prototype.empty = function () {
+CoreElement.prototype.empty = function () {
 
     this.element.innerHTML = '';
 
 }
 
-CoreHTMLElement.prototype.find = function ( query ) {
+CoreElement.prototype.find = function ( query ) {
 
     return this.element.querySelector( query );
 
 }
 
-CoreHTMLElement.prototype.findAll = function ( query ) {
+CoreElement.prototype.findAll = function ( query ) {
 
     return this.element.querySelectorAll( query );
 
 }
 
-CoreHTMLElement.prototype.append = function ( html ) {
+CoreElement.prototype.append = function ( html ) {
 
 
     if( typeof html === 'string' ) {
 
         this.element.insertAdjacentHTML( 'beforeend', html );
 
-    } else if( html instanceof CoreHTMLElement ) {
+    } else if( html instanceof CoreElement ) {
 
         this.append( html.element );
 
@@ -432,4 +440,4 @@ CoreHTMLElement.prototype.append = function ( html ) {
 }
 
 
-module.exports = CoreHTMLElement;
+module.exports = CoreElement;

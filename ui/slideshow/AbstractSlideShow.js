@@ -5,7 +5,7 @@
  */
 // @formatter:off
 
-var CoreHTMLElement                         = require('../../core/html/CoreElement');
+var CoreElement                             = require('../../core/html/CoreElement');
 var CommonEvent                             = require('../../common/events/CommonEvent');
 var AnimationEvent                          = require('../animation/AnimationEvent');
 var ResizeManager                           = require('../../control/ResizeManager' );
@@ -15,25 +15,29 @@ AbstractSlideShow.DIRECTION_VERTICAL        = 'vertical';
 AbstractSlideShow.DIRECTION_HORIZONTAL      = 'horizontal';
 AbstractSlideShow.DIRECTION_NONE            = 'none';
 
+var SLIDES_CONTAINER                        = '.js-slides-container';
+var SLIDE                                   = '.js-slide';
+
 
 // @formatter:on
 
 
-CoreHTMLElement.extend( AbstractSlideShow );
+CoreElement.extend( AbstractSlideShow );
 
 /**
  * @constructor
- * @extends CoreHTMLElement
+ * @extends CoreElement
  * @param {HTMLElement}
  * @event CommonEvent.CHANGE
  * @event AnimationEvent.START
  * @event AnimationEvent.COMPLETE
  */
-function AbstractSlideShow ( element ) {
+function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
 
     AbstractSlideShow.super_.call( this, element );
 
     var _this = this;
+    var _slideConstructor = opt_slideConstructor;
     var _currentSlide;
     var _currentSlideIndex = -1;
     var _previousSlide;
@@ -49,14 +53,16 @@ function AbstractSlideShow ( element ) {
     var _direction;
     var _autoResize;
     var _resizeManager;
+    var _slidesContainer = _this.find( SLIDES_CONTAINER );
+    _slidesContainer = _slidesContainer ? new CoreElement( _slidesContainer ) : _this;
 
     // set initial styling
-    var positionStyle = this.getStyle( 'position' );
-    if( positionStyle !== 'relative' && positionStyle !== 'absolute' ) this.element.style = 'relative';
-    _this.element.style.overflow = 'hidden';
+    var positionStyle = _this.getStyle( 'position' );
+    if( positionStyle !== 'relative' && positionStyle !== 'absolute' ) _this.element.style = 'relative';
 
     /* this fixes the overflow:hidden and position absolute bug in Chrome/Opera */
-    _this.element.style.webkitMaskImage = 'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC)';
+    _slidesContainer.element.style.webkitMaskImage = 'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC)';
+    _slidesContainer.element.style.overflow = 'hidden';
 
 
     _this.enable = function () {
@@ -77,12 +83,11 @@ function AbstractSlideShow ( element ) {
 
         if( _this.debug ) _this.logDebug( 'parsing slides..  \'' + selector + '\'' );
 
-        var slideElements = _this.element.querySelectorAll( selector );
+        var slideElements = _slidesContainer.findAll( selector );
 
         for ( var i = 0, leni = slideElements.length; i < leni; i++ ) {
 
-            var slideElement = slideElements[ i ];
-            _this.addSlide( new constructor( slideElement ) );
+            _this.addSlide( new constructor( slideElements[ i ] ) );
 
         }
 
@@ -160,13 +165,12 @@ function AbstractSlideShow ( element ) {
 
         _isTransitioning = value;
 
+        if( !_isTransitioning && _currentSlide ) _currentSlide.activate();
+        else if( _previousSlide ) _previousSlide.deactivate();
+
+        if( _slidesLength > _currentSlideIndex + 1 ) _slides[ _currentSlideIndex + 1 ].prepare();
+
         _this.dispatchEvent( new AnimationEvent( _isTransitioning ? AnimationEvent.START : AnimationEvent.COMPLETE ) );
-
-    }
-
-    _this.setDisableOnAnimation = function ( value ) {
-
-        _disableDuringTransition = value;
 
     }
 
@@ -187,6 +191,21 @@ function AbstractSlideShow ( element ) {
         }
 
         _this.updateLayout();
+
+    }
+
+    _this.previous = function () {
+
+        if( _this.debug ) _this.logDebug( 'previous' );
+        _this.setCurrentSlide( _this.currentSlideIndex - 1 );
+
+    }
+
+
+    _this.next = function () {
+
+        if( _this.debug ) _this.logDebug( 'next' );
+        _this.setCurrentSlide( _this.currentSlideIndex + 1 );
 
     }
 
@@ -216,8 +235,16 @@ function AbstractSlideShow ( element ) {
             } else {
 
                 _resizeManager.removeCallback( handleWindowResize );
+
             }
 
+        }
+    } );
+
+    Object.defineProperty( this, 'slideConstructor', {
+        enumerable: true,
+        get: function () {
+            return _slideConstructor;
         }
     } );
 
@@ -314,14 +341,23 @@ function AbstractSlideShow ( element ) {
         enumerable: true,
         get: function () {
             return _disableDuringTransition;
+        },
+        set: function ( value ) {
+            _disableDuringTransition = value;
         }
     } );
-
 
     Object.defineProperty( this, 'direction', {
         enumerable: true,
         get: function () {
             return _direction;
+        }
+    } );
+
+    Object.defineProperty( this, 'slidesContainer', {
+        enumerable: true,
+        get: function () {
+            return _slidesContainer;
         }
     } );
 
@@ -342,6 +378,9 @@ function AbstractSlideShow ( element ) {
 
     } );
 
+
+    if( opt_autoInit === undefined || opt_autoInit ) _this.init();
+
 }
 
 AbstractSlideShow.prototype.init = function ( opt_direction ) {
@@ -349,6 +388,8 @@ AbstractSlideShow.prototype.init = function ( opt_direction ) {
     if( this.debug ) this.logDebug( 'init' );
 
     this.setDirection( opt_direction || AbstractSlideShow.DIRECTION_HORIZONTAL );
+
+    if( this.slideConstructor ) this.parseSlides( SLIDE, this.slideConstructor );
 
     this.enable();
 
@@ -361,20 +402,6 @@ AbstractSlideShow.prototype.init = function ( opt_direction ) {
 
 }
 
-AbstractSlideShow.prototype.previous = function () {
-
-    if( this.debug ) this.logDebug( 'previous' );
-    this.setCurrentSlide( this.currentSlideIndex - 1 );
-
-}
-
-
-AbstractSlideShow.prototype.next = function () {
-
-    if( this.debug ) this.logDebug( 'next' );
-    this.setCurrentSlide( this.currentSlideIndex + 1 );
-
-}
 
 AbstractSlideShow.prototype.setSize = function ( width, height ) {
 
@@ -392,8 +419,8 @@ AbstractSlideShow.prototype.updateLayout = function () {
 
     if( this.fullSizeSlides ) {
 
-        var width = this.width;
-        var height = this.height;
+        var width = this.slidesContainer.width;
+        var height = this.slidesContainer.height;
 
         if( this.debug ) this.logDebug( 'update layout ' + width + ', ' + height );
 
