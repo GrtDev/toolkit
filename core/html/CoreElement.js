@@ -6,30 +6,33 @@
 
 // @formatter:off
 
-var CoreEventDispatcher              = require('./../events/CoreEventDispatcher');
+var CoreEventDispatcher             = require('./../events/CoreEventDispatcher');
 
-//@formatter:on
 
 
 CoreEventDispatcher.extend( CoreElement );
 
+var ELEMENT_CORE_PROPERTY           = 'core';
+
+//@formatter:on
 
 /**
  * Creates a new CoreHTMLElement with basic element manipulation & log capabilities and a destruct method.
  * @constructor
  * @extends CoreEventDispatcher
- * @param {HTMLElement}
+ * @param {HTMLElement|CoreElement|string} element
  */
 function CoreElement ( element ) {
 
     CoreElement.super_.call( this );
 
-    if( typeof element === 'string' ) element = document.querySelector( element );
-
-    if( !element ) return this.logError( 'element could not be found or is null!  element: ' + element );
-
     var _this = this;
-    var _element = element;
+    var _element = typeof element === 'string' ? document.querySelector( element ) : element instanceof CoreElement ? element.element : element;
+
+    if( !_element || !(_element instanceof HTMLElement) ) return _this.logError( 'element is null or an invalid type!  element: ', element );
+
+    _element[ ELEMENT_CORE_PROPERTY ] = _this;
+
     var _data;
     var _width;
     var _height;
@@ -252,7 +255,11 @@ function CoreElement ( element ) {
 
     _this.setDestruct( function () {
 
-        _element = undefined;
+        if( _element ) {
+            _element[ ELEMENT_CORE_PROPERTY ] = undefined;
+            _element = undefined;
+        }
+
         _data = undefined;
         _width = NaN;
         _height = NaN;
@@ -286,7 +293,7 @@ Object.defineProperty( CoreElement.prototype, 'x', {
     },
     set: function ( value ) {
         this.matrix.tx = value;
-        this.applyMatrix();
+        this.applyTranslation();
     }
 } );
 
@@ -297,7 +304,7 @@ Object.defineProperty( CoreElement.prototype, 'y', {
     },
     set: function ( value ) {
         this.matrix.ty = value;
-        this.applyMatrix();
+        this.applyTranslation();
     }
 } );
 
@@ -308,7 +315,8 @@ Object.defineProperty( CoreElement.prototype, 'scaleX', {
     },
     set: function ( value ) {
         this.matrix.a = value;
-        this.applyMatrix();
+
+        //TODO:
     }
 } );
 
@@ -319,7 +327,8 @@ Object.defineProperty( CoreElement.prototype, 'scaleY', {
     },
     set: function ( value ) {
         this.matrix.d = value;
-        this.applyMatrix();
+
+        //TODO:
     }
 } );
 
@@ -327,7 +336,7 @@ CoreElement.prototype.position = function ( x, y ) {
 
     this.matrix.tx = x;
     this.matrix.ty = y;
-    this.applyMatrix();
+    this.applyTranslation();
 
 }
 
@@ -344,13 +353,14 @@ CoreElement.prototype.resetMatrix = function () {
 
 }
 
-CoreElement.prototype.applyMatrix = function () {
+CoreElement.prototype.applyTranslation = function () {
 
     this.element.style.transform =
         this.element.style.OTransform =
             this.element.style.msTransform =
                 this.element.style.MozTransform =
-                    this.element.style.webkitTransform = 'matrix(' + this.matrix.a + ', ' + this.matrix.b + ', ' + this.matrix.c + ', ' + this.matrix.d + ', ' + this.matrix.tx + ', ' + this.matrix.ty + ')';
+                    this.element.style.webkitTransform = 'translate3d( ' + this.matrix.tx + 'px, ' + this.matrix.ty + 'px, 0)';
+    //this.element.style.webkitTransform = 'matrix(' + this.matrix.a + ', ' + this.matrix.b + ', ' + this.matrix.c + ', ' + this.matrix.d + ', ' + this.matrix.tx + ', ' + this.matrix.ty + ')';
 
 }
 
@@ -407,15 +417,32 @@ CoreElement.prototype.empty = function () {
 
 }
 
-CoreElement.prototype.find = function ( query ) {
+CoreElement.prototype.find = function ( query, opt_convert ) {
 
-    return this.element.querySelector( query );
+    return opt_convert ? new CoreElement( this.element.querySelector( query ) ) : this.element.querySelector( query );
 
 }
 
-CoreElement.prototype.findAll = function ( query ) {
+CoreElement.prototype.findAll = function ( query, opt_convert ) {
 
-    return this.element.querySelectorAll( query );
+    if( opt_convert ) {
+
+        var elements = this.element.querySelectorAll( query );
+        var coreElements = [];
+
+        for ( var i = 0, leni = elements.length; i < leni; i++ ) {
+
+            coreElements.push( new CoreElement( elements[ i ] ) );
+
+        }
+
+        return coreElements;
+
+    } else {
+
+        return this.element.querySelectorAll( query );
+
+    }
 
 }
 
@@ -436,6 +463,14 @@ CoreElement.prototype.append = function ( html ) {
 
     }
 
+
+}
+
+CoreElement.prototype.get = function ( selector ) {
+
+    console.log( this );
+    console.log( this.prototype );
+    console.log( this.constructor );
 
 }
 

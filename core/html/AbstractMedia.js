@@ -31,6 +31,7 @@ function AbstractMedia ( element ) {
     var _sourceWidth;
     var _sourceHeight;
     var _source = _this.element.getAttribute( 'src' );
+    var _loaded;
 
     _this.parseData();
 
@@ -45,6 +46,8 @@ function AbstractMedia ( element ) {
         if( _this.debug ) _this.logDebug( 'updated aspect ratio: ' + _sourceWidth + ', ' + _sourceHeight + ', ratio: ' + _aspectRatio );
 
         if( _fillAutoUpdate ) _this.fillSize( _fillWidth, _fillHeight );
+
+        _loaded = true;//TODO:
 
         _this.dispatchEvent( new MediaEvent( MediaEvent.DIMENSIONS_SET ) );
 
@@ -101,22 +104,43 @@ function AbstractMedia ( element ) {
         }
     } );
 
-     Object.defineProperty(this, 'fillAutoUpdate', {
-          enumerable: true,
-          get: function() {
-              return _fillAutoUpdate;
-          },
-          set: function(value) {
-              _fillAutoUpdate = value;
-          }
-     });
+    Object.defineProperty( this, 'fillAutoUpdate', {
+        enumerable: true,
+        get: function () {
+            return _fillAutoUpdate;
+        },
+        set: function ( value ) {
+            _fillAutoUpdate = value;
+        }
+    } );
 
-     Object.defineProperty(this, 'hasSource', {
-         enumerable: true,
-     	get: function() {
-              return _source !== undefined;
-          }
-     });
+    Object.defineProperty( this, 'hasSource', {
+        enumerable: true,
+        get: function () {
+            return _source !== undefined;
+        }
+    } );
+
+    Object.defineProperty( this, 'sourceWidth', {
+        enumerable: true,
+        get: function () {
+            return _sourceWidth;
+        }
+    } );
+
+    Object.defineProperty( this, 'sourceHeight', {
+        enumerable: true,
+        get: function () {
+            return _sourceHeight;
+        }
+    } );
+
+    Object.defineProperty( this, 'loaded', {
+        enumerable: true,
+        get: function () {
+            return _loaded;
+        }
+    } );
 
     _this.setDestruct( function () {
 
@@ -138,7 +162,7 @@ AbstractMedia.prototype.preload = function () {
 
     if( !this.data || !this.data.src ) return this.logWarn( 'Could not find a source' );
 
-    this.source  = this.data.src;
+    this.source = this.data.src;
 
     if( this.debug ) this.logDebug( 'preloading... ' + this.source );
 
