@@ -16,8 +16,6 @@ function SelectGroup ( opt_items, opt_class ) {
     var _selectedIndex;
     var _hasClassMethods;
 
-    _this.debug = true;
-
     _this.add = function ( item ) {
 
         _items.push( item );
@@ -48,8 +46,6 @@ function SelectGroup ( opt_items, opt_class ) {
      * @param item {object|number} object or index number
      */
     _this.select = function ( item ) {
-
-        if( _this.debug ) console.log( 'select: ', item );
 
         if( item === null || item === undefined ) {
 

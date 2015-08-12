@@ -50,8 +50,6 @@ function PageScroller () {
     var _scrollTween;
 
 
-    _this.debug = true;
-
     _this.addLinks = function ( element ) {
 
         var links = element.getElementsByTagName( 'a' );

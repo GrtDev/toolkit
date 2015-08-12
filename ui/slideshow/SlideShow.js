@@ -23,10 +23,7 @@ AbstractSlideShow.extend( SlideShow );
  */
 function SlideShow ( element, opt_slideConstructor, opt_autoInit ) {
 
-    this.debug = true;
-
     SlideShow.super_.call( this, element, opt_slideConstructor, false );
-
 
     // how many pixels you need to drag to trigger a previous / next call.
     var TOUCH_THRESHOLD = 30;

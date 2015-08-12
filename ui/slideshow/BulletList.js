@@ -28,8 +28,6 @@ function BulletList ( element ) {
     var _listElement;
     var _onClickCallback;
 
-    _this.debug = true;
-
     var listElements = _this.findAll( 'li', true );
 
     if( listElements.length ) {

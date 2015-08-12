@@ -20,8 +20,6 @@ AbstractSlide.extend( VideoSlide );
  */
 function VideoSlide ( element ) {
 
-    this.debug = true;
-
     VideoSlide.super_.call( this, element );
 
     var _this = this;
