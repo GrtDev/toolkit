@@ -47,7 +47,7 @@ function SlideControls ( slideShow ) {
 
     if( _activeMenu ) {
 
-        _selectGroup = new SelectGroup( 'active' );
+        _selectGroup = new SelectGroup( null, 'active' );
         var children = _activeMenu.children;
 
         for ( var i = 0, leni = children.length; i < leni; i++ ) {

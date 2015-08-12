@@ -12,8 +12,6 @@ var CoreEventDispatcher             = require('./../events/CoreEventDispatcher')
 
 CoreEventDispatcher.extend( CoreElement );
 
-var ELEMENT_CORE_PROPERTY           = 'core';
-
 //@formatter:on
 
 /**
@@ -30,8 +28,6 @@ function CoreElement ( element ) {
     var _element = typeof element === 'string' ? document.querySelector( element ) : element instanceof CoreElement ? element.element : element;
 
     if( !_element || !(_element instanceof HTMLElement) ) return _this.logError( 'element is null or an invalid type!  element: ', element );
-
-    _element[ ELEMENT_CORE_PROPERTY ] = _this;
 
     var _data;
     var _width;
@@ -256,7 +252,6 @@ function CoreElement ( element ) {
     _this.setDestruct( function () {
 
         if( _element ) {
-            _element[ ELEMENT_CORE_PROPERTY ] = undefined;
             _element = undefined;
         }
 

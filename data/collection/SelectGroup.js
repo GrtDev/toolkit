@@ -4,8 +4,9 @@
  * @module sector22/utils
  */
 
+var DEFAULT_CLASS = 'selected';
 
-function SelectGroup ( opt_class, opt_items ) {
+function SelectGroup ( opt_items, opt_class ) {
 
     var _this = this;
     var _selectedClass;
@@ -14,6 +15,7 @@ function SelectGroup ( opt_class, opt_items ) {
     var _itemsLength = 0;
     var _selected;
     var _selectedIndex;
+    var _hasClassMethods;
 
     _this.debug = true;
 
@@ -21,6 +23,8 @@ function SelectGroup ( opt_class, opt_items ) {
 
         _items.push( item );
         _itemsLength++;
+
+        _hasClassMethods = typeof item.removeClass === 'function' && typeof item.addClass === 'function';
 
     }
 
@@ -50,28 +54,46 @@ function SelectGroup ( opt_class, opt_items ) {
 
         if( _this.debug ) console.log( 'select: ', item );
 
-        // convert item to index
-        if( !isFinite( item ) ) item = _items.indexOf( item );
+        if( item === null || item === undefined ) {
 
-        if( item < 0 || item > _itemsLength || item === _selectedIndex ) return;
-
-        _selectedIndex = item;
-
-        if( _selectedClass ) {
-
-            if( _selected ) _selected.className = _selected.className.replace( _selectedClassRegExp, '' );
-
-            _selected = _items[ _selectedIndex ];
-
-            // check if the item already has the class, if not - add it
-            if( !_selectedClassRegExp.test( _selected ) ) _selected.className = _selected.className + ' ' + _selectedClass;
+            _selectedIndex = -1;
 
         } else {
 
-            _selected = _items[ _selectedIndex ];
+            // convert item to index
+            if( !isFinite( item ) ) item = _items.indexOf( item );
+
+            if( item < 0 || item > _itemsLength || item === _selectedIndex ) return;
+
+            _selectedIndex = item;
 
         }
 
+
+        if( _selectedClass ) {
+
+            if( _selected ) {
+
+                if( _hasClassMethods ) _selected.removeClass( _selectedClass );
+                else _selected.className = _selected.className.replace( _selectedClassRegExp, '' );
+
+            }
+
+            _selected = _selectedIndex >= 0 ? _items[ _selectedIndex ] : null;
+
+            // check if the item already has the class, if not - add it
+            if( _selected && !_selectedClassRegExp.test( _selected ) ) {
+
+                if( _hasClassMethods ) _selected.addClass( _selectedClass );
+                else _selected.className = _selected.className += ' ' + _selectedClass;
+
+            }
+
+        } else {
+
+            _selected = _selectedIndex >= 0 ? _items[ _selectedIndex ] : null;
+
+        }
 
     }
 
@@ -82,17 +104,25 @@ function SelectGroup ( opt_class, opt_items ) {
         },
         set: function ( value ) {
 
-            console.log( value );
-
             if( value === _selectedClass ) return;
 
-            if( _selectedClass && _selected ) _selected.className = _selected.className.replace( _selectedClassRegExp, '' );
+            if( _selectedClass && _selected ) {
+
+                if( _hasClassMethods ) _selected.removeClass( _selectedClass );
+                else _selected.className = _selected.className.replace( _selectedClassRegExp, '' );
+
+            }
 
             _selectedClass = value;
             _selectedClassRegExp = new RegExp( '\\b\\s?' + _selectedClass + '\\b' );
 
             // check if the item already has the class, if not - add it
-            if( _selected && !_selectedClassRegExp.test( _selected ) ) _selected.className = _selected.className += ' ' + _selectedClass;
+            if( _selected && !_selectedClassRegExp.test( _selected ) ) {
+
+                if( _hasClassMethods ) _selected.addClass( _selectedClass );
+                else _selected.className = _selected.className += ' ' + _selectedClass;
+
+            }
         }
     } );
 
@@ -147,7 +177,13 @@ function SelectGroup ( opt_class, opt_items ) {
     }
 
 
-    if( opt_class ) _this.selectedClass = opt_class;
+    if( opt_class ) {
+
+        if( typeof opt_class === 'string' ) _this.selectedClass = opt_class;
+        else  _this.selectedClass = DEFAULT_CLASS;
+
+    }
+
     if( opt_items ) {
 
         for ( var i = 0, leni = opt_items.length; i < leni; i++ ) {

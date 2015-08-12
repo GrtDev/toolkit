@@ -165,8 +165,17 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
 
         _isTransitioning = value;
 
-        if( !_isTransitioning && _currentSlide ) _currentSlide.activate();
-        else if( _previousSlide ) _previousSlide.deactivate();
+        if( !_isTransitioning ) {
+
+            if( _currentSlide ) _currentSlide.activate();
+            if( _previousSlide ) _previousSlide.hide();
+
+        } else {
+
+            if( _previousSlide ) _previousSlide.deactivate();
+
+        }
+
 
         if( _slidesLength > _currentSlideIndex + 1 ) _slides[ _currentSlideIndex + 1 ].prepare();
 

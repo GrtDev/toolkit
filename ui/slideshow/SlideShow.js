@@ -25,7 +25,7 @@ function SlideShow ( element, opt_slideConstructor, opt_autoInit ) {
 
     this.debug = true;
 
-    SlideShow.super_.call( this, element, opt_slideConstructor, opt_autoInit );
+    SlideShow.super_.call( this, element, opt_slideConstructor, false );
 
 
     // how many pixels you need to drag to trigger a previous / next call.
@@ -160,6 +160,16 @@ function SlideShow ( element, opt_slideConstructor, opt_autoInit ) {
         _currentTouchValue = NaN;
 
     } );
+
+    if( opt_autoInit === undefined || opt_autoInit ) _this.init();
+
+}
+
+SlideShow.prototype.init = function () {
+
+    SlideShow.super_.prototype.init.call( this );
+
+    this.setEventTarget( this.element );
 
 }
 
