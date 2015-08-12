@@ -12,7 +12,6 @@ function SelectGroup ( opt_items, opt_class ) {
     var _selectedClass;
     var _selectedClassRegExp;
     var _items = [];
-    var _itemsLength = 0;
     var _selected;
     var _selectedIndex;
     var _hasClassMethods;
@@ -22,10 +21,8 @@ function SelectGroup ( opt_items, opt_class ) {
     _this.add = function ( item ) {
 
         _items.push( item );
-        _itemsLength++;
 
         _hasClassMethods = typeof item.removeClass === 'function' && typeof item.addClass === 'function';
-
     }
 
     _this.remove = function ( item ) {
@@ -36,9 +33,9 @@ function SelectGroup ( opt_items, opt_class ) {
 
         if( index < 0 ) return;
 
-        _items.splice( 1, index );
-        _itemsLength--;
+        return _items.splice( 1, index );
     }
+
 
     _this.indexOf = function ( item ) {
 
@@ -63,7 +60,7 @@ function SelectGroup ( opt_items, opt_class ) {
             // convert item to index
             if( !isFinite( item ) ) item = _items.indexOf( item );
 
-            if( item < 0 || item > _itemsLength || item === _selectedIndex ) return;
+            if( item < 0 || item > _items.length || item === _selectedIndex ) return;
 
             _selectedIndex = item;
 
@@ -136,7 +133,7 @@ function SelectGroup ( opt_items, opt_class ) {
     Object.defineProperty( this, 'length', {
         enumerable: true,
         get: function () {
-            return _itemsLength;
+            return _items.length;
         }
     } );
 
@@ -164,7 +161,6 @@ function SelectGroup ( opt_items, opt_class ) {
         _selectedClass          = undefined;
         _selectedClassRegExp    = undefined;
         _items                  = undefined
-        _itemsLength            = undefined;
         _selected               = undefined;
         _selectedIndex          = undefined;
 

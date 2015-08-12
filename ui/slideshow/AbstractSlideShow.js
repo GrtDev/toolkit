@@ -87,15 +87,23 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
 
         for ( var i = 0, leni = slideElements.length; i < leni; i++ ) {
 
-            _this.addSlide( new constructor( slideElements[ i ] ) );
+            _this.addSlide( new constructor( slideElements[ i ] ), true );
 
         }
 
-        if( leni <= 0 ) _this.logWarn( 'Failed to find any slides.. selector: ' + selector );
+        if( leni <= 0 ) {
+
+            _this.logWarn( 'Failed to find any slides.. selector: ' + selector );
+
+        }  else {
+
+            _this.dispatchEvent( new CommonEvent( CommonEvent.CHANGE ) );
+
+        }
 
     }
 
-    _this.addSlide = function ( slide ) {
+    _this.addSlide = function ( slide, opt_silent ) {
 
         if( _this.debug ) _this.logDebug( 'add slide', slide );
 
@@ -111,7 +119,7 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
         _slides.push( slide );
         _slidesLength++;
 
-        _this.dispatchEvent( new CommonEvent( CommonEvent.CHANGE ) );
+        if( !opt_silent  ) _this.dispatchEvent( new CommonEvent( CommonEvent.CHANGE ) );
 
     }
 

@@ -151,6 +151,12 @@ function SlideShow ( element, opt_slideConstructor, opt_autoInit ) {
             _eventTarget = undefined;
         }
 
+        if( _controls ) {
+
+            _controls.destruct();
+            _controls = undefined;
+        }
+
         if( _this.currentSlide ) TweenLite.killTweensOf( _this.currentSlide );
         if( _this.previousSlide ) TweenLite.killTweensOf( _this.previousSlide );
 

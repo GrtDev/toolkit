@@ -7,10 +7,14 @@
 // @formatter:off
 
 var CoreEventDispatcher             = require('./../events/CoreEventDispatcher');
+var log                             = require('./../debug/Log' ).getInstance();
 
 
 
 CoreEventDispatcher.extend( CoreElement );
+
+var CORE_REFERENCES_PROPERTY            = '__coreElements';
+var CORE_GET_PROPERTY                   = 'getCore';
 
 //@formatter:on
 
@@ -42,6 +46,17 @@ function CoreElement ( element ) {
     var _animationLast;
     var _animationNow;
     var _animationTick;
+
+    if( _element[ CORE_GET_PROPERTY ] === undefined ) {
+
+        _element[ CORE_REFERENCES_PROPERTY ] = [ _this ];
+        _element[ CORE_GET_PROPERTY ] = getCoreReference;
+
+    } else {
+
+        _element[ CORE_REFERENCES_PROPERTY ].push( _this );
+
+    }
 
 
     _this.getStyle = function ( property, opt_clearCache ) {
@@ -252,6 +267,7 @@ function CoreElement ( element ) {
     _this.setDestruct( function () {
 
         if( _element ) {
+            removeCoreReference(_element, _this);
             _element = undefined;
         }
 
@@ -471,3 +487,47 @@ CoreElement.prototype.get = function ( selector ) {
 
 
 module.exports = CoreElement;
+
+
+function removeCoreReference ( element, coreElement ) {
+
+    if( element[ CORE_REFERENCES_PROPERTY ] ) {
+
+        var index = element[ CORE_REFERENCES_PROPERTY ].indexOf( coreElement );
+        element[ CORE_REFERENCES_PROPERTY ].splice( index, 1 );
+
+        if( element[ CORE_REFERENCES_PROPERTY ].length <= 0 ) {
+
+            element[ CORE_REFERENCES_PROPERTY ] = undefined;
+            element[ CORE_GET_PROPERTY ] = undefined;
+            element
+        }
+
+    }
+
+}
+
+function getCoreReference ( opt_constructor ) {
+
+    var length = this[ CORE_REFERENCES_PROPERTY ].length;
+    if( length === 1 ) return this[ CORE_REFERENCES_PROPERTY ][ 0 ];
+
+    if( !opt_constructor ) return log.error( 'CoreElement', 'getCoreElement: Could not get core element reference because there are multiple and no constructor was given....' );
+
+    var selectedCoreElement;
+
+    for ( var i = 0; i < length; i++ ) {
+
+        var coreElement = this[ CORE_REFERENCES_PROPERTY ][ i ];
+
+        if( coreElement instanceof opt_constructor ) {
+
+            if( selectedCoreElement ) return log.error( 'CoreElement', 'getCoreElement: Could not narrow down the core element you are looking for since there are multiple of the same type..!' );
+            selectedCoreElement = coreElement;
+
+        }
+
+    }
+    return selectedCoreElement;
+
+};

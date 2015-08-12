@@ -7,71 +7,82 @@
 
 var CommonEvent                 = require('../../common/events/CommonEvent');
 var CoreElement                 = require('../../core/html/CoreElement');
+var SelectGroup                 = require('../../data/collection/SelectGroup');
 
 // @formatter:on
 
-CoreElement.extend( BulletListMenu );
+CoreElement.extend( BulletList );
 
 
 /**
  * @constructor
- * @extends AbstractSlideShow
+ * @extends CoreElement
  * @param element {HTMLElement}
- * @param opt_autoCreate {boolean}
  */
-function BulletListMenu ( element ) {
+function BulletList ( element ) {
 
-    BulletListMenu.super_.call( this, element );
+    BulletList.super_.call( this, element );
 
     var _this = this;
+    var _selectGroup;
     var _listElement;
-    var _listElements;
-    var _listElementsLength;
-    var _autoCreate;
-    var _selectedBulletIndex;
-    var _previousBulletIndex;
-    var _onBulletIndexClick;
+    var _onClickCallback;
 
-    _listElements = [];
-    _listElementsLength = 0;
+    var listElements = _this.findAll( 'li', true );
 
+    if( listElements.length ) {
 
-    var bulletItems = _this.element.getElementsByTagName( 'li' );
-    if(bulletItems.length) _listElement = bulletItems[ 0 ].cloneNode( true );
+        _listElement = listElements[ 0 ].element.cloneNode( true );
 
-    for ( var i = 0, leni = bulletItems.length; i < leni; i++ ) {
+    } else {
 
-        _listElements.push( new CoreElement( bulletItems[ i ] ) );
-        _listElementsLength++;
+        _listElement = document.createElement( 'li' );
 
     }
+
+    _selectGroup = new SelectGroup( listElements, 'active' );
 
 
     _this.select = function ( index ) {
 
-        if( _this.debug ) _this.logDebug( 'select: ' + index );
-
-        if( index < 0 || index >= _listElementsLength || _selectedBulletIndex === index ) return;
-
-        _previousBulletIndex = _selectedBulletIndex;
-        _selectedBulletIndex = index;
-
-        update();
+        _selectGroup.select( index );
 
     }
 
-    function updateBulletsLength ( length ) {
+    _this.onIndexClick = function ( callback ) {
+
+        if( !_onClickCallback ) {
+
+            for ( var i = 0, leni = _selectGroup.length; i < leni; i++ ) {
+                var bullet = _selectGroup[ i ];
+                bullet.element.addEventListener( 'click', handleBulletIndexClick );
+            }
+
+        }
+
+        _onClickCallback = callback;
+
+    }
+
+    function handleBulletIndexClick ( event ) {
+
+        var bullet = event.currentTarget.getCore();
+
+        if( _onClickCallback ) _onClickCallback.call( null, _selectGroup.indexOf( bullet ) );
+
+    }
+
+    function updateLength ( length ) {
 
         if( _this.debug ) _this.logDebug( 'set length: ' + length );
 
-        if( _listElementsLength === length ) return;
+        if( _selectGroup.length === length ) return;
 
-        if( _listElementsLength > length ) {
+        if( _selectGroup.length > length ) {
 
-            while ( _listElements.length > length ) {
+            while ( _selectGroup.length > length ) {
 
-                var bullet = _listElements.pop();
-                _listElementsLength--;
+                var bullet = _selectGroup.items.pop();
                 _this.removeChild( bullet );
                 bullet.destruct();
 
@@ -79,60 +90,14 @@ function BulletListMenu ( element ) {
 
         } else {
 
-            while ( _listElements.length < length ) {
+            while ( _selectGroup.length < length ) {
 
                 var bullet = new CoreElement( _listElement.cloneNode( true ) );
                 _this.addChild( bullet );
-                _listElements.push( bullet );
-                _listElementsLength++;
+                _selectGroup.push( bullet );
 
             }
 
-        }
-
-    }
-
-    function update () {
-
-        if( _this.debug ) _this.logDebug( 'update', _listElements );
-
-        var bullet = _listElements[ _selectedBulletIndex ];
-        bullet.addClass( 'selected' );
-
-        if( _previousBulletIndex >= 0 ) {
-
-            bullet = _listElements[ _previousBulletIndex ];
-            bullet.removeClass( 'selected' );
-
-        }
-
-    }
-
-
-    function handleClickEvent ( event ) {
-
-        if( _this.debug ) _this.logDebug( 'handle click: ', event );
-
-        if( typeof _onBulletIndexClick === 'function' ) {
-
-            var bullet = event.target;
-            var listElement;
-            var index = -1;
-
-            for ( var i = 0; i < _listElementsLength; i++ ) {
-
-                listElement = _listElements[ i ];
-
-                if( listElement.element === bullet ) {
-                    index = i;
-                    break;
-                }
-
-            }
-
-            if( index < 0 ) return _this.logError( 'Failed to retrieve bullet index' );
-
-            _onBulletIndexClick.call( _this, index );
         }
 
     }
@@ -140,37 +105,10 @@ function BulletListMenu ( element ) {
     Object.defineProperty( this, 'length', {
         enumerable: true,
         get: function () {
-            return _listElementsLength;
+            return _selectGroup.length;
         },
         set: function ( value ) {
-            updateBulletsLength( value );
-        }
-    } );
-
-    Object.defineProperty( this, 'onBulletIndexClick', {
-        enumerable: true,
-        get: function () {
-            return _onBulletIndexClick;
-        },
-        /**
-         * @param value {function}
-         */
-        set: function ( value ) {
-
-            if( value === _onBulletIndexClick ) return;
-
-            _onBulletIndexClick = value;
-
-            if( !_onBulletIndexClick ) {
-
-                _this.element.removeEventListener( 'click', handleClickEvent );
-
-            }
-            else {
-
-                _this.element.addEventListener( 'click', handleClickEvent );
-
-            }
+            updateLength( value );
         }
     } );
 
@@ -178,14 +116,14 @@ function BulletListMenu ( element ) {
     _this.setDestruct( function () {
 
         _listElement = undefined;
-        _listElements = undefined;
-        _autoCreate = undefined;
-        _selectedBulletIndex = NaN;
-        _previousBulletIndex = NaN;
+        if( _selectGroup ) {
+            _selectGroup.destruct();
+            _selectGroup = undefined;
+        }
 
     } );
 
 }
 
 
-module.exports = BulletListMenu;
+module.exports = BulletList;
