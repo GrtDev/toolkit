@@ -64,6 +64,7 @@ function SlideControls ( slideShow ) {
 
         _bulletList = new BulletList( _bulletList );
         _bulletList.length = _slideShow.length;
+        _bulletList.onIndexClick(onBulletIndexClick);
 
     }
 
@@ -81,6 +82,12 @@ function SlideControls ( slideShow ) {
         if( _totalSlidesInfo ) _totalSlidesInfo.innerHTML = _slideShow.length;
         if( _activeMenuGroup ) _activeMenuGroup.select( _slideShow.currentSlideIndex );
         if( _bulletList ) _bulletList.select( _slideShow.currentSlideIndex );
+
+    }
+
+    function onBulletIndexClick ( index ) {
+
+        _slideShow.setCurrentSlide( index );
 
     }
 
@@ -112,7 +119,6 @@ function SlideControls ( slideShow ) {
     }
 
 
-
     function handleButtonClicks ( event ) {
 
         event.preventDefault();
@@ -132,8 +138,6 @@ function SlideControls ( slideShow ) {
                 _this.logError( 'Unhandled switch case' );
         }
     }
-
-
 
 
     /**

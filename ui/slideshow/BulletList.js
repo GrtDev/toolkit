@@ -56,7 +56,7 @@ function BulletList ( element ) {
         if( !_onClickCallback ) {
 
             for ( var i = 0, leni = _selectGroup.length; i < leni; i++ ) {
-                var bullet = _selectGroup[ i ];
+                var bullet = _selectGroup.items[ i ];
                 bullet.element.addEventListener( 'click', handleBulletIndexClick );
             }
 
