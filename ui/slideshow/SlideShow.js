@@ -38,7 +38,7 @@ function SlideShow ( element, opt_slideConstructor, opt_autoInit ) {
     var _touchStartValue = -1;
     var _currentTouchValue = -1;
     var _listenersAdded;
-    var _controls = new SlideControls( _this );
+    var _controls;
 
 
     _this.setEventTarget = function ( target ) {
@@ -48,6 +48,13 @@ function SlideShow ( element, opt_slideConstructor, opt_autoInit ) {
         removeTouchListeners();
         _eventTarget = target;
         addTouchListeners();
+
+    }
+
+    _this.initControls = function () {
+
+        if( _controls ) return _this.logWarn( 'controls are already initiated!' );
+        _controls = new SlideControls( _this );
 
     }
 
@@ -176,6 +183,8 @@ SlideShow.prototype.init = function () {
     SlideShow.super_.prototype.init.call( this );
 
     this.setEventTarget( this.element );
+
+    this.initControls();
 
 }
 

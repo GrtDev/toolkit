@@ -61,8 +61,6 @@ function SlideControls ( slideShow ) {
     }
 
     if( _bulletList ) {
-        
-        console.log(_bulletList);
 
         _bulletList = new BulletList( _bulletList );
         _bulletList.length = _slideShow.length;

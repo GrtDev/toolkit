@@ -28,6 +28,8 @@ function BulletList ( element ) {
     var _listElement;
     var _onClickCallback;
 
+    _this.debug = true;
+
     var listElements = _this.findAll( 'li', true );
 
     if( listElements.length ) {
@@ -76,6 +78,8 @@ function BulletList ( element ) {
 
         if( _this.debug ) _this.logDebug( 'set length: ' + length );
 
+        if( isNaN( length ) ) return _this.logError( 'Invalid length! ', length );
+
         if( _selectGroup.length === length ) return;
 
         if( _selectGroup.length > length ) {
@@ -94,7 +98,7 @@ function BulletList ( element ) {
 
                 var bullet = new CoreElement( _listElement.cloneNode( true ) );
                 _this.addChild( bullet );
-                _selectGroup.push( bullet );
+                _selectGroup.add( bullet );
 
             }
 
