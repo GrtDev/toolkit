@@ -267,7 +267,7 @@ function CoreElement ( element ) {
     _this.setDestruct( function () {
 
         if( _element ) {
-            removeCoreReference(_element, _this);
+            removeCoreReference( _element, _this );
             _element = undefined;
         }
 
@@ -288,6 +288,26 @@ function CoreElement ( element ) {
 
 }
 
+
+ Object.defineProperty(CoreElement.prototype, 'text', {
+      enumerable: true,
+      get: function() {
+          return this.element.textContent;
+      },
+      set: function(value) {
+          this.element.textContent = value;
+      }
+ });
+
+ Object.defineProperty(CoreElement.prototype, 'html', {
+      enumerable: true,
+      get: function() {
+          return this.element.innerHTML;
+      },
+      set: function(value) {
+          this.element.innerHTML = value;
+      }
+ });
 
 Object.defineProperty( CoreElement.prototype, 'idName', {
     enumerable: true,
@@ -428,9 +448,12 @@ CoreElement.prototype.empty = function () {
 
 }
 
+
+
 CoreElement.prototype.find = function ( query, opt_convert ) {
 
-    return opt_convert ? new CoreElement( this.element.querySelector( query ) ) : this.element.querySelector( query );
+    var element = this.element.querySelector( query );
+    return opt_convert ? element ? new CoreElement( element ) : element : this.element.querySelector( query );
 
 }
 
