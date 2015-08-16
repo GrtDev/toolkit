@@ -12,6 +12,7 @@ var singletonMixin              = require('../../core/mixin/singletonMixin');
 var CoreEventDispatcher         = require('../../core/events/CoreEventDispatcher');
 var eases                       = require('../../extern/gsap/easing/EasePack');
 var TweenLite                   = require('../../extern/gsap/TweenLite');
+var systemUtils                 = require('../../core/utils/systemUtils');
 
 //@formatter:on
 
@@ -28,7 +29,6 @@ var ACTIVE_LINK_CLASS = 'active';
 
 
 // TODO: Mayor cleanup & support multiple links to items
-
 
 
 /**
@@ -51,16 +51,16 @@ function PageScroller () {
     var _this = this;
     var _links = [];
     var _document = document;
-    var _scrollContainer = document.getElementsByTagName( 'body' )[ 0 ];
+    var _scrollContainer = document.documentElement ;//systemUtils.isIE() ? document.documentElement : document.body;
     var _scrollTween;
     var _tracking;
     var _trackedItems;
 
     var _activeLink;
     var _activeLinkClass = ACTIVE_LINK_CLASS;
-    var _activeLinkClassRegExp = new RegExp('\\b\\s?' + _activeLinkClass + '\\b', 'i');
+    var _activeLinkClassRegExp = new RegExp( '\\b\\s?' + _activeLinkClass + '\\b', 'i' );
 
-
+    
 
 
     _this.addLinks = function ( element, opt_track ) {
@@ -109,6 +109,7 @@ function PageScroller () {
 
     function handleWindowScroll ( event ) {
 
+
         for ( var i = 0, leni = _trackedItems.length; i < leni; i++ ) {
 
             var tracked = _trackedItems[ i ];
@@ -117,28 +118,26 @@ function PageScroller () {
 
 
             var rect = trackedElement.getBoundingClientRect();
-            var midTop = (window.innerWidth/2) - 100;
-            var midBottom = (window.innerWidth/2) + 100;
+            var midTop = (window.innerWidth / 2) - 100;
+            var midBottom = (window.innerWidth / 2) + 100;
 
-            if(rect.top < midBottom && rect.bottom > midTop){
+            if( rect.top < midBottom && rect.bottom > midTop ) {
 
 
-                if(_activeLink) {
+                if( _activeLink ) {
 
-                    _activeLink.className =_activeLink.className.replace(_activeLinkClassRegExp, '');
+                    _activeLink.className = _activeLink.className.replace( _activeLinkClassRegExp, '' );
 
                 }
 
                 _activeLink = trackedLink;
 
-                if(!_activeLinkClassRegExp.test(_activeLink.className)) _activeLink.className = _activeLink.className + ' ' + _activeLinkClass;
+                if( !_activeLinkClassRegExp.test( _activeLink.className ) ) _activeLink.className = _activeLink.className + ' ' + _activeLinkClass;
 
 
                 break;
 
             }
-
-
 
 
         }
@@ -163,7 +162,7 @@ function PageScroller () {
 
             //TODO: make this IE9 friendly?
 
-            history.replaceState( {}, "", window.location.origin + window.location.pathname + item );
+            history.replaceState( {}, "", window.location.origin + (window.location.pathname || '/') + item );
 
 
         } else {
@@ -174,24 +173,21 @@ function PageScroller () {
         }
 
 
-        if( _this.debug ) _this.logDebug( 'scroll to : ', element );
-
         var y = 0;
         while ( element && !isNaN( element.offsetTop ) ) {
 
             y += element.offsetTop - element.scrollTop;
-            element = element.offsetParent;
+            element = element.parentNode;
 
         }
 
-        console.log( 'y: ' + y );
-        console.log( 'y: ' + _scrollContainer.scrollTop );
+        console.log(y);
+        console.log(_scrollContainer.scrollTop);
 
-        y = _scrollContainer.scrollTop + y;
+        //y = _scrollContainer.scrollTop + y;
+        y = (document.documentElement.scrollTop || document.body.scrollTop) + y;
 
-        if( item )
-
-            TweenLite.to( _scrollContainer, SCROLL_TIME, { scrollTop: y, ease: SCROLL_EASE } );
+        TweenLite.to( [document.documentElement,  document.body], SCROLL_TIME, { scrollTop: y, ease: SCROLL_EASE } );
 
     }
 

@@ -62,6 +62,21 @@ function documentPolyfill ( global ) {
 
 }
 
+/**
+ * Fixes origin for IE
+ * @param global
+ */
+function originPolyfill ( global ) {
+
+    if( !global.location ) return;
+
+    if( !global.location.origin ) {
+
+        global.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+
+    }
+
+}
 
 
 var polyfillApplied;
@@ -83,6 +98,7 @@ polyfill.apply = function ( opt_global ) {
     animationFramePolyfill( opt_global );
     consolePolyfill( opt_global );
     documentPolyfill( opt_global );
+    originPolyfill( opt_global );
 
 }
 
