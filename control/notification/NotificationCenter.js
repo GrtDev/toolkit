@@ -194,7 +194,7 @@ function NotificationCenter () {
                 for ( i = 0; i < length; i++ ) {
 
                     listener = array[ i ];
-                    listener.call( this, notification );
+                    listener.call( null, notification );
 
                 }
 

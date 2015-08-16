@@ -24,6 +24,11 @@ CoreEventDispatcher.extend( PageScroller );
 singletonMixin.apply( PageScroller );
 
 var idLinkRegExp = /\#[\w|-]*/;
+var ACTIVE_LINK_CLASS = 'active';
+
+
+// TODO: Mayor cleanup & support multiple links to items
+
 
 
 /**
@@ -48,11 +53,24 @@ function PageScroller () {
     var _document = document;
     var _scrollContainer = document.getElementsByTagName( 'body' )[ 0 ];
     var _scrollTween;
+    var _tracking;
+    var _trackedItems;
+
+    var _activeLink;
+    var _activeLinkClass = ACTIVE_LINK_CLASS;
+    var _activeLinkClassRegExp = new RegExp('\\b\\s?' + _activeLinkClass + '\\b', 'i');
 
 
-    _this.addLinks = function ( element ) {
+
+
+    _this.addLinks = function ( element, opt_track ) {
 
         var links = element.getElementsByTagName( 'a' );
+
+        if( opt_track && !_tracking ) {
+            window.addEventListener( 'scroll', handleWindowScroll );
+            _trackedItems = [];
+        }
 
         for ( var i = 0, leni = links.length; i < leni; i++ ) {
 
@@ -69,6 +87,17 @@ function PageScroller () {
                     link.addEventListener( 'click', handleLinkClick, true );
                     _links.push( link );
 
+                    if( opt_track ) {
+
+                        var element = _document.getElementById( href.slice( 1 ) );
+                        if( element ) {
+
+                            _trackedItems.push( { element: element, link: link } );
+
+                        }
+
+                    }
+
                 }
 
                 if( _this.debug ) _this.logDebug( 'Added link: ' + link.href + ' (' + link.textContent + ')' );
@@ -78,30 +107,91 @@ function PageScroller () {
 
     }
 
+    function handleWindowScroll ( event ) {
+
+        for ( var i = 0, leni = _trackedItems.length; i < leni; i++ ) {
+
+            var tracked = _trackedItems[ i ];
+            var trackedElement = tracked.element;
+            var trackedLink = tracked.link;
+
+
+            var rect = trackedElement.getBoundingClientRect();
+            var midTop = (window.innerWidth/2) - 100;
+            var midBottom = (window.innerWidth/2) + 100;
+
+            if(rect.top < midBottom && rect.bottom > midTop){
+
+
+                if(_activeLink) {
+
+                    _activeLink.className =_activeLink.className.replace(_activeLinkClassRegExp, '');
+
+                }
+
+                _activeLink = trackedLink;
+
+                if(!_activeLinkClassRegExp.test(_activeLink.className)) _activeLink.className = _activeLink.className + ' ' + _activeLinkClass;
+
+
+                break;
+
+            }
+
+
+
+
+        }
+
+    }
+
+    /**
+     * Scroll to an item
+     * @param item {string|HTMLElement}
+     * @returns null
+     */
     _this.scrollTo = function ( item ) {
+
+        var element;
 
         if( typeof item === 'string' ) {
 
             if( !idLinkRegExp.test( item ) ) return _this.logError( 'invalid id given! ', item );
 
-            item = item.slice( 1 ); // remove
-            item = _document.getElementById( item );
+            element = _document.getElementById( item.slice( 1 ) );
+            if( !element ) return;
+
+            //TODO: make this IE9 friendly?
+
+            history.replaceState( {}, "", window.location.origin + window.location.pathname + item );
+
+
+        } else {
+
+            element = item;
+            if( !element ) return;
 
         }
 
-        if( !item ) return;
 
-        if( _this.debug ) _this.logDebug( 'scroll to : ', item );
+        if( _this.debug ) _this.logDebug( 'scroll to : ', element );
 
         var y = 0;
-        while ( item && !isNaN( item.offsetTop ) ) {
+        while ( element && !isNaN( element.offsetTop ) ) {
 
-            y += item.offsetTop - item.scrollTop;
-            item = item.offsetParent;
+            y += element.offsetTop - element.scrollTop;
+            element = element.offsetParent;
 
         }
 
-        TweenLite.to( _scrollContainer, SCROLL_TIME, { scrollTop: y, ease: SCROLL_EASE } );
+        console.log( 'y: ' + y );
+        console.log( 'y: ' + _scrollContainer.scrollTop );
+
+        y = _scrollContainer.scrollTop + y;
+
+        if( item )
+
+            TweenLite.to( _scrollContainer, SCROLL_TIME, { scrollTop: y, ease: SCROLL_EASE } );
 
     }
 

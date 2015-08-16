@@ -10,6 +10,8 @@ var AbstractNotification                    = require('./AbstractNotification');
 
 Notification.MENU_OPENED                    = 'Notification.MENU_OPENED';
 Notification.MENU_CLOSED                    = 'Notification.MENU_CLOSED';
+Notification.MODAL_OPENED                   = 'Notification.MODAL_OPENED';
+Notification.MODAL_CLOSED                   = 'Notification.MODAL_CLOSED';
 
 // @formatter:on
 

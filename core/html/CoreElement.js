@@ -33,7 +33,8 @@ function CoreElement ( element ) {
 
     if( !_element || !(_element instanceof HTMLElement) ) return _this.logError( 'element is null or an invalid type!  element: ', element );
 
-    var _data;
+    var _data = {};
+    var _dataParsed;
     var _width;
     var _height;
     var _computedStyle;
@@ -74,11 +75,11 @@ function CoreElement ( element ) {
      */
     _this.parseData = function () {
 
-        if( _data !== undefined ) return _this.logWarn( 'data was already parsed.' );
+        if( _dataParsed ) return _this.logWarn( 'data was already parsed.' );
+        _dataParsed = true;
 
         if( _this.debug ) _this.logDebug( 'parsing data attributes..' );
 
-        _data = {};
         var attributes = _element.attributes;
         var cameCaseRexp = /-(\w)/g;
         var dataRegExp = /^data-/i;

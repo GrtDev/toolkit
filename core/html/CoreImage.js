@@ -25,7 +25,7 @@ function CoreImage ( element ) {
 
 
     _this.element.style.maxWidth = 'none';
-    _this.element.style.maxHeight = 'none';
+    _this.element.style.maxHeight = 'none'; //TODO: move this to the width/height setter?
 
     if( _this.element.complete ) {
 
