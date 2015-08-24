@@ -44,9 +44,11 @@ destructibleMixin.destruct = function () {
  */
 destructibleMixin.setDestruct = function ( destructFunction ) {
 
+    var parentDestruct = this.destruct;
+
     this.destruct = function () {
 
-        destructObject( this, this.destruct, destructFunction );
+        destructObject( this, parentDestruct, destructFunction );
 
     };
 

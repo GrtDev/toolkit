@@ -10,13 +10,24 @@ var CoreEventDispatcher             = require('./../events/CoreEventDispatcher')
 var log                             = require('./../debug/Log' ).getInstance();
 
 
-
-CoreEventDispatcher.extend( CoreElement );
-
+// property that is set on the native element to save a reference to the CoreElement instances
+// useful for retrieving the CoreElement with a reference of the native element. e.g. event.target.
 var CORE_REFERENCES_PROPERTY            = '__coreElements';
+// property containing the function for retrieving the CoreElement reference.
+// TODO: Add automatic constructor testing.
 var CORE_GET_PROPERTY                   = 'getCore';
 
+
+var DEG2RAD =  Math.PI/180; // used to convert degrees to radians.
+var ROUND   = 100000; // values for the matrix transform are rounded using this number
+
+// used to determine display type when hidden/shown
+var BLOCK_ELEMENTS = ['div', 'article', 'body', 'footer', 'header', 'section'];
+
 //@formatter:on
+
+
+CoreEventDispatcher.extend( CoreElement );
 
 /**
  * Creates a new CoreHTMLElement with basic element manipulation & log capabilities and a destruct method.
@@ -39,7 +50,16 @@ function CoreElement ( element ) {
     var _height;
     var _computedStyle;
     var _originalDisplay;
+
+    var _skewX = 0;
+    var _skewRad = 0;
+    var _skewY = 0;
+    var _scaleX = 1;
+    var _scaleY = 1;
+    var _rotation = 0;
+    var _rotationRad = 0;
     var _matrix = { a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 };
+    var _force3D; // Force the use of 3D matrix - and GPU rendering.
 
     // simple animation vars
     var _animationId;
@@ -60,139 +80,112 @@ function CoreElement ( element ) {
     }
 
 
-    _this.getStyle = function ( property, opt_clearCache ) {
+    _this.getStyle = function ( property ) {
 
-        if( !_computedStyle || opt_clearCache ) _computedStyle = getComputedStyle( _element, null );
-
+        if( !_computedStyle ) _computedStyle = getComputedStyle( _element, null );
         return _computedStyle.getPropertyValue( property );
 
     }
 
-    /**
-     * Function that parses all the data attributes on the element.
-     * @public
-     * @function
-     */
-    _this.parseData = function () {
+    _this.show = function () {
 
-        if( _dataParsed ) return _this.logWarn( 'data was already parsed.' );
-        _dataParsed = true;
-
-        if( _this.debug ) _this.logDebug( 'parsing data attributes..' );
-
-        var attributes = _element.attributes;
-        var cameCaseRexp = /-(\w)/g;
-        var dataRegExp = /^data-/i;
-
-        for ( var i = 0, leni = attributes.length; i < leni; i++ ) {
-
-            var attribute = attributes[ i ];
-
-            // check if the attribute is a data value, if so save it.
-            if( dataRegExp.test( attribute.nodeName ) ) {
-
-                var name = attribute.nodeName;
-                name = name.replace( dataRegExp, '' );
-                name = name.replace( cameCaseRexp, camelCaseReplacer );
-                _data[ name ] = attribute.nodeValue;
-            }
-
-        }
-
-        if( _this.debug ) _this.logDebug( 'parsed data:', _this.data );
-
-        // helper function to convert dashed variable names to camelCase.
-        function camelCaseReplacer ( match, p1 ) {
-
-            return p1 ? p1.toUpperCase() : '';
-
-        }
-
-    }
-
-
-    _this.show = function ( opt_display ) {
-
+        if( !_originalDisplay ) getOriginalDisplay();
         if( _this.opacity < 0 ) _this.opacity = 1;
-        _element.style.display = opt_display || _originalDisplay || 'block';
+        _element.style.display = _originalDisplay;
 
     }
 
     _this.hide = function () {
 
-        if( !_originalDisplay ) {
-            _originalDisplay = _this.getStyle( 'display' );
-            if( _originalDisplay === 'none' ) _originalDisplay = 'block';
-        }
+        if( !_originalDisplay ) getOriginalDisplay();
         _element.style.display = 'none';
 
     }
 
-
+    /**
+     * Performs a simple fade in animation. Will also automatically update the display property.
+     * @param opt_milliseconds
+     * @param opt_callback
+     */
     _this.fadeIn = function ( opt_milliseconds, opt_callback ) {
 
         if( _animationId ) window.cancelAnimationFrame( _animationId );
 
-        _animationStep = (1 / (opt_milliseconds || 450));
-        _animationNow = _animationLast = Date.now();
-
-        _this.opacity = 0;
         _this.show();
-
-        _animationTick = function () {
-
-            _animationNow = Date.now();
-            _this.opacity += (_animationNow - _animationLast) * _animationStep;
-            _animationLast = _animationNow;
-
-            if( _this.opacity < 1 ) {
-
-                _animationId = window.requestAnimationFrame( _animationTick );
-
-            } else {
-
-                _animationId = undefined;
-                if( typeof opt_callback === 'function' ) opt_callback.call( this );
-
-            }
-        };
-
-        _animationTick();
+        _this.opacity = 0;
+        _animationId = animate( _this, 'opacity', 1, opt_milliseconds, opt_callback );
 
     }
 
+    /**
+     * Performs a simple fade out animation. Will set display to none upon completion.
+     * @param opt_milliseconds
+     * @param opt_callback
+     */
     _this.fadeOut = function ( opt_milliseconds, opt_callback ) {
 
         if( _animationId ) window.cancelAnimationFrame( _animationId );
 
-        _animationStep = (1 / (opt_milliseconds || 450));
-        _animationNow = _animationLast = Date.now();
+        _animationId = animate( _this, 'opacity', 0, opt_milliseconds, function () {
 
-        _this.opacity = 1;
+            _this.hide();
 
-        _animationTick = function () {
+            if( typeof opt_callback === 'function' ) opt_callback.call( _this );
 
-            _animationNow = Date.now();
-            _this.opacity -= (_animationNow - _animationLast) * _animationStep;
-            _animationLast = _animationNow;
-
-            if( _this.opacity > 0 ) {
-
-                _animationId = window.requestAnimationFrame( _animationTick );
-
-            } else {
-
-                _animationId = undefined;
-                _this.hide();
-                if( typeof opt_callback === 'function' ) opt_callback.call( this );
-
-            }
-        };
-
-        _animationTick();
+        } );
 
     }
 
+    /**
+     * Resets the matrix and thus the position, scale, skew and rotation fo the element.
+     */
+    _this.resetMatrix = function () {
+
+        this.matrix.a = this.matrix.d = _scaleX = _scaleY = 1;
+        this.matrix.b = this.matrix.c = this.matrix.tx = this.matrix.ty = 0;
+        _rotation = _rotationRad = _skewX = _skewRad = _skewY = 0;
+
+        this.element.style.transform =
+            this.element.style.OTransform =
+                this.element.style.msTransform =
+                    this.element.style.MozTransform =
+                        this.element.style.webkitTransform = '';
+
+    }
+
+    /**
+     * @private
+     * updates the matrix and applies the transform to the element.
+     */
+    function updateMatrix () {
+
+        _matrix.a = ((Math.cos( _rotationRad ) * _scaleX * ROUND) | 0) / ROUND;
+        _matrix.b = ((Math.sin( _rotationRad ) * _scaleX * ROUND) | 0) / ROUND;
+        _matrix.c = ((Math.sin( _skewRad ) * -_scaleY * ROUND) | 0) / ROUND;
+        _matrix.d = ((Math.cos( _skewRad ) * _scaleY * ROUND) | 0) / ROUND;
+        _this.applyTransform();
+
+    }
+
+    /**
+     * @private
+     * Retrieves and saves the original display of this element.
+     */
+    function getOriginalDisplay () {
+
+        _originalDisplay = _this.getStyle( 'display' );
+
+        if( _originalDisplay === 'none' ) {
+            _originalDisplay = (BLOCK_ELEMENTS.indexOf( _element.tagName ) >= 0) ? 'block' : 'inline-block';
+        }
+
+    }
+
+    /**
+     * Returns the matrix of this element.
+     * @readonly
+     * @returns {a:{number}, b:{number}, c:{number}, d:{number}, tx:{number}, ty:{number}}
+     */
     Object.defineProperty( this, 'matrix', {
         enumerable: true,
         get: function () {
@@ -242,11 +235,25 @@ function CoreElement ( element ) {
         }
     } );
 
-
     Object.defineProperty( this, 'data', {
         enumerable: true,
         get: function () {
+
+            // lazy parse data attributes
+            if( !_dataParsed ) {
+                _dataParsed = true;
+                _data = {};
+                this.parseData();
+            }
+
             return _data;
+        }
+    } );
+
+    Object.defineProperty( this, 'dataParsed', {
+        enumerable: true,
+        get: function () {
+            return _dataParsed;
         }
     } );
 
@@ -265,6 +272,93 @@ function CoreElement ( element ) {
         }
     } );
 
+
+    Object.defineProperty( this, 'force3D', {
+        enumerable: true,
+        get: function () {
+            return _force3D;
+        },
+        set: function ( value ) {
+            if( _force3D == value ) return;
+            _force3D = value;
+            _this.applyTransform();
+        }
+    } );
+
+    Object.defineProperty( this, 'scale', {
+        enumerable: true,
+        get: function () {
+            return _scaleX;
+        },
+        set: function ( value ) {
+            _scaleX = _scaleY = value;
+        }
+    } );
+
+    Object.defineProperty( this, 'scaleX', {
+        enumerable: true,
+        get: function () {
+            return _scaleX;
+        },
+        set: function ( value ) {
+            _scaleX = value;
+            updateMatrix();
+        }
+    } );
+
+    Object.defineProperty( this, 'scaleY', {
+        enumerable: true,
+        get: function () {
+            return _scaleY;
+        },
+        set: function ( value ) {
+            _scaleY = value;
+            updateMatrix();
+        }
+    } );
+
+    Object.defineProperty( this, 'skewX', {
+        enumerable: true,
+        get: function () {
+            return _skewX;
+        },
+        set: function ( value ) {
+            _skewX = value;
+            _skewRad = (_skewX + _skewY + _rotationRad) * DEG2RAD; // we simulate skewY with a combination of skewX and a rotation
+            updateMatrix();
+        }
+    } );
+
+    Object.defineProperty( this, 'skewY', {
+        enumerable: true,
+        get: function () {
+            return _skewY;
+        },
+        set: function ( value ) {
+            _skewY = value;
+            // we simulate skewY with a combination of skewX and a rotation
+            _skewRad = (_skewX + _skewY + _rotationRad) * DEG2RAD;
+            _rotationRad = (_rotation + _skewY) * DEG2RAD;
+            updateMatrix();
+        }
+    } );
+
+    Object.defineProperty( this, 'rotation', {
+        enumerable: true,
+        get: function () {
+            return _rotation;
+        },
+        set: function ( value ) {
+            _rotation = value;
+            _rotationRad = (_rotation + _skewY) * DEG2RAD; // we simulate skewY with a combination of skewX and a rotation
+            _skewRad = (_skewX + _skewY + _rotationRad) * DEG2RAD;
+            updateMatrix();
+        }
+    } );
+
+    /**
+     * @see CoreObject
+     */
     _this.setDestruct( function () {
 
         if( _element ) {
@@ -281,34 +375,34 @@ function CoreElement ( element ) {
             _animationId = undefined;
         }
 
-        _animationStep = undefined;
-        _animationLast = undefined;
-        _animationNow = _animationLast;
+        animationStep = undefined;
+        animationLast = undefined;
+        animationNow = animationLast;
 
     } );
 
 }
 
 
- Object.defineProperty(CoreElement.prototype, 'text', {
-      enumerable: true,
-      get: function() {
-          return this.element.textContent;
-      },
-      set: function(value) {
-          this.element.textContent = value;
-      }
- });
+Object.defineProperty( CoreElement.prototype, 'text', {
+    enumerable: true,
+    get: function () {
+        return this.element.textContent;
+    },
+    set: function ( value ) {
+        this.element.textContent = value;
+    }
+} );
 
- Object.defineProperty(CoreElement.prototype, 'html', {
-      enumerable: true,
-      get: function() {
-          return this.element.innerHTML;
-      },
-      set: function(value) {
-          this.element.innerHTML = value;
-      }
- });
+Object.defineProperty( CoreElement.prototype, 'html', {
+    enumerable: true,
+    get: function () {
+        return this.element.innerHTML;
+    },
+    set: function ( value ) {
+        this.element.innerHTML = value;
+    }
+} );
 
 Object.defineProperty( CoreElement.prototype, 'idName', {
     enumerable: true,
@@ -325,7 +419,7 @@ Object.defineProperty( CoreElement.prototype, 'x', {
     },
     set: function ( value ) {
         this.matrix.tx = value;
-        this.applyTranslation();
+        this.applyTransform();
     }
 } );
 
@@ -336,66 +430,53 @@ Object.defineProperty( CoreElement.prototype, 'y', {
     },
     set: function ( value ) {
         this.matrix.ty = value;
-        this.applyTranslation();
+        this.applyTransform();
     }
 } );
 
-Object.defineProperty( CoreElement.prototype, 'scaleX', {
-    enumerable: true,
-    get: function () {
-        return this.matrix.a;
-    },
-    set: function ( value ) {
-        this.matrix.a = value;
-
-        //TODO:
-    }
-} );
-
-Object.defineProperty( CoreElement.prototype, 'scaleY', {
-    enumerable: true,
-    get: function () {
-        return this.matrix.d;
-    },
-    set: function ( value ) {
-        this.matrix.d = value;
-
-        //TODO:
-    }
-} );
-
+/**
+ * Sets the position of the element using a matrix transform.
+ * More optimized vs using x and y separate since this will only update the transform once.
+ * @param x
+ * @param y
+ */
 CoreElement.prototype.position = function ( x, y ) {
 
     this.matrix.tx = x;
     this.matrix.ty = y;
-    this.applyTranslation();
+    this.applyTransform();
 
 }
 
-CoreElement.prototype.resetMatrix = function () {
+/**
+ * Applies the current matrix transform.
+ */
+CoreElement.prototype.applyTransform = function () {
 
-    this.matrix.a = this.matrix.d = 1;
-    this.matrix.b = this.matrix.c = this.matrix.tx = this.matrix.ty = 0;
+    if( !this.force3D ) {
 
-    this.element.style.transform =
-        this.element.style.OTransform =
-            this.element.style.msTransform =
-                this.element.style.MozTransform =
-                    this.element.style.webkitTransform = '';
+        this.element.style.transform =
+            this.element.style.OTransform =
+                this.element.style.msTransform =
+                    this.element.style.MozTransform =
+                        this.element.style.webkitTransform = 'matrix(' + this.matrix.a + ', ' + this.matrix.b + ', ' + this.matrix.c + ', ' + this.matrix.d + ', ' + this.matrix.tx + ', ' + this.matrix.ty + ')';
+
+    } else {
+
+        this.element.style.transform =
+            this.element.style.OTransform =
+                this.element.style.msTransform =
+                    this.element.style.MozTransform =
+                        this.element.style.webkitTransform = 'matrix3d(' + this.matrix.a + ', ' + this.matrix.b + ', 0, 0, ' + this.matrix.c + ', ' + this.matrix.d + ', 0, 0, 0, 0, 1, 0, ' + this.matrix.tx + ', ' + this.matrix.ty + ', 0, 1)';
+    }
 
 }
 
-CoreElement.prototype.applyTranslation = function () {
-
-    this.element.style.transform =
-        this.element.style.OTransform =
-            this.element.style.msTransform =
-                this.element.style.MozTransform =
-                    this.element.style.webkitTransform = 'translate3d( ' + this.matrix.tx + 'px, ' + this.matrix.ty + 'px, 0)';
-    //this.element.style.webkitTransform = 'matrix(' + this.matrix.a + ', ' + this.matrix.b + ', ' + this.matrix.c + ', ' + this.matrix.d + ', ' + this.matrix.tx + ', ' + this.matrix.ty + ')';
-
-}
-
+/**
+ * Set the size of this element.
+ * @param width
+ * @param height
+ */
 CoreElement.prototype.setSize = function ( width, height ) {
 
     this.width = width;
@@ -403,25 +484,41 @@ CoreElement.prototype.setSize = function ( width, height ) {
 
 }
 
-
+/**
+ * Check if the element has a certain class
+ * @param name
+ * @returns {boolean}
+ */
 CoreElement.prototype.hasClass = function ( name ) {
 
     return (new RegExp( '\\b' + name + '\\b' )).test( this.element.className )
 
 }
 
+/**
+ * Adds a class if the element does not yet have it.
+ * @param name {string}
+ */
 CoreElement.prototype.addClass = function ( name ) {
 
     if( !this.hasClass( name ) ) this.element.className = this.element.className + ' ' + name;
 
 }
 
+/**
+ * Removes a class.
+ * @param name {string}
+ */
 CoreElement.prototype.removeClass = function ( name ) {
 
     this.element.className = this.element.className.replace( new RegExp( '\\b\\s?' + name + '\\b' ), '' );
 
 }
 
+/**
+ * Adds or removes a class depending whether it already has the class or not.
+ * @param name {string}
+ */
 CoreElement.prototype.toggleClass = function ( name ) {
 
     if( this.hasClass( name ) ) this.removeClass( name );
@@ -429,6 +526,10 @@ CoreElement.prototype.toggleClass = function ( name ) {
 
 }
 
+/**
+ * Removes a child element.
+ * @param element {CoreElement|HTMLElement}
+ */
 CoreElement.prototype.removeChild = function ( element ) {
 
     if( element instanceof CoreElement ) element = element.element;
@@ -436,6 +537,10 @@ CoreElement.prototype.removeChild = function ( element ) {
 
 }
 
+/**
+ * Adds a child element.
+ * @param element {CoreElement|HTMLElement}
+ */
 CoreElement.prototype.addChild = function ( element ) {
 
     if( element instanceof CoreElement ) element = element.element;
@@ -443,14 +548,21 @@ CoreElement.prototype.addChild = function ( element ) {
 
 }
 
+/**
+ * Clears out the content of the element.
+ */
 CoreElement.prototype.empty = function () {
 
     this.element.innerHTML = '';
 
 }
 
-
-
+/**
+ * Find an element within this element.
+ * @param query {string} and valid querySelector argument.
+ * @param opt_convert {boolean} will convert the object into a CoreElement if true.
+ * @returns {CoreElement|HTMLElement}
+ */
 CoreElement.prototype.find = function ( query, opt_convert ) {
 
     var element = this.element.querySelector( query );
@@ -458,6 +570,12 @@ CoreElement.prototype.find = function ( query, opt_convert ) {
 
 }
 
+/**
+ * Finds all elements within this element.
+ * @param query {string} and valid querySelector argument.
+ * @param opt_convert {boolean} will convert the objects into a CoreElement if true.
+ * @returns Array.{CoreElement|HTMLElement}
+ */
 CoreElement.prototype.findAll = function ( query, opt_convert ) {
 
     if( opt_convert ) {
@@ -481,6 +599,10 @@ CoreElement.prototype.findAll = function ( query, opt_convert ) {
 
 }
 
+/**
+ * Appends an element or html within this element.
+ * @param html {string|CoreElement|HTMLElement}
+ */
 CoreElement.prototype.append = function ( html ) {
 
 
@@ -501,18 +623,49 @@ CoreElement.prototype.append = function ( html ) {
 
 }
 
-CoreElement.prototype.get = function ( selector ) {
 
-    console.log( this );
-    console.log( this.prototype );
-    console.log( this.constructor );
+/**
+ * Function that parses all the data attributes [data-*] on the element.
+ * The data will be stored in the data property in camelCase names.
+ * @public
+ */
+CoreElement.prototype.parseData = function () {
+
+    if( this.dataParsed ) return this.logWarn( 'data was already parsed.' );
+
+    if( this.debug ) this.logDebug( 'parsing data attributes..' );
+
+    var attributes = this.element.attributes;
+    var cameCaseRexp = /-(\w)/g;
+    var dataRegExp = /^data-/i;
+
+    for ( var i = 0, leni = attributes.length; i < leni; i++ ) {
+
+        var attribute = attributes[ i ];
+
+        // check if the attribute is a data value, if so save it.
+        if( dataRegExp.test( attribute.nodeName ) ) {
+
+            var name = attribute.nodeName;
+            name = name.replace( dataRegExp, '' );
+            name = name.replace( cameCaseRexp, camelCaseReplacer );
+            this.data[ name ] = attribute.nodeValue;
+        }
+
+    }
+
+    if( this.debug ) this.logDebug( 'parsed data:', this.data );
 
 }
 
 
 module.exports = CoreElement;
 
-
+/**
+ * Removes core element reference from the native element.
+ * @param element {HTMLElement}
+ * @param coreElement {CoreElement} element reference to remove.
+ */
 function removeCoreReference ( element, coreElement ) {
 
     if( element[ CORE_REFERENCES_PROPERTY ] ) {
@@ -531,6 +684,11 @@ function removeCoreReference ( element, coreElement ) {
 
 }
 
+/**
+ * Function that can retrieve a CoreElement from a native element.
+ * @param opt_constructor {function} if multiple CoreElements are registered on a HTMLElement this can be used determine which one you are looking form
+ * @returns {CoreElement}
+ */
 function getCoreReference ( opt_constructor ) {
 
     var length = this[ CORE_REFERENCES_PROPERTY ].length;
@@ -555,3 +713,55 @@ function getCoreReference ( opt_constructor ) {
     return selectedCoreElement;
 
 };
+
+// helper function to convert dashed variable names to camelCase.
+function camelCaseReplacer ( match, p1 ) {
+
+    return p1 ? p1.toUpperCase() : '';
+
+}
+
+/**
+ * Provides a very simple animation function.
+ * @param element {object} element that is the target of the animation
+ * @param property {string} property to animate
+ * @param to {number} the value the property needs to be
+ * @param opt_milliseconds {number=} time to complete the animation
+ * @param opt_callback {function} callback
+ * @returns {number} id of the animation.
+ */
+function animate ( element, property, to, opt_milliseconds, opt_callback ) {
+
+    var from = element[ property ] || 0;
+    var animationID;
+    var animationLast;
+    var animationStep = ((from - to) / (opt_milliseconds || 450));
+    var animationNow = animationLast = Date.now();
+    var up = to > from;
+
+    element[ property ] = from;
+
+    var animationTick = function () {
+
+        animationNow = Date.now();
+        element[ property ] += (animationNow - animationLast) * animationStep;
+        animationLast = animationNow;
+
+        if( up ? (element[ property ] < to) : (element[ property ] < to) ) {
+
+            animationID = window.requestAnimationFrame( animationTick );
+
+        } else {
+
+            element[ property ] = to;
+            animationID = undefined;
+            if( typeof opt_callback === 'function' ) opt_callback.call( element );
+
+        }
+    };
+
+    animationTick();
+
+    return animationID;
+
+}

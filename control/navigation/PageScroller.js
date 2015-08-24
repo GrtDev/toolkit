@@ -12,7 +12,6 @@ var singletonMixin              = require('../../core/mixin/singletonMixin');
 var CoreEventDispatcher         = require('../../core/events/CoreEventDispatcher');
 var eases                       = require('../../extern/gsap/easing/EasePack');
 var TweenLite                   = require('../../extern/gsap/TweenLite');
-var systemUtils                 = require('../../core/utils/systemUtils');
 
 //@formatter:on
 
@@ -51,7 +50,7 @@ function PageScroller () {
     var _this = this;
     var _links = [];
     var _document = document;
-    var _scrollContainer = document.documentElement ;//systemUtils.isIE() ? document.documentElement : document.body;
+    var _scrollContainer = document.documentElement;//systemUtils.isIE() ? document.documentElement : document.body;
     var _scrollTween;
     var _tracking;
     var _trackedItems;
