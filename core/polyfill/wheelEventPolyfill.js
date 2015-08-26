@@ -1,5 +1,5 @@
 // @formatter:off
-var log                     = require('./Log');
+var log                     = require('../debug/Log');
 // @formatter:on
 
 function createWeelEventPolyfill(global){
