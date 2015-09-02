@@ -159,8 +159,6 @@ function PageScroller () {
             element = _document.getElementById( item.slice( 1 ) );
             if( !element ) return;
 
-            //TODO: make this IE9 friendly?
-
             history.replaceState( {}, "", window.location.origin + (window.location.pathname || '/') + item );
 
 
@@ -179,9 +177,6 @@ function PageScroller () {
             element = element.parentNode;
 
         }
-
-        console.log(y);
-        console.log(_scrollContainer.scrollTop);
 
         //y = _scrollContainer.scrollTop + y;
         y = (document.documentElement.scrollTop || document.body.scrollTop) + y;

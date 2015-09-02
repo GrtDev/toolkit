@@ -68,11 +68,20 @@ function documentPolyfill ( global ) {
  */
 function originPolyfill ( global ) {
 
-    if( !global.location ) return;
-
-    if( !global.location.origin ) {
+    if( global.location && !global.location.origin ) {
 
         global.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+
+    }
+
+    if( global.HTMLAnchorElement && !global.HTMLAnchorElement.prototype.hasOwnProperty( 'origin' ) ) {
+
+        Object.defineProperty( global.HTMLAnchorElement.prototype, 'origin', {
+            enumerable: true,
+            get: function () {
+                return this.protocol + "//" + this.hostname + (this.port ? ':' + this.port : '');
+            }
+        } );
 
     }
 

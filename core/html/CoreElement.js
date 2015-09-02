@@ -560,7 +560,7 @@ CoreElement.prototype.empty = function () {
 /**
  * Find an element within this element.
  * @param query {string} and valid querySelector argument.
- * @param opt_convert {boolean} will convert the object into a CoreElement if true.
+ * @param opt_convert {boolean=} will convert the object into a CoreElement if true.
  * @returns {CoreElement|HTMLElement}
  */
 CoreElement.prototype.find = function ( query, opt_convert ) {
@@ -573,7 +573,7 @@ CoreElement.prototype.find = function ( query, opt_convert ) {
 /**
  * Finds all elements within this element.
  * @param query {string} and valid querySelector argument.
- * @param opt_convert {boolean} will convert the objects into a CoreElement if true.
+ * @param {boolean} [opt_convert] will convert the objects into a CoreElement if true.
  * @returns Array.{CoreElement|HTMLElement}
  */
 CoreElement.prototype.findAll = function ( query, opt_convert ) {
