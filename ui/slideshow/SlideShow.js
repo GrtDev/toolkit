@@ -175,9 +175,9 @@ function SlideShow ( element, opt_slideConstructor, opt_autoInit ) {
 
 }
 
-SlideShow.prototype.init = function () {
+SlideShow.prototype.init = function (opt_direction) {
 
-    SlideShow.super_.prototype.init.call( this );
+    SlideShow.super_.prototype.init.call( this, opt_direction );
 
     this.setEventTarget( this.element );
 

@@ -50,7 +50,7 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
     var _disableDuringTransition = true;
     var _fullSizeSlides = true;
     var _autoHide = true;
-    var _direction;
+    var _direction = AbstractSlideShow.DIRECTION_HORIZONTAL;
     var _autoResize;
     var _resizeManager;
     var _slidesContainer = _this.find( SLIDES_CONTAINER );
@@ -404,7 +404,7 @@ AbstractSlideShow.prototype.init = function ( opt_direction ) {
 
     if( this.debug ) this.logDebug( 'init' );
 
-    this.setDirection( opt_direction || AbstractSlideShow.DIRECTION_HORIZONTAL );
+    if(opt_direction !== undefined) this.setDirection( opt_direction );
 
     if( this.slideConstructor ) this.parseSlides( SLIDE, this.slideConstructor );
 
