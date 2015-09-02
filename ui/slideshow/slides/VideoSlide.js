@@ -34,6 +34,7 @@ function VideoSlide ( element ) {
     _image = new CoreImage( poster );
     _image.element.style.position = 'absolute';
 
+    _image.addEventListener( MediaEvent.DIMENSIONS_SET, handleImageDimensionEvent );
     _video.addEventListener( MediaEvent.DIMENSIONS_SET, handleVideoEvents );
     _video.element.addEventListener( 'loadeddata', handleVideoEvents );
 
@@ -57,6 +58,12 @@ function VideoSlide ( element ) {
 
     }
 
+    function handleImageDimensionEvent ( event ) {
+
+        _this.updateLayout();
+
+    }
+
     Object.defineProperty( this, 'video', {
         enumerable: true,
         get: function () {
@@ -75,6 +82,7 @@ function VideoSlide ( element ) {
 
         if( _video ) {
 
+            _video.element.removeEventListener( 'loadeddata', handleVideoEvents );
             _video.removeEventListener( MediaEvent.DIMENSIONS_SET, handleVideoEvents );
             _video.destruct();
             _video = null;
@@ -82,8 +90,11 @@ function VideoSlide ( element ) {
         }
 
         if( _image ) {
+
+            _image.removeEventListener( MediaEvent.DIMENSIONS_SET, handleImageDimensionEvent );
             _image.destruct();
             _image = null;
+
         }
 
         _this = undefined;

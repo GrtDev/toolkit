@@ -35,7 +35,11 @@ function AbstractMedia ( element ) {
 
     _this.parseData();
 
-
+    /**
+     * @protected
+     * @param width
+     * @param height
+     */
     _this.setSourceDimensions = function ( width, height ) {
 
         _sourceWidth = width;

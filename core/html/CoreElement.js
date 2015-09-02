@@ -119,8 +119,8 @@ function CoreElement ( element ) {
 
     /**
      * Performs a simple fade out animation. Will set display to none upon completion.
-     * @param opt_milliseconds
-     * @param opt_callback
+     * @param {number} [opt_milliseconds]
+     * @param {function} [opt_callback]
      */
     _this.fadeOut = function ( opt_milliseconds, opt_callback ) {
 
