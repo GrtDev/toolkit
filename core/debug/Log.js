@@ -122,15 +122,16 @@ var logLevelFilter = Log.DEBUG;
  * @static
  * @function logLevel
  * @param logLevel {LogLevel}
+ * @param opt_warn {boolean=}
  */
-Log.setLevel = function (logLevel) {
+Log.setLevel = function (logLevel, opt_warn) {
     if(!(logLevel instanceof LogLevel)) {
         Log.getInstance().error('Log:setLevel Invalid type of logLevel given, needs to be the type of LogLevel');
         return;
     }
     logLevelFilter = logLevel;
     // bypass log level filter by calling `log` directly
-    log(Log.INFO, Log, 'Log level filter set to: ' + logLevel.name.toUpperCase());
+    if(opt_warn === undefined || opt_warn) log(Log.WARNING, Log, 'Log level filter set to: ' + logLevel.name.toUpperCase());
 }
 
 

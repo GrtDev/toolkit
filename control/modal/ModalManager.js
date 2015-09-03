@@ -105,7 +105,6 @@ function ModalManager () {
         }
 
         _background = _container.find( BACKGROUND_SELECTOR );
-        console.log(_background);
         if( _background ) _background.addEventListener( 'click', handleBackgroundClick );
 
         _this.openClass = opt_openClass ? opt_openClass : MODAL_OPEN_CLASS;
