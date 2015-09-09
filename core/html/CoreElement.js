@@ -16,6 +16,7 @@ var CORE_REFERENCES_PROPERTY            = '__coreElements';
 // property containing the function for retrieving the CoreElement reference.
 // TODO: Add automatic constructor testing.
 var CORE_GET_PROPERTY                   = 'getCore';
+var CORE_HAS_PROPERTY                   = 'hasCore';
 
 
 var DEG2RAD =  Math.PI/180; // used to convert degrees to radians.
@@ -72,6 +73,7 @@ function CoreElement ( element ) {
 
         _element[ CORE_REFERENCES_PROPERTY ] = [ _this ];
         _element[ CORE_GET_PROPERTY ] = getCoreReference;
+        _element[ CORE_HAS_PROPERTY ] = true;
 
     } else {
 
