@@ -241,9 +241,9 @@ function CoreElement ( element ) {
 
             // lazy parse data attributes
             if( !_dataParsed ) {
-                _dataParsed = true;
                 _data = {};
-                this.parseData();
+                _dataParsed = true;
+                _this.parseData(true);
             }
 
             return _data;
@@ -629,9 +629,12 @@ CoreElement.prototype.append = function ( html ) {
  * The data will be stored in the data property in camelCase names.
  * @public
  */
-CoreElement.prototype.parseData = function () {
+CoreElement.prototype.parseData = function (opt_force) {
 
-    if( this.dataParsed ) return this.logWarn( 'data was already parsed.' );
+    if( this.dataParsed && !opt_force ) {
+        if( this.debug ) this.logWarn( 'data was already parsed.' );
+        return;
+    }
 
     if( this.debug ) this.logDebug( 'parsing data attributes..' );
 

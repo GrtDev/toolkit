@@ -32,17 +32,27 @@ function SlideControls ( slideShow ) {
 
     // @formatter:off
 
-    var _this = this;
-    var _slideShow = slideShow;
+    var _this                   = this;
+    var _slideShow              = slideShow;
+    var _touchTarget            = slideShow.element;
+    var _touchAdded;
+    var _touchThreshold         = 30;   // how many pixels you need to drag to trigger a previous / next call.
+    var _touchStartValue        = -1;
+    var _touchCurrentValue      = -1;
     var _activeMenuGroup;
-    var _activeMenu         = _slideShow.find( CONTROL_ACTIVE_MENU );
-    var _nextButton         = _slideShow.find( CONTROL_NEXT );
-    var _previousButton     = _slideShow.find( CONTROL_PREVIOUS );
-    var _currentSlideInfo   = _slideShow.find( INFO_CURRENT );
-    var _totalSlidesInfo    = _slideShow.find( INFO_TOTAL );
-    var _bulletList         = _slideShow.find( CONTROL_BULLETS );
+    var _activeMenu             = _slideShow.find( CONTROL_ACTIVE_MENU );
+    var _nextButton             = _slideShow.find( CONTROL_NEXT );
+    var _previousButton         = _slideShow.find( CONTROL_PREVIOUS );
+    var _currentSlideInfo       = _slideShow.find( INFO_CURRENT );
+    var _totalSlidesInfo        = _slideShow.find( INFO_TOTAL );
+    var _bulletList             = _slideShow.find( CONTROL_BULLETS );
 
     // @formatter:on
+
+
+    addTouch();
+
+
 
     if( _nextButton ) _nextButton.addEventListener( 'click', handleButtonClicks );
     if( _previousButton ) _previousButton.addEventListener( 'click', handleButtonClicks );
@@ -64,7 +74,7 @@ function SlideControls ( slideShow ) {
 
         _bulletList = new BulletList( _bulletList );
         _bulletList.length = _slideShow.length;
-        _bulletList.onIndexClick(onBulletIndexClick);
+        _bulletList.onIndexClick( onBulletIndexClick );
 
     }
 
@@ -78,23 +88,62 @@ function SlideControls ( slideShow ) {
 
     function updateInfo () {
 
+        // @formatter:off
+
         if( _currentSlideInfo ) _currentSlideInfo.innerHTML = _slideShow.currentSlideIndex + 1;
-        if( _totalSlidesInfo ) _totalSlidesInfo.innerHTML = _slideShow.length;
-        if( _activeMenuGroup ) _activeMenuGroup.select( _slideShow.currentSlideIndex );
-        if( _bulletList ) _bulletList.select( _slideShow.currentSlideIndex );
+        if( _totalSlidesInfo )  _totalSlidesInfo.innerHTML = _slideShow.length;
+        if( _activeMenuGroup )  _activeMenuGroup.select( _slideShow.currentSlideIndex );
+        if( _bulletList )       _bulletList.select( _slideShow.currentSlideIndex );
+
+        // @formatter:on
 
     }
 
+
+    _this.setTouchTarget = function ( target ) {
+
+        if( _touchTarget === target ) return;
+
+        removeTouch();
+        _touchTarget = target;
+        addTouch();
+
+    }
+
+
+    function addTouch () {
+
+        if( _touchAdded ) return;
+        _touchAdded = true;
+
+        _touchTarget.addEventListener( 'touchstart', handleTouchEvents );
+        _touchTarget.addEventListener( 'touchmove', handleTouchEvents );
+        _touchTarget.addEventListener( 'touchend', handleTouchEvents );
+
+    }
+
+    function removeTouch () {
+
+        if( !_touchAdded ) return;
+        _touchAdded = false;
+
+        _touchTarget.removeEventListener( 'touchstart', handleTouchEvents );
+        _touchTarget.removeEventListener( 'touchmove', handleTouchEvents );
+        _touchTarget.removeEventListener( 'touchend', handleTouchEvents );
+
+    }
+
+
     function onBulletIndexClick ( index ) {
 
-        _slideShow.setCurrentSlide( index );
+        _slideShow.setCurrentSlide( index, false, false, 'bullet' );
 
     }
 
     function handleActiveMenuClick ( event ) {
 
         event.preventDefault();
-        _slideShow.setCurrentSlide( _activeMenuGroup.indexOf( event.currentTarget ) );
+        _slideShow.setCurrentSlide( _activeMenuGroup.indexOf( event.currentTarget ), false, false, 'menu' );
 
     }
 
@@ -126,12 +175,12 @@ function SlideControls ( slideShow ) {
         switch ( event.currentTarget ) {
             case _nextButton:
 
-                _slideShow.next();
+                _slideShow.next( false, false, 'button-next');
 
                 break;
             case _previousButton:
 
-                _slideShow.previous();
+                _slideShow.previous( false, false, 'button-previous');
 
                 break;
             default:
@@ -139,54 +188,79 @@ function SlideControls ( slideShow ) {
         }
     }
 
-
     /**
      *
-     *  TODO:
-     *
-     * @param listElement {HTMLElement}
-     * @param opt_autoCreate {boolean=true}
+     * @param event {TouchEvent|Event}
      */
-        //_this.addBulletListMenu = function ( listElement, opt_autoCreate ) {
-        //
-        //    if( _bulletList ) return _this.logError( 'bullets already exist!' );
-        //
-        //    _bulletList = new BulletList( listElement, opt_autoCreate );
-        //
-        //    if( opt_autoCreate ) {
-        //
-        //        _bulletList.length = _this.length;
-        //        _this.addEventListener( CommonEvent.CHANGE, handleSlideShowEvents );
-        //
-        //    }
-        //
-        //    _bulletList.select( _this.currentSlideIndex );
-        //    _bulletList.onBulletIndexClick = _this.setCurrentSlide;
-        //
-        //    _this.addEventListener( CommonEvent.UPDATE, handleSlideShowEvents );
-        //
-        //}
+    function handleTouchEvents ( event ) {
 
-        //function handleSlideShowEvents ( event ) {
-        //
-        //    switch ( event.type ) {
-        //        case CommonEvent.CHANGE:
-        //
-        //            if( _bulletList ) _bulletList.length = _this.length;
-        //
-        //            break;
-        //        case CommonEvent.UPDATE:
-        //
-        //            if( _bulletList ) _bulletList.select( _this.currentSlideIndex );
-        //
-        //            break;
-        //        default:
-        //            _this.logError( 'Unhandled slide show event' );
-        //    }
-        //
-        //
-        //}
+        if( _this.isDestructed ) return;
 
+
+        switch ( event.type ) {
+            case 'touchstart':
+
+                if( _slideShow.isHorizontal ) _touchStartValue = event.touches[ 0 ].clientX;
+                else  _touchStartValue = event.touches[ 0 ].clientY;
+
+
+                break;
+            case 'touchmove':
+
+                if( _slideShow.isHorizontal ) _touchCurrentValue = event.touches[ 0 ].clientX;
+                else  _touchCurrentValue = event.touches[ 0 ].clientY;
+
+
+                if( (_touchCurrentValue - _touchStartValue) > _touchThreshold ) {
+
+                    event.preventDefault();
+                    _slideShow.previous( false, false, 'touch-previous');
+                    _touchStartValue = _touchCurrentValue;
+
+                }
+                else if( (_touchCurrentValue - _touchStartValue) < -_touchThreshold ) {
+
+                    event.preventDefault();
+                    _slideShow.next( false, false, 'touch-next');
+                    _touchStartValue = _touchCurrentValue;
+
+                }
+
+
+                break;
+            case 'touchend':
+
+                _touchCurrentValue = -1;
+                _touchStartValue = -1;
+
+                break;
+            default:
+                _this.logError( 'Unhandled touch event', event );
+        }
+
+    }
+
+    Object.defineProperty( this, 'bulletList', {
+        enumerable: true,
+        get: function () {
+            return _bulletList;
+        }
+    } );
+
+     Object.defineProperty(this, 'nextButton', {
+         enumerable: true,
+     	get: function() {
+              return _nextButton;
+          }
+     });
+
+
+     Object.defineProperty(this, 'previousButton', {
+         enumerable: true,
+     	get: function() {
+              return _previousButton;
+          }
+     });
 
     _this.setDestruct( function () {
 
@@ -213,8 +287,17 @@ function SlideControls ( slideShow ) {
             _activeMenuGroup = undefined;
         }
 
+        if( _touchTarget ) {
+
+            removeTouch();
+            _touchTarget = undefined;
+
+        }
+
         _currentSlideInfo = undefined;
         _totalSlidesInfo = undefined;
+        _touchStartValue = NaN;
+        _touchCurrentValue = NaN;
 
     } );
 

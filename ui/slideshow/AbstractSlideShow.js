@@ -37,6 +37,7 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
     AbstractSlideShow.super_.call( this, element );
 
     var _this = this;
+    var _updateTriggerID;
     var _slideConstructor = opt_slideConstructor;
     var _currentSlide;
     var _currentSlideIndex = -1;
@@ -46,6 +47,7 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
     var _slidesLength;
     var _slideForward;
     var _enabled;
+    var _isInitialized;
     var _isTransitioning;
     var _disableDuringTransition = true;
     var _fullSizeSlides = true;
@@ -95,7 +97,7 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
 
             _this.logWarn( 'Failed to find any slides.. selector: ' + selector );
 
-        }  else {
+        } else {
 
             _this.dispatchEvent( new CommonEvent( CommonEvent.CHANGE ) );
 
@@ -119,7 +121,7 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
         _slides.push( slide );
         _slidesLength++;
 
-        if( !opt_silent  ) _this.dispatchEvent( new CommonEvent( CommonEvent.CHANGE ) );
+        if( !opt_silent ) _this.dispatchEvent( new CommonEvent( CommonEvent.CHANGE ) );
 
     }
 
@@ -141,7 +143,7 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
     }
 
 
-    _this.setCurrentSlide = function ( slideIndex, opt_instant, opt_noUpdate ) {
+    _this.setCurrentSlide = function ( slideIndex, opt_instant, opt_noUpdate, opt_triggerID ) {
 
         if( !_enabled || _this.isDestructed || (_disableDuringTransition && _isTransitioning) ) return;
 
@@ -154,6 +156,8 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
 
         _currentSlideIndex = slideIndex;
         _currentSlide = _slides[ _currentSlideIndex ];
+
+        _updateTriggerID = opt_triggerID; // used for tracking purposes
 
         if( _autoHide ) _currentSlide.show();
 
@@ -211,18 +215,18 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
 
     }
 
-    _this.previous = function () {
+    _this.previous = function ( opt_instant, opt_noUpdate, opt_triggerID ) {
 
         if( _this.debug ) _this.logDebug( 'previous' );
-        _this.setCurrentSlide( _this.currentSlideIndex - 1 );
+        _this.setCurrentSlide( _this.currentSlideIndex - 1, opt_instant, opt_noUpdate, opt_triggerID );
 
     }
 
 
-    _this.next = function () {
+    _this.next = function ( opt_instant, opt_noUpdate, opt_triggerID ) {
 
         if( _this.debug ) _this.logDebug( 'next' );
-        _this.setCurrentSlide( _this.currentSlideIndex + 1 );
+        _this.setCurrentSlide( _this.currentSlideIndex + 1, opt_instant, opt_noUpdate, opt_triggerID );
 
     }
 
@@ -257,6 +261,13 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
 
         }
     } );
+
+     Object.defineProperty(this, 'updateTriggerID', {
+         enumerable: true,
+     	get: function() {
+              return _updateTriggerID;
+          }
+     });
 
     Object.defineProperty( this, 'slideConstructor', {
         enumerable: true,
@@ -378,6 +389,16 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
         }
     } );
 
+    Object.defineProperty( this, 'isInitialized', {
+        enumerable: true,
+        get: function () {
+            return _isInitialized;
+        },
+        set: function ( value ) {
+            _isInitialized = value;
+        }
+    } );
+
     _this.setDestruct( function () {
 
         if( _resizeManager ) {
@@ -404,7 +425,7 @@ AbstractSlideShow.prototype.init = function ( opt_direction ) {
 
     if( this.debug ) this.logDebug( 'init' );
 
-    if(opt_direction !== undefined) this.setDirection( opt_direction );
+    if( opt_direction !== undefined ) this.setDirection( opt_direction );
 
     if( this.slideConstructor ) this.parseSlides( SLIDE, this.slideConstructor );
 
@@ -416,6 +437,7 @@ AbstractSlideShow.prototype.init = function ( opt_direction ) {
 
     this.updateLayout();
 
+    this.isInitialized = true;
 
 }
 
