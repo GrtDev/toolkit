@@ -20,10 +20,11 @@ var GTM_ATTR_ACTION             = 'data-gtm-action';
 var GTM_ATTR_LABEL              = 'data-gtm-label';
 
 
-var URL_VARIABLE                = /{url}/ig
-var PATH_VARIABLE               = /{pathname}/ig
-var VALUE_VARIABLE              = /{value}/ig
-var TEXT_VARIABLE               = /{text}/ig
+var VARIABLE_URL                = /{url}/ig
+var VARIABLE_PATH               = /{pathname}/ig
+var VARIABLE_VALUE              = /{value}/ig
+var VARIABLE_TEXT               = /{text}/ig
+var VARIABLE_COUNT              = /{count}/ig
 
 //@formatter:on
 
@@ -46,7 +47,7 @@ function GTMManager () {
 
     var _this = this;
     var _dataLayerName = 'datalayer';   // default: 'datalayer'
-    var _trackedElements = [];
+    var _trackedElements = {};
 
 
     _this.trackContent = function ( opt_container ) {
@@ -72,7 +73,7 @@ function GTMManager () {
                         element.addEventListener( 'click', handleGTMElementEvents );
                 }
 
-                _trackedElements.push( element );
+                _trackedElements[ element ] = 0; // keep track of the tracked count
 
             }
 
@@ -86,6 +87,8 @@ function GTMManager () {
 
         var element = event.currentTarget;
 
+        _trackedElements[ element ]++; // increase track count
+
         // @formatter:off
 
         var event       = element.getAttribute( GTM_ATTR_EVENT );
@@ -98,9 +101,6 @@ function GTMManager () {
         if( _this.debug ) _this.logDebug( '\ntracked element: \n\tcategory:\t' + category + ( action !== undefined ? ('\n\taction:\t\t' + action) : '') + ( label !== undefined ? ('\n\tlabel:\t\t' + label) : '') );
 
 
-        console.log( element.tagName );
-        console.log( typeof VALUE_VARIABLE );
-
         if( element.tagName === 'SELECT' ) {
 
             var value = element.options[ element.selectedIndex ].value;
@@ -108,19 +108,23 @@ function GTMManager () {
 
             if( label ) {
 
-                label = label.replace( VALUE_VARIABLE, value );
-                label = label.replace( TEXT_VARIABLE, text );
+                label = label.replace( VARIABLE_VALUE, value );
+                label = label.replace( VARIABLE_TEXT, text );
 
             }
 
             if( action ) {
 
-                action = action.replace( VALUE_VARIABLE, value );
-                action = action.replace( TEXT_VARIABLE, text );
+                action = action.replace( VARIABLE_VALUE, value );
+                action = action.replace( VARIABLE_TEXT, text );
 
             }
 
         }
+
+        var count = _trackedElements[ element ];
+        if( action ) action = action.replace( VARIABLE_COUNT, count );
+        if( label ) label = label.replace( VARIABLE_COUNT, count );
 
 
         var data = { 'event': event || GTM_DEFAULT_EVENT, 'eventCategory': category, 'eventAction': action };
@@ -172,8 +176,8 @@ function GTMManager () {
 
     function parseValues ( string ) {
 
-        string = string.replace( URL_VARIABLE, global.location.href );
-        string = string.replace( PATH_VARIABLE, global.location.pathname );
+        string = string.replace( VARIABLE_URL, global.location.href );
+        string = string.replace( VARIABLE_PATH, global.location.pathname );
 
         return string;
 
