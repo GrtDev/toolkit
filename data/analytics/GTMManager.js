@@ -46,9 +46,8 @@ function GTMManager () {
     GTMManager.super_.call( this );
 
     var _this = this;
-    var _dataLayerName = 'datalayer';   // default: 'datalayer'
+    var _dataLayerName = 'dataLayer';   // default: 'dataLayer'
     var _trackedElements = {};
-
 
     _this.trackContent = function ( opt_container ) {
 
