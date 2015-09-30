@@ -294,6 +294,7 @@ function CoreElement ( element ) {
         },
         set: function ( value ) {
             _scaleX = _scaleY = value;
+            updateMatrix();
         }
     } );
 
