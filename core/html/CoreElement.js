@@ -16,6 +16,7 @@ var CORE_REFERENCES_PROPERTY            = '__coreElements';
 // property containing the function for retrieving the CoreElement reference.
 // TODO: Add automatic constructor testing.
 var CORE_GET_PROPERTY                   = 'getCore';
+var CORE_HAS_PROPERTY                   = 'hasCore';
 
 
 var DEG2RAD =  Math.PI/180; // used to convert degrees to radians.
@@ -72,6 +73,7 @@ function CoreElement ( element ) {
 
         _element[ CORE_REFERENCES_PROPERTY ] = [ _this ];
         _element[ CORE_GET_PROPERTY ] = getCoreReference;
+        _element[ CORE_HAS_PROPERTY ] = true;
 
     } else {
 
@@ -119,8 +121,8 @@ function CoreElement ( element ) {
 
     /**
      * Performs a simple fade out animation. Will set display to none upon completion.
-     * @param opt_milliseconds
-     * @param opt_callback
+     * @param {number} [opt_milliseconds]
+     * @param {function} [opt_callback]
      */
     _this.fadeOut = function ( opt_milliseconds, opt_callback ) {
 
@@ -241,9 +243,9 @@ function CoreElement ( element ) {
 
             // lazy parse data attributes
             if( !_dataParsed ) {
-                _dataParsed = true;
                 _data = {};
-                this.parseData();
+                _dataParsed = true;
+                _this.parseData(true);
             }
 
             return _data;
@@ -561,7 +563,7 @@ CoreElement.prototype.empty = function () {
 /**
  * Find an element within this element.
  * @param query {string} and valid querySelector argument.
- * @param opt_convert {boolean} will convert the object into a CoreElement if true.
+ * @param opt_convert {boolean=} will convert the object into a CoreElement if true.
  * @returns {CoreElement|HTMLElement}
  */
 CoreElement.prototype.find = function ( query, opt_convert ) {
@@ -574,7 +576,7 @@ CoreElement.prototype.find = function ( query, opt_convert ) {
 /**
  * Finds all elements within this element.
  * @param query {string} and valid querySelector argument.
- * @param opt_convert {boolean} will convert the objects into a CoreElement if true.
+ * @param {boolean} [opt_convert] will convert the objects into a CoreElement if true.
  * @returns Array.{CoreElement|HTMLElement}
  */
 CoreElement.prototype.findAll = function ( query, opt_convert ) {
@@ -630,9 +632,12 @@ CoreElement.prototype.append = function ( html ) {
  * The data will be stored in the data property in camelCase names.
  * @public
  */
-CoreElement.prototype.parseData = function () {
+CoreElement.prototype.parseData = function (opt_force) {
 
-    if( this.dataParsed ) return this.logWarn( 'data was already parsed.' );
+    if( this.dataParsed && !opt_force ) {
+        if( this.debug ) this.logWarn( 'data was already parsed.' );
+        return;
+    }
 
     if( this.debug ) this.logDebug( 'parsing data attributes..' );
 

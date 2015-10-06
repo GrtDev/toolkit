@@ -138,4 +138,3 @@ function ResizeManager () {
 
 
 module.exports = ResizeManager;
-

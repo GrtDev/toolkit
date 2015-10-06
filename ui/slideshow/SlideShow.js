@@ -25,28 +25,12 @@ function SlideShow ( element, opt_slideConstructor, opt_autoInit ) {
 
     SlideShow.super_.call( this, element, opt_slideConstructor, false );
 
-    // how many pixels you need to drag to trigger a previous / next call.
-    var TOUCH_THRESHOLD = 30;
-
     var _this = this;
-    var _eventTarget = this;
     var _animationTime = 1;
     var _animationEase = eases.Power3.easeInOut;
-    var _touchStartValue = -1;
-    var _currentTouchValue = -1;
-    var _listenersAdded;
+
     var _controls;
 
-
-    _this.setEventTarget = function ( target ) {
-
-        if( _eventTarget === target ) return;
-
-        removeTouchListeners();
-        _eventTarget = target;
-        addTouchListeners();
-
-    }
 
     _this.initControls = function () {
 
@@ -55,81 +39,6 @@ function SlideShow ( element, opt_slideConstructor, opt_autoInit ) {
 
     }
 
-
-    function addTouchListeners () {
-
-        if( _listenersAdded ) return;
-        _listenersAdded = true;
-
-        _eventTarget.addEventListener( 'touchstart', handleTouchEvents );
-        _eventTarget.addEventListener( 'touchmove', handleTouchEvents );
-        _eventTarget.addEventListener( 'touchend', handleTouchEvents );
-
-    }
-
-    function removeTouchListeners () {
-
-        if( !_listenersAdded ) return;
-        _listenersAdded = false;
-
-        _eventTarget.removeEventListener( 'touchstart', handleTouchEvents );
-        _eventTarget.removeEventListener( 'touchmove', handleTouchEvents );
-        _eventTarget.removeEventListener( 'touchend', handleTouchEvents );
-
-    }
-
-
-    /**
-     *
-     * @param event {TouchEvent|Event}
-     */
-    function handleTouchEvents ( event ) {
-
-        if( _this.isDestructed ) return;
-
-
-        switch ( event.type ) {
-            case 'touchstart':
-
-                if( _this.isHorizontal ) _touchStartValue = event.touches[ 0 ].clientX;
-                else  _touchStartValue = event.touches[ 0 ].clientY;
-
-
-                break;
-            case 'touchmove':
-
-                if( _this.isHorizontal ) _currentTouchValue = event.touches[ 0 ].clientX;
-                else  _currentTouchValue = event.touches[ 0 ].clientY;
-
-
-                if( (_currentTouchValue - _touchStartValue) > TOUCH_THRESHOLD ) {
-
-                    event.preventDefault();
-                    _this.previous();
-                    _touchStartValue = _currentTouchValue;
-
-                }
-                else if( (_currentTouchValue - _touchStartValue) < -TOUCH_THRESHOLD ) {
-
-                    event.preventDefault();
-                    _this.next();
-                    _touchStartValue = _currentTouchValue;
-
-                }
-
-
-                break;
-            case 'touchend':
-
-                _currentTouchValue = -1;
-                _touchStartValue = -1;
-
-                break;
-            default:
-                _this.logError( 'Unhandled touch event', event );
-        }
-
-    }
 
     Object.defineProperty( this, 'animationTime', {
         enumerable: true,
@@ -145,15 +54,14 @@ function SlideShow ( element, opt_slideConstructor, opt_autoInit ) {
         }
     } );
 
+     Object.defineProperty(this, 'controls', {
+         enumerable: true,
+     	get: function() {
+              return _controls;
+          }
+     });
+
     _this.setDestruct( function () {
-
-        if( _eventTarget ) {
-
-            _eventTarget.removeEventListener( 'touchstart', handleTouchEvents );
-            _eventTarget.removeEventListener( 'touchmove', handleTouchEvents );
-            _eventTarget.removeEventListener( 'touchend', handleTouchEvents );
-            _eventTarget = undefined;
-        }
 
         if( _controls ) {
 
@@ -166,8 +74,6 @@ function SlideShow ( element, opt_slideConstructor, opt_autoInit ) {
 
         _animationEase = undefined;
         _animationTime = NaN;
-        _touchStartValue = NaN;
-        _currentTouchValue = NaN;
 
     } );
 
@@ -175,11 +81,9 @@ function SlideShow ( element, opt_slideConstructor, opt_autoInit ) {
 
 }
 
-SlideShow.prototype.init = function () {
+SlideShow.prototype.init = function (opt_direction) {
 
-    SlideShow.super_.prototype.init.call( this );
-
-    this.setEventTarget( this.element );
+    SlideShow.super_.prototype.init.call( this, opt_direction );
 
     this.initControls();
 
