@@ -117,6 +117,6 @@ destructibleMixin.apply = function ( constructor, opt_unsafe ) {
 };
 
 
-if( typeof Object.freeze === 'function' ) Object.freeze( destructibleMixin ) // lock the object to minimize accidental changes
+Object.freeze( destructibleMixin ) // lock the object to minimize accidental changes
 
 module.exports = destructibleMixin;

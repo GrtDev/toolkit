@@ -88,6 +88,6 @@ httpStatusUtils.getDescription = function ( number ) {
 }
 
 
-if( typeof Object.freeze === 'function' ) Object.freeze( httpStatusUtils ) // lock the object to minimize accidental changes
+Object.freeze( httpStatusUtils ) // lock the object to minimize accidental changes
 
 module.exports = httpStatusUtils;

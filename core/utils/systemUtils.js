@@ -107,6 +107,6 @@ systemUtils.isWebkit = function () {
 }
 
 
-if( typeof Object.freeze === 'function' ) Object.freeze( systemUtils ) // lock the object to minimize accidental changes
+Object.freeze( systemUtils ) // lock the object to minimize accidental changes
 
 module.exports = systemUtils;

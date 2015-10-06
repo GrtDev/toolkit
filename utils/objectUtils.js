@@ -46,5 +46,6 @@ objectUtils.isEmpty = function (object) {
     return true;
 }
 
-if( typeof Object.freeze === 'function') Object.freeze(objectUtils) // lock the object to minimize accidental changes
+Object.freeze(objectUtils) // lock the object to minimize accidental changes
+
 module.exports = objectUtils;

@@ -102,5 +102,7 @@ geomUtils.differenceAngle = function(angle1, angle2) {
     return ((((angle1 - angle2) + threesixty / 2) % threesixty + threesixty) % threesixty) - threesixty / 2;
 }
 
-if( typeof Object.freeze === 'function') Object.freeze(geomUtils) // lock the object to minimize accidental changes
+
+Object.freeze(geomUtils) // lock the object to minimize accidental changes
+
 module.exports = geomUtils;

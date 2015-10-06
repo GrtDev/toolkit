@@ -161,5 +161,5 @@ documentUtils.toString = function () {
 
 }
 
-if( typeof Object.freeze === 'function' ) Object.freeze( documentUtils ) // lock the object to minimize accidental changes
+Object.freeze( documentUtils ) // lock the object to minimize accidental changes
 module.exports = documentUtils;

@@ -120,6 +120,6 @@ htmlDataParser.parseHTMLData = function ( htmlData ) {
 }
 
 
-if( typeof Object.freeze === 'function' ) Object.freeze( htmlDataParser ) // lock the object to minimize accidental changes
+Object.freeze( htmlDataParser ) // lock the object to minimize accidental changes
 
 module.exports = htmlDataParser;

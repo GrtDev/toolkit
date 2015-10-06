@@ -55,5 +55,5 @@ elementUtils.toggleClass = function ( name ) {
 
 
 
-if( typeof Object.freeze === 'function' ) Object.freeze( elementUtils ) // lock the object to minimize accidental changes
+Object.freeze( elementUtils ) // lock the object to minimize accidental changes
 module.exports = elementUtils;

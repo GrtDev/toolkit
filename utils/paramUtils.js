@@ -56,5 +56,5 @@ paramUtils.validate = function (options, chosen, opt_default, opt_useCamelCase) 
 }
 
 
-if(typeof Object.freeze === 'function') Object.freeze(paramUtils) // lock the object to minimize accidental changes
+Object.freeze(paramUtils) // lock the object to minimize accidental changes
 module.exports = paramUtils;

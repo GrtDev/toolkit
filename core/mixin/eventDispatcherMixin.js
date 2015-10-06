@@ -264,6 +264,6 @@ eventDispatcherMixin.apply = function ( constructor, opt_unsafe ) {
 };
 
 
-if( typeof Object.freeze === 'function' ) Object.freeze( eventDispatcherMixin ) // lock the object to minimize accidental changes
+Object.freeze( eventDispatcherMixin ) // lock the object to minimize accidental changes
 
 module.exports = eventDispatcherMixin;

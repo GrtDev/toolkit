@@ -231,7 +231,7 @@ function searchRegExpReplacer ( character ) {
 }
 
 
-if( typeof Object.freeze === 'function' ) Object.freeze( stringUtils ) // lock the object to minimize accidental changes
+Object.freeze( stringUtils ) // lock the object to minimize accidental changes
 
 module.exports = stringUtils;
 
