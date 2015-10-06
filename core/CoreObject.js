@@ -6,6 +6,8 @@
 
 // @formatter:off
 
+require('./toolkit'); // pull in the toolkit core to force the application of the polyfills
+
 var inherits                = require('./utils/inherits');
 var destructibleMixin       = require('./mixin/destructibleMixin');
 var logMixin                = require('./mixin/logMixin');
@@ -50,12 +52,6 @@ function CoreObject () {
 
 }
 
-CoreObject.prototype.test = function ( ) {
-
-    console.log('Running bamboo test');
-
-}
-
 /**
  * Function to easily inherit the CoreObject class.
  * @memberOf sector22/core.CoreObject
@@ -63,14 +59,11 @@ CoreObject.prototype.test = function ( ) {
  * @function extend
  * @param constructor {function} the class that should inherit the CoreObject
  */
-CoreObject.prototype.extend = function ( constructor ) {
+CoreObject.extend = CoreObject.prototype.extend = function ( constructor ) {
 
     inherits( constructor, this );
     constructor.extend = CoreObject.extend;
 
 }
-
-CoreObject.extend = CoreObject.prototype.extend;
-
 
 module.exports = CoreObject

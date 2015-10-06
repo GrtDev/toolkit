@@ -6,8 +6,6 @@
 
 //@formatter:off
 
-                                  require('../../core/polyfill/corePolyfill' ).apply(global);
-
 var singletonMixin              = require('../../core/mixin/singletonMixin');
 var CoreEventDispatcher         = require('../../core/events/CoreEventDispatcher');
 var eases                       = require('../../extern/gsap/easing/EasePack');

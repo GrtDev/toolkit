@@ -6,8 +6,6 @@
 
 //@formatter:off
 
-require('../../core/polyfill/corePolyfill' ).apply(global);
-
 var documentUtils               = require('../../utils/html/documentUtils');
 var singletonMixin              = require('../../core/mixin/singletonMixin');
 var CoreEventDispatcher         = require('../../core/events/CoreEventDispatcher');

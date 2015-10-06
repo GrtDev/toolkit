@@ -42,11 +42,18 @@ destructibleMixin.destruct = function () {
  * @protected
  * @param destructFunction {function}
  */
-destructibleMixin.setDestruct = function ( destructFunction ) {
+destructibleMixin.setDestruct = function setDestruct ( destructFunction ) {
 
+    // Safe a reference to the destruct function so we can call it from the current child class.
     var parentDestruct = this.destruct;
 
-    this.destruct = function () {
+    // Useful for testing the destruct chain.
+    var instanceName = (this.debug && setDestruct.caller !== undefined && setDestruct.caller.name !== undefined ) ? setDestruct.caller.name : undefined;
+
+
+    this.destruct = function dest () {
+
+        if( this.debug && instanceName !== undefined ) this.logDebug( 'destructing: ' + instanceName );
 
         destructObject( this, parentDestruct, destructFunction );
 
@@ -65,8 +72,6 @@ function destructObject ( object, parentDestruct, destructFunction ) {
 
     if( object.isDestructed ) return;
 
-    if( object.debug && typeof object.logDebug === 'function' ) object.logDebug.call( object, '-- destruct --' );
-
     destructFunction.call( object );
 
     if( typeof parentDestruct === 'function' ) {
@@ -74,6 +79,8 @@ function destructObject ( object, parentDestruct, destructFunction ) {
         parentDestruct.call( object )
 
     } else {
+
+        if( object.debug && typeof object.logDebug === 'function' ) object.logDebug.call( object, '-- destructed --' );
 
         Object.defineProperty( object, 'isDestructed', {
             enumerable: true,

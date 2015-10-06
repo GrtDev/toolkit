@@ -2,7 +2,19 @@
  * @author Geert Fokke [geert@sector22.com]
  * @www sector22.com
  */
-var log = require( './debug/Log' ).getInstance();
+
+// @formatter:off
+
+// Pull in commonly used polyfills
+require( './polyfill/animationFrame' )();
+require( './polyfill/console' )();
+require( './polyfill/document' )();
+require( './polyfill/location' )();
+require( './polyfill/object' )();
+
+var log   = require( './debug/Log' ).getInstance();
+
+// @formatter:on
 
 /**
  * Core object containing global scope object and info about this framework.
@@ -31,11 +43,10 @@ toolkit.getNamespace = function ( name, opt_defaultValue ) {
 toolkit.hasNamespace = function ( name ) {
 
     return namespaces[ name ] !== undefined;
-    
+
 }
 
-
-if( typeof Object.freeze === 'function' ) Object.freeze( toolkit ) // lock the object to minimize accidental changes
+Object.freeze( toolkit ) // lock the object to minimize accidental changes
 
 module.exports = toolkit;
 

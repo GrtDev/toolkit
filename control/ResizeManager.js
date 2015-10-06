@@ -6,8 +6,6 @@
 
 //@formatter:off
 
-require('../core/polyfill/corePolyfill' ).apply(global);
-
 var singletonMixin              = require('../core/mixin/singletonMixin');
 var CoreObject                  = require('../core/CoreObject');
 
