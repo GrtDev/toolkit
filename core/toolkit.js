@@ -8,9 +8,9 @@
 // Pull in commonly used polyfills
 require( './polyfill/animationFrame' )();
 require( './polyfill/console' )();
-require( './polyfill/document' )();
-require( './polyfill/location' )();
 require( './polyfill/object' )();
+require( './polyfill/location' )();
+require( './polyfill/document' )();
 
 var log   = require( './debug/Log' ).getInstance();
 
