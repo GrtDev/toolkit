@@ -20,7 +20,7 @@ logMixin.apply( CoreObject, true );
 
 
 // Keeps count of the number of objects created.
-CoreObject.numObjects = 0;
+CoreObject.__counter = 0;
 
 /**
  * Creates a new Object with log capabilities and a destruct method.
@@ -37,11 +37,11 @@ function CoreObject () {
      * @property _id {string}
      * @readonly
      */
-    Object.defineProperty( this, '_id', {
+    Object.defineProperty( this, 'id', {
         enumerable: true,
         configurable: false,
         writable: false,
-        value: ('core_object_' + ++CoreObject.numObjects)
+        value: ('core_object_' + ++CoreObject.__counter)
     } );
 
     this.setDestruct( function () {
