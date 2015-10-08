@@ -18,7 +18,7 @@ function Map () {
     this.__collection = {};
 
     // Set a unique ID for this map
-    Object.defineProperty( this, 'id', {
+    Object.defineProperty( this, 'toolkitId', {
         enumerable: true,
         configurable: false,
         writable: false,
@@ -45,7 +45,19 @@ Map.prototype.hash = function ( key ) {
 }
 
 /**
- * Get the value for the given key
+ * Returns whether the map contains a value for this key.
+ * @param key {*}
+ * @returns {*}
+ */
+Map.prototype.has = function ( key ) {
+
+    return this.__collection[ this.hash( key ) ] !== undefined;
+
+};
+
+
+/**
+ * Get the value for the given key.
  * @param key {*}
  * @returns {*}
  */
@@ -57,7 +69,7 @@ Map.prototype.get = function ( key ) {
 };
 
 /**
- * Save a key / value pair
+ * Save a key / value pair.
  * @param key {*}
  * @param value {*}
  * @returns {Map}

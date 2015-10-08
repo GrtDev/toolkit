@@ -37,7 +37,7 @@ function CoreObject () {
      * @property _id {string}
      * @readonly
      */
-    Object.defineProperty( this, 'id', {
+    Object.defineProperty( this, 'toolkitId', {
         enumerable: true,
         configurable: false,
         writable: false,
