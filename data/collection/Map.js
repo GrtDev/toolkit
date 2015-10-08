@@ -105,6 +105,7 @@ Map.prototype.remove = function ( key ) {
 Map.prototype.removeAll = function () {
 
     this.__collection = {};
+    this.__length = 0;
 
     return this;
 };
