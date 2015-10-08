@@ -8,6 +8,7 @@
 
 var singletonMixin              = require('../../core/mixin/singletonMixin');
 var CoreEventDispatcher         = require('../../core/events/CoreEventDispatcher');
+var Map                         = require('../../data/collection/Map');
 
 
 var GTM_DEFAULT_EVENT           = 'gtm.trackEvent';
@@ -47,7 +48,7 @@ function GTMManager () {
 
     var _this = this;
     var _dataLayerName = 'dataLayer';   // default: 'dataLayer'
-    var _trackedElements = {};
+    var _trackedElements = new Map();
 
     _this.trackContent = function ( opt_container ) {
 
@@ -55,11 +56,13 @@ function GTMManager () {
 
         var elements = opt_container.querySelectorAll( '.gtm' );
 
+        if(_this.debug) _this.logDebug('track content: ', elements);
 
         for ( var i = 0, leni = elements.length; i < leni; i++ ) {
-            var element = elements[ i ];
 
-            if( _trackedElements[ element ] === undefined ) {
+            var element = elements[ i ];
+            
+            if( !_trackedElements.has( element ) ) {
 
                 switch ( element.tagName ) {
                     case 'SELECT':
@@ -72,7 +75,7 @@ function GTMManager () {
                         element.addEventListener( 'click', handleGTMElementEvents );
                 }
 
-                _trackedElements[ element ] = 0; // keep track of the tracked count
+                _trackedElements.set( element, 0 ); // keep track of the tracked element and the track count
 
             }
 
@@ -85,8 +88,9 @@ function GTMManager () {
     function handleGTMElementEvents ( event ) {
 
         var element = event.currentTarget;
+        var count = _trackedElements.get( element ) + 1; // increase track count
 
-        _trackedElements[ element ]++; // increase track count
+        _trackedElements.set( element, count );
 
         // @formatter:off
 
@@ -121,14 +125,13 @@ function GTMManager () {
 
         }
 
-        var count = _trackedElements[ element ];
         if( action ) action = action.replace( VARIABLE_COUNT, count );
         if( label ) label = label.replace( VARIABLE_COUNT, count );
 
 
         var data = { 'event': event || GTM_DEFAULT_EVENT, 'eventCategory': category, 'eventAction': action };
 
-        if( label ) data[ 'eventLabel' ] = event || GTM_DEFAULT_EVENT;
+        if( label ) data[ 'eventLabel' ] = label;
 
         _this.pushData( data );
 
@@ -144,9 +147,7 @@ function GTMManager () {
      */
     _this.track = function ( category, action, opt_label ) {
 
-
         if( _this.debug ) _this.logDebug( '\ntrack: \n\tcategory:\t' + category + '\n\taction:\t\t' + action + ( opt_label !== undefined ? ('\n\tlabel:\t\t' + opt_label) : '') );
-
 
         var data = { 'event': GTM_DEFAULT_EVENT, 'eventCategory': category, 'eventAction': action };
 
@@ -160,7 +161,7 @@ function GTMManager () {
 
         if( !Array.isArray( global[ _dataLayerName ] ) ) {
 
-            return _this.logError( 'Failed to push data to the Google Tag Manager, datalayer is undefined or not of type Array!', global[ _dataLayerName ] );
+            return _this.logError( 'Failed to push data to the Google Tag Manager, ' + _dataLayerName + ' is undefined or not of type Array!', global[ _dataLayerName ] );
 
         }
 
