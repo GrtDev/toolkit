@@ -52,6 +52,7 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
     var _disableDuringTransition = true;
     var _fullSizeSlides = true;
     var _autoHide = true;
+	var _infiniteSlides = true;
     var _direction = AbstractSlideShow.DIRECTION_HORIZONTAL;
     var _autoResize;
     var _resizeManager;
@@ -146,6 +147,16 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
     _this.setCurrentSlide = function ( slideIndex, opt_instant, opt_noUpdate, opt_triggerID ) {
 
         if( !_enabled || _this.isDestructed || (_disableDuringTransition && _isTransitioning) ) return;
+
+		if(_infiniteSlides) {
+
+			if( slideIndex < 0 ) {
+				slideIndex = _slidesLength + slideIndex;
+			} else if( slideIndex >= _slidesLength ) {
+				slideIndex = slideIndex - _slidesLength;
+			}
+
+		}
 
         if( slideIndex < 0 || slideIndex >= _slidesLength || slideIndex === _currentSlideIndex ) return;
 
@@ -398,6 +409,12 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
             _isInitialized = value;
         }
     } );
+
+	 Object.defineProperty(this, 'infiniteSlides', {
+	      enumerable: true,
+	      get: function() { return _infiniteSlides; },
+	      set: function(value) { _infiniteSlides = value; }
+	 });
 
     _this.setDestruct( function () {
 
