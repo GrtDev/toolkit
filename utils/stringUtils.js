@@ -11,6 +11,7 @@ var lettersRegExp                   = /[^\u0000-\u007E]|[a-zA-Z]/g;
 var cameCaseRexp                    = /[^\w]+(\w)/g;
 var hypenateRegExp                  = /([A-Z]+)|(?:[^\w]+)(\w)/g;
 var whiteSpaceRegExp                = /\s+/g;
+var singleWhiteSpaceRegExp          = /\s/g;
 var metaCharactedRegExp             = /([|()[{.+*?^$\\])/g;
 var diacriticsRegExp                = /[^\u0000-\u007E]/g;
 
@@ -115,16 +116,16 @@ var diacriticsCollection = [
 // Fill the  diacritics map and the search map
 for ( var i = 0, leni = diacriticsCollection.length; i < leni; i++ ) {
 
-    var base = diacriticsCollection[ i ].base;
-    var letters = diacriticsCollection[ i ].letters;
-    var search = base.length === 1; // ligatures are not supported in the search regexp, so we don't need them in the map.
+	var base = diacriticsCollection[ i ].base;
+	var letters = diacriticsCollection[ i ].letters;
+	var search = base.length === 1; // ligatures are not supported in the search regexp, so we don't need them in the map.
 
-    if( search ) searchRegExpMap[ base ] = letters;
+	if( search ) searchRegExpMap[ base ] = letters;
 
-    for ( var j = 0, lenj = letters.length; j < lenj; j++ ) {
-        diacriticsMap[ letters[ j ] ] = base;
-        if( search ) searchRegExpMap[ letters[ j ] ] = searchRegExpMap[ base ];
-    }
+	for ( var j = 0, lenj = letters.length; j < lenj; j++ ) {
+		diacriticsMap[ letters[ j ] ] = base;
+		if( search ) searchRegExpMap[ letters[ j ] ] = searchRegExpMap[ base ];
+	}
 
 }
 
@@ -142,19 +143,19 @@ var stringUtils = {};
  */
 stringUtils.camelCase = function camelCase ( string ) {
 
-    if( !string ) return '';
-    string = string.replace( cameCaseRexp, camelCaseReplacer );
-    string = string.charAt( 0 ).toLowerCase() + string.slice( 1 ); // force lower case on first letter
-    return string;
+	if( !string ) return '';
+	string = string.replace( cameCaseRexp, camelCaseReplacer );
+	string = string.charAt( 0 ).toLowerCase() + string.slice( 1 ); // force lower case on first letter
+	return string;
 
 }
 
 stringUtils.hyphenate = function hyphenate ( string ) {
 
-    if( !string ) return '';
-    string = string.replace( hypenateRegExp, hyphenateReplacer );
-    string = string.replace( /^-/, '' ); // make sure we didn't place a hyphen as the first character
-    return string;
+	if( !string ) return '';
+	string = string.replace( hypenateRegExp, hyphenateReplacer );
+	string = string.replace( /^-/, '' ); // make sure we didn't place a hyphen as the first character
+	return string;
 
 }
 
@@ -166,30 +167,38 @@ stringUtils.hyphenate = function hyphenate ( string ) {
  */
 stringUtils.normalize = function normalize ( string ) {
 
-    if( !string ) return '';
+	if( !string ) return '';
 
-    // perform a quick test to see if the string actually contains any unusual characters
-    if( !diacriticsRegExp.test( string ) ) return string;
+	// perform a quick test to see if the string actually contains any unusual characters
+	if( !diacriticsRegExp.test( string ) ) return string;
 
-    // faster than (per collection) RegExp replacing.
-    return string.replace( diacriticsRegExp, diacriticsRemovalReplacer );
+	// faster than (per collection) RegExp replacing.
+	return string.replace( diacriticsRegExp, diacriticsRemovalReplacer );
 
 }
 
 // ligatures not supported.
 // TODO: Add ligature support!
-stringUtils.createSearchRegExp = function createSearchRegExp ( string, opt_caseSensitive, opt_diacriticsSensitive ) {
+stringUtils.createSearchRegExp = function createSearchRegExp ( string, opt_caseSensitive, opt_diacriticsSensitive, opt_forceFullMatch, opt_whitespaceSensitive ) {
 
-    // escape meta characters
-    string = string.replace( metaCharactedRegExp, "\\$1" );
+	if( !string ) return /()/g; // return empty RegExp if the string is empty or undefined.
 
-    // replace each letter with a range regexp that is accent insensitive.
-    if( !opt_diacriticsSensitive ) string = string.replace( lettersRegExp, searchRegExpReplacer );
+	// escape meta characters
+	string = string.replace( metaCharactedRegExp, '\\$1' );
 
-    // replace white space with a white space selector
-    string = string.replace( whiteSpaceRegExp, "\\s+" );
+	// replace each letter with a range regexp that is accent insensitive.
+	if( !opt_diacriticsSensitive ) string = string.replace( lettersRegExp, searchRegExpReplacer );
 
-    return new RegExp( string, 'g' + (opt_caseSensitive ? '' : 'i') );
+	// replace white space with a white space selector ( either very specific or a more lenient one )
+	string = opt_whitespaceSensitive ? string.replace( singleWhiteSpaceRegExp, '\\s' ) : string.replace( whiteSpaceRegExp, '\\s+' );
+
+	if( opt_forceFullMatch ) {
+
+		string = '^' + string + '$';
+
+	}
+
+	return new RegExp( string, 'g' + (opt_caseSensitive ? '' : 'i') );
 
 }
 
@@ -198,35 +207,35 @@ stringUtils.createSearchRegExp = function createSearchRegExp ( string, opt_caseS
 
 function camelCaseReplacer ( match, group1 ) {
 
-    return group1 ? group1.toUpperCase() : '';
+	return group1 ? group1.toUpperCase() : '';
 
 }
 
 function hyphenateReplacer ( match, group1, group2 ) {
 
-    if( group1 ) {
+	if( group1 ) {
 
-        return '-' + group1.toLowerCase();
+		return '-' + group1.toLowerCase();
 
-    } else if( group2 ) {
+	} else if( group2 ) {
 
-        return '-' + group2.toLowerCase();
+		return '-' + group2.toLowerCase();
 
-    }
+	}
 
-    return '';
+	return '';
 
 }
 
 function diacriticsRemovalReplacer ( character ) {
 
-    return diacriticsMap[ character ] || character;
+	return diacriticsMap[ character ] || character;
 
 }
 
 function searchRegExpReplacer ( character ) {
 
-    return '[' + (searchRegExpMap[ character ] || character) + ']';
+	return '[' + (searchRegExpMap[ character ] || character) + ']';
 
 }
 
@@ -234,5 +243,3 @@ function searchRegExpReplacer ( character ) {
 Object.freeze( stringUtils ) // lock the object to minimize accidental changes
 
 module.exports = stringUtils;
-
-
