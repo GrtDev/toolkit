@@ -6,14 +6,13 @@
 
 //@formatter:off
 
+var toolkit              		= require('../../core/toolkit');
 var singletonMixin              = require('../../core/mixin/singletonMixin');
 var CoreEventDispatcher         = require('../../core/events/CoreEventDispatcher');
 var Map                         = require('../../data/collection/Map');
 
 
 var GTM_DEFAULT_EVENT           = 'gtm.trackEvent';
-
-var GTM_ELEMENT_SELECTOR        = '.gtm';
 
 var GTM_ATTR_EVENT              = 'data-gtm-event';
 var GTM_ATTR_CATEGORY           = 'data-gtm-category';
@@ -40,59 +39,62 @@ singletonMixin.apply( GTMManager );
  * @mixes singletonMixin
  * @extends {CoreEventDispatcher}
  */
-function GTMManager () {
+function GTMManager() {
 
-    GTMManager.singletonCheck( this );
+	GTMManager.singletonCheck( this );
 
-    GTMManager.super_.call( this );
+	GTMManager.super_.call( this );
 
-    var _this = this;
-    var _dataLayerName = 'dataLayer';   // default: 'dataLayer'
-    var _trackedElements = new Map();
+	var _this = this;
+	var _dataLayerName = 'dataLayer';   // default: 'dataLayer'
+	var _trackedElements = new Map();
 
-    _this.trackContent = function ( opt_container ) {
-
-        opt_container = opt_container || document;
-
-        var elements = opt_container.querySelectorAll( '.gtm' );
-
-        if(_this.debug) _this.logDebug('track content: ', elements);
-
-        for ( var i = 0, leni = elements.length; i < leni; i++ ) {
-
-            var element = elements[ i ];
-            
-            if( !_trackedElements.has( element ) ) {
-
-                switch ( element.tagName ) {
-                    case 'SELECT':
-
-                        element.addEventListener( 'change', handleGTMElementEvents );
-
-                        break;
-                    default:
-
-                        element.addEventListener( 'click', handleGTMElementEvents );
-                }
-
-                _trackedElements.set( element, 0 ); // keep track of the tracked element and the track count
-
-            }
+	_this.debug = toolkit.debug;
 
 
-        }
+	_this.trackContent = function ( opt_container ) {
+
+		opt_container = opt_container || document;
+
+		var elements = opt_container.querySelectorAll( '[' + GTM_ATTR_EVENT+ '], ' + '[' + GTM_ATTR_CATEGORY+ '], ' + '[' + GTM_ATTR_ACTION+ '], ' + '[' + GTM_ATTR_LABEL+ ']' );
+
+		if(_this.debug) _this.logDebug('track content: ', elements);
+
+		for ( var i = 0, leni = elements.length; i < leni; i++ ) {
+
+			var element = elements[ i ];
+
+			if( !_trackedElements.has( element ) ) {
+
+				switch ( element.tagName ) {
+					case 'SELECT':
+
+						element.addEventListener( 'change', handleGTMElementEvents );
+
+						break;
+					default:
+
+						element.addEventListener( 'click', handleGTMElementEvents );
+				}
+
+				_trackedElements.set( element, 0 ); // keep track of the tracked element and the track count
+
+			}
 
 
-    }
+		}
 
-    function handleGTMElementEvents ( event ) {
 
-        var element = event.currentTarget;
-        var count = _trackedElements.get( element ) + 1; // increase track count
+	}
 
-        _trackedElements.set( element, count );
+	function handleGTMElementEvents ( event ) {
 
-        // @formatter:off
+		var element = event.currentTarget;
+		var count = _trackedElements.get( element ) + 1; // increase track count
+
+		_trackedElements.set( element, count );
+
+		// @formatter:off
 
         var event       = element.getAttribute( GTM_ATTR_EVENT );
         var category    = element.getAttribute( GTM_ATTR_CATEGORY );
@@ -101,97 +103,97 @@ function GTMManager () {
 
         // @formatter:on
 
-        if( _this.debug ) _this.logDebug( '\ntracked element: \n\tcategory:\t' + category + ( action !== undefined ? ('\n\taction:\t\t' + action) : '') + ( label !== undefined ? ('\n\tlabel:\t\t' + label) : '') );
+		if( _this.debug ) _this.logDebug( '\ntracked element: \n\tcategory:\t' + category + ( action !== undefined ? ('\n\taction:\t\t' + action) : '') + ( label !== undefined ? ('\n\tlabel:\t\t' + label) : '') );
 
 
-        if( element.tagName === 'SELECT' ) {
+		if( element.tagName === 'SELECT' ) {
 
-            var value = element.options[ element.selectedIndex ].value;
-            var text = element.options[ element.selectedIndex ].text;
+			var value = element.options[ element.selectedIndex ].value;
+			var text = element.options[ element.selectedIndex ].text;
 
-            if( label ) {
+			if( label ) {
 
-                label = label.replace( VARIABLE_VALUE, value );
-                label = label.replace( VARIABLE_TEXT, text );
+				label = label.replace( VARIABLE_VALUE, value );
+				label = label.replace( VARIABLE_TEXT, text );
 
-            }
+			}
 
-            if( action ) {
+			if( action ) {
 
-                action = action.replace( VARIABLE_VALUE, value );
-                action = action.replace( VARIABLE_TEXT, text );
+				action = action.replace( VARIABLE_VALUE, value );
+				action = action.replace( VARIABLE_TEXT, text );
 
-            }
+			}
 
-        }
+		}
 
-        if( action ) action = action.replace( VARIABLE_COUNT, count );
-        if( label ) label = label.replace( VARIABLE_COUNT, count );
-
-
-        var data = { 'event': event || GTM_DEFAULT_EVENT, 'eventCategory': category, 'eventAction': action };
-
-        if( label ) data[ 'eventLabel' ] = label;
-
-        _this.pushData( data );
+		if( action ) action = action.replace( VARIABLE_COUNT, count );
+		if( label ) label = label.replace( VARIABLE_COUNT, count );
 
 
-    }
+		var data = { 'event': event || GTM_DEFAULT_EVENT, 'eventCategory': category, 'eventAction': action };
+
+		if( label ) data[ 'eventLabel' ] = label;
+
+		_this.pushData( data );
 
 
-    /**
-     * Default function for tracking purposes
-     * @param category {string}
-     * @param action {string}
-     * @param opt_label {=string}
-     */
-    _this.track = function ( category, action, opt_label ) {
+	}
 
-        if( _this.debug ) _this.logDebug( '\ntrack: \n\tcategory:\t' + category + '\n\taction:\t\t' + action + ( opt_label !== undefined ? ('\n\tlabel:\t\t' + opt_label) : '') );
 
-        var data = { 'event': GTM_DEFAULT_EVENT, 'eventCategory': category, 'eventAction': action };
+	/**
+	 * Default function for tracking purposes
+	 * @param category {string}
+	 * @param action {string}
+	 * @param opt_label {=string}
+	 */
+	_this.track = function ( category, action, opt_label ) {
 
-        if( opt_label !== undefined ) data[ 'eventLabel' ] = opt_label;
+		if( _this.debug ) _this.logDebug( '\ntrack: \n\tcategory:\t' + category + '\n\taction:\t\t' + action + ( opt_label !== undefined ? ('\n\tlabel:\t\t' + opt_label) : '') );
 
-        _this.pushData( data )
+		var data = { 'event': GTM_DEFAULT_EVENT, 'eventCategory': category, 'eventAction': action };
 
-    }
+		if( opt_label !== undefined ) data[ 'eventLabel' ] = opt_label;
 
-    _this.pushData = function ( data ) {
+		_this.pushData( data )
 
-        if( !Array.isArray( global[ _dataLayerName ] ) ) {
+	}
 
-            return _this.logError( 'Failed to push data to the Google Tag Manager, ' + _dataLayerName + ' is undefined or not of type Array!', global[ _dataLayerName ] );
+	_this.pushData = function ( data ) {
 
-        }
+		if( !Array.isArray( global[ _dataLayerName ] ) ) {
 
-        if( data[ 'eventAction' ] ) data[ 'eventAction' ] = parseValues( data[ 'eventAction' ] );
-        if( data[ 'eventLabel' ] ) data[ 'eventLabel' ] = parseValues( data[ 'eventLabel' ] );
+			return _this.logError( 'Failed to push data to the Google Tag Manager, ' + _dataLayerName + ' is undefined or not of type Array!', global[ _dataLayerName ] );
 
-        if( _this.debug ) _this.logDebug( 'push data: ', data );
+		}
 
-        global[ _dataLayerName ].push( data );
+		if( data[ 'eventAction' ] ) data[ 'eventAction' ] = parseValues( data[ 'eventAction' ] );
+		if( data[ 'eventLabel' ] ) data[ 'eventLabel' ] = parseValues( data[ 'eventLabel' ] );
 
-    }
+		if( _this.debug ) _this.logDebug( 'push data: ', data );
 
-    function parseValues ( string ) {
+		global[ _dataLayerName ].push( data );
 
-        string = string.replace( VARIABLE_URL, global.location.href );
-        string = string.replace( VARIABLE_PATH, global.location.pathname );
+	}
 
-        return string;
+	function parseValues ( string ) {
 
-    }
+		string = string.replace( VARIABLE_URL, global.location.href );
+		string = string.replace( VARIABLE_PATH, global.location.pathname );
 
-    Object.defineProperty( this, 'dataLayerName', {
-        enumerable: true,
-        get: function () {
-            return _dataLayerName;
-        },
-        set: function ( value ) {
-            _dataLayerName = value;
-        }
-    } );
+		return string;
+
+	}
+
+	Object.defineProperty( this, 'dataLayerName', {
+		enumerable: true,
+		get: function () {
+			return _dataLayerName;
+		},
+		set: function ( value ) {
+			_dataLayerName = value;
+		}
+	} );
 
 }
 
