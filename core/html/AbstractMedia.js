@@ -162,7 +162,7 @@ function AbstractMedia ( element ) {
 
 AbstractMedia.prototype.preload = function () {
 
-    if( this.source ) return this.logWarn( 'Source is already set, so it already is (pre)loading...' );
+    if( this.source && this.debug ) return this.logWarn( 'Source is already set, so it already is (pre)loading...' );
 
     if( !this.data || !this.data.src ) return this.logWarn( 'Could not find a source' );
 

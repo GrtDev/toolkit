@@ -53,7 +53,7 @@ function ModalManager () {
     var _openClass;
     var _openClassRegExp;
 
-    _this.debug = true;
+    //_this.debug = true;
 
 
     _this.setModal = function ( modal ) {

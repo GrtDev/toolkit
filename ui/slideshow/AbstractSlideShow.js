@@ -172,7 +172,8 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
 
         if( _autoHide ) _currentSlide.show();
 
-        _slideForward = (!_previousSlideIndex || _previousSlideIndex <= _currentSlideIndex);
+        _slideForward = ( _previousSlideIndex < 0 || _previousSlideIndex === _currentSlideIndex-1 || (_infiniteSlides && _previousSlideIndex === this.length-1 && _currentSlideIndex === 0));
+		
 
         _this.dispatchEvent( new CommonEvent( CommonEvent.UPDATE ) );
 
@@ -191,7 +192,7 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
         if( !_isTransitioning ) {
 
             if( _currentSlide ) _currentSlide.activate();
-            if( _previousSlide ) _previousSlide.hide();
+            if( _previousSlide && _autoHide ) _previousSlide.hide();
 
         } else {
 
@@ -248,6 +249,7 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
     }
 
     Object.defineProperty( this, 'autoResize', {
+
         enumerable: true,
         get: function () {
 
@@ -266,6 +268,8 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
 
             } else {
 
+
+
                 _resizeManager.removeCallback( handleWindowResize );
 
             }
@@ -279,6 +283,12 @@ function AbstractSlideShow ( element, opt_slideConstructor, opt_autoInit ) {
               return _updateTriggerID;
           }
      });
+
+	 Object.defineProperty(this, 'autoHide', {
+	      enumerable: true,
+	      get: function() { return _autoHide; },
+	      set: function(value) { _autoHide = value; }
+	 });
 
     Object.defineProperty( this, 'slideConstructor', {
         enumerable: true,

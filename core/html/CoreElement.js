@@ -198,7 +198,7 @@ function CoreElement ( element ) {
     Object.defineProperty( this, 'opacity', {
         enumerable: true,
         get: function () {
-            return _element.style.opacity || 1;
+            return Number(_element.style.opacity === '' ? 1 : _element.style.opacity);
         },
         set: function ( value ) {
             _element.style.opacity = (value > 1) ? 1 : (value < 0) ? 0 : value;
@@ -741,19 +741,23 @@ function animate ( element, property, to, opt_milliseconds, opt_callback ) {
     var from = element[ property ] || 0;
     var animationID;
     var animationLast;
-    var animationStep = ((from - to) / (opt_milliseconds || 450));
-    var animationNow = animationLast = Date.now();
     var up = to > from;
+    var animationStep = Math.abs((to - from) / (opt_milliseconds || 450));
+    var animationNow = animationLast = Date.now();
 
     element[ property ] = from;
 
     var animationTick = function () {
 
         animationNow = Date.now();
-        element[ property ] += (animationNow - animationLast) * animationStep;
+
+		if(up)  from += (animationNow - animationLast) * animationStep;
+		else from -= (animationNow - animationLast) * animationStep;
+
+		element[ property ] = from;
         animationLast = animationNow;
 
-        if( up ? (element[ property ] < to) : (element[ property ] < to) ) {
+        if( up ? (from < to) : (from > to) ) {
 
             animationID = window.requestAnimationFrame( animationTick );
 
